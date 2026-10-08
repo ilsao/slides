@@ -6,7 +6,7 @@ import { slides } from '../../src/deck';
 // raster checks. In particular, nothing may restart when the fade completes.
 test('real-time fades keep an opaque destination and stationary stage on every frame',async({page},testInfo)=>{
   await page.setViewportSize({width:1366,height:768});
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await page.evaluate(()=>document.fonts.ready);
   const reports=[];
   for(const from of [49,26,37,33]){

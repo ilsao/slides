@@ -11,7 +11,7 @@ async function jump(page:Page,id:number) {
 }
 test('fullscreen and keyboard dialogs work on a laptop', async ({page}) => {
  await page.setViewportSize({width:1366,height:768});
- await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible(); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+ await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible(); await expect(page.locator('[data-ready="true"]')).toBeVisible();
  await page.keyboard.press('f'); await expect.poll(()=>page.evaluate(()=>Boolean(document.fullscreenElement))).toBe(true);
  await page.keyboard.press('f'); await expect.poll(()=>page.evaluate(()=>Boolean(document.fullscreenElement))).toBe(false);
  await page.keyboard.press('?'); await expect(page.getByRole('dialog')).toBeVisible();
@@ -19,7 +19,7 @@ test('fullscreen and keyboard dialogs work on a laptop', async ({page}) => {
 });
 test('all slides and reveal steps fit three presentation sizes', async ({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await page.evaluate(()=>document.fonts.ready);
   for(const viewport of [{width:1920,height:1080},{width:1366,height:768},{width:1280,height:720}]) {
     await page.setViewportSize(viewport);
@@ -113,7 +113,7 @@ test('runtime needs no external network and reveals answers only on cue', async 
     if(new URL(route.request().url()).hostname!=='localhost'){external.push(route.request().url());return route.abort();}
     return route.continue();
   });
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,18001);
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,18001);
   await expect(page.locator('.source-code')).toHaveCount(0);
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('.source-code')).toContainText('filter_courses');

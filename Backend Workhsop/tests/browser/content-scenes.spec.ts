@@ -6,7 +6,7 @@ async function jump(page:Page,id:number){
   await expect(page.locator('[data-ready="true"]')).toBeVisible();await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();await expect(page.locator(stage)).toHaveAttribute('data-slide',String(id));await expect(page.locator('.page-transition')).toHaveAttribute('data-transition','none');}
 
 test('Query keeps stable rows; Path rejects abc before entering the function',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await jump(page,21);const origin=await page.locator('[data-course="1"]').boundingBox();
   await page.keyboard.press('ArrowRight');
   for(let i=0;i<12;i++){
@@ -28,7 +28,7 @@ test('Query keeps stable rows; Path rejects abc before entering the function',as
 });
 
 test('Mermaid diagrams include every mapped element and Production ends the line',async({page})=>{
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for(const diagram of diagrams){
     await jump(page,diagram.slideId);
     for(let i=1;i<slides.find(s=>s.id===diagram.slideId)!.cues.length;i++)await page.keyboard.press('ArrowRight');
@@ -50,7 +50,7 @@ test('Mermaid diagrams include every mapped element and Production ends the line
 });
 
 test('skipping an unrevealed question preserves its unrevealed outgoing snapshot',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for(const id of [18001,44001]){
     await jump(page,id);await page.keyboard.press('PageDown');
     const outgoing=page.locator('.page-outgoing .stage');

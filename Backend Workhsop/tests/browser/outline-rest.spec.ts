@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { chapters } from '../../src/deck';
-const viewer = '/slides/backend-workshop';
+const viewer = '/backend-workshop';
 const stage = '.stage[data-present="true"]';
 const restKey = 'slides:backend-workshop:rest';
 async function jump(page: Page, id: number) {

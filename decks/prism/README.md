@@ -1,6 +1,6 @@
 # Prism
 
-播放：`/slides/template-prism`。五頁：cover、concept、compare、motion、closing。首頁提供九張不同頁面／步驟的靜態拼貼。
+播放：`/template-prism`。五頁：cover、concept、compare、motion、closing。首頁提供九張不同頁面／步驟的靜態拼貼。
 
 ## 設計與動畫
 
@@ -20,7 +20,7 @@
 2. 將設定中的 ID 改成唯一的 `my-talk`，更新名稱、描述，並將 CSS 的 `[data-deck="template-prism"]` 全部改成 `[data-deck="my-talk"]`。
 3. 編輯頁面元件與頁面陣列，更新 `previews` 引用。保留此模板的 `pr-` class 可正常隔離；新增 CSS keyframes 請使用新 ID 作為前綴。
 4. 在 `src/registry.ts` 登錄新 ID 與名稱，使用 `import('../decks/my-talk/deck').then(module => module.prismDeck)`。
-5. 開啟 `/slides/my-talk?start=1`。頁面或步驟結構變更時遞增 `version`。
+5. 開啟 `/my-talk?start=1`。頁面或步驟結構變更時遞增 `version`。
 
 共用的 `Reveal`、`isStill`、`canInteract` 位於 `decks/shared/authoring.tsx`，只處理動態效果與互動條件，不要求共用版型。可修改各次 `Reveal` 的 `at`、`effect`、`duration`，也可直接使用 Motion／CSS／Web Animations API。步驟狀態由 `runtime.step` 算出，以支援退回、跳頁與重新整理。
 

@@ -13,7 +13,7 @@ for (const design of designs) {
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await page.goto(`/slides/template-${design.slug}?start=1`);
+    await page.goto(`/template-${design.slug}?start=1`);
     const slide = page.locator('.page-incoming [data-authored-slide]');
     for (const [index, id] of design.pages.entries()) {
       await expect(slide).toHaveAttribute('data-authored-slide', id);

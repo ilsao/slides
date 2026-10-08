@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, ChevronFirst, ChevronLast, ExternalLink, Grid2X2
 import { PlaybackProvider, usePlayback } from './context';
 import { PresentationStage } from './Stage';
 import type { DeckDefinition } from './types';
+import { sitePath } from '../paths';
 
 export function IconButton({ label, children, onClick, disabled, secondary = false }: {
   label: string; children: ReactNode; onClick: () => void; disabled?: boolean; secondary?: boolean;
@@ -72,7 +73,7 @@ function PlayerView() {
     <div className="presentation-player projection-app" data-ready={ready} onPointerMove={revealTools} onPointerDown={revealTools}>
       <PresentationStage/>
       <div className={`presentation-controls projection-controls ${tools || menu || help ? 'visible' : ''}`} onFocus={revealTools}>
-        <a href="/" className="icon-button" aria-label="返回首頁" title="返回首頁"><Home size={20}/></a>
+        <a href={sitePath()} className="icon-button" aria-label="返回首頁" title="返回首頁"><Home size={20}/></a>
         <button className="icon-button" aria-label="章節與頁面（O）" title="章節與頁面（O）" ref={menuButton} onClick={() => setMenu(true)}><Grid2X2 size={20}/></button>
         <div className="control-divider"/>
         <IconButton label="上一頁（Page Up）" secondary onClick={actions.previousSlide} disabled={index === 0}><ChevronFirst size={20}/></IconButton>

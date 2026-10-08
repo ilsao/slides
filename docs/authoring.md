@@ -58,7 +58,7 @@ CSS 變數也放在 `[data-deck="my-talk"]`，動畫名稱使用該簡報的前�
 }
 ```
 
-登錄 ID 與定義 ID 必須一致；放映網址為 `/slides/my-talk`。`load` 成功時須回傳 `DeckDefinition`。
+登錄 ID 與定義 ID 必須一致；放映網址為 `/my-talk`。`load` 成功時須回傳 `DeckDefinition`。
 
 ## 渲染與預覽
 

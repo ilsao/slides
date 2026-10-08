@@ -11,7 +11,7 @@ async function jump(page:Page,id:number) {
   await page.evaluate(() => document.fonts.ready);
 }
 test('row scope fills every cell and reverses cleanly',async({page})=>{
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for(const reducedMotion of ['reduce','no-preference'] as const) {
     await page.emulateMedia({reducedMotion});
     await jump(page,37);
@@ -25,7 +25,7 @@ test('row scope fills every cell and reverses cleanly',async({page})=>{
   }
 });
 test('both source exercises reveal the complete answer only on cue',async({page})=>{
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for(const slide of slides.filter(s=>s.exercise)){
     await jump(page,slide.id);
     await expect(page.locator('.code-exercise')).toBeVisible();
@@ -39,7 +39,7 @@ test('both source exercises reveal the complete answer only on cue',async({page}
 });
 test('fast input, chapter jumps and motion preserve authoritative state',async({page,context})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await jump(page,26);
   let expected=reduce(backendWorkshop,initialState(backendWorkshop),{type:'jump',id:26});
   for(let i=0;i<9;i++){await page.keyboard.press('ArrowRight');expected=reduce(backendWorkshop,expected,{type:'next'});}
@@ -52,7 +52,7 @@ test('fast input, chapter jumps and motion preserve authoritative state',async({
 });
 test('all distinct motion templates have review screenshots',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   const ids=[2,4,11,13,20,21,24,26,29108,29116,29,23001,19,37,39,40,41,43,44,48,
     ...slides.filter(s=>s.excerpt?.block===24||s.title.startsWith('enrollments Schema')).map(s=>s.id)];
   for(const id of ids){

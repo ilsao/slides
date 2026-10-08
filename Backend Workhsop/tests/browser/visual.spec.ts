@@ -28,7 +28,7 @@ async function pauseFades(page:Page){
 for(const width of [1920,1366])test(`all ${slides.length-1} page fades: painted start, midpoint, end and reverse at ${width}`,async({page},testInfo)=>{
   test.setTimeout(600000);
   await pauseFades(page);
-  await page.setViewportSize({width,height:width===1920?1080:768});await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.setViewportSize({width,height:width===1920?1080:768});await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await expect(page.locator('[data-ready="true"]')).toBeVisible();await page.evaluate(()=>document.fonts.ready);
   // Omit the idle controls from image comparisons; only the slide is measured.
   await page.addStyleTag({content:'.projection-controls,.progress-guide{visibility:hidden!important}'});
@@ -97,7 +97,7 @@ for(const width of [1920,1366])test(`all ${slides.length-1} page fades: painted 
 });
 
 test('opening, fast switching and static previews preserve states',async({page,context})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(850);await page.screenshot({path:'test-results/cover.png'});
   await page.keyboard.press('ArrowRight');await settle(page);
   const clientRect=await page.locator('.journey-client').boundingBox();
@@ -131,7 +131,7 @@ test('opening, fast switching and static previews preserve states',async({page,c
 
 
 test('input interrupts a fade exactly once; reduced motion, reload keep state',async({page,context})=>{
-  await pauseFades(page);await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await pauseFades(page);await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await expect(page.locator('[data-ready="true"]')).toBeVisible();
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.keyboard.press('PageDown');await expect(page.locator('.page-outgoing')).toHaveCount(1);
   await page.getByRole('button',{name:'報名課程',exact:true}).click();

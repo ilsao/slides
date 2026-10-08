@@ -15,13 +15,13 @@ test('the public template appears as a second animated showcase with static prev
   await page.screenshot({ path: info.outputPath('template-showcase.png') });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await card.getByRole('link', { name: '播放投影片', exact: true }).click();
-  await expect(page).toHaveURL(/\/slides\/template$/);
+  await expect(page).toHaveURL(/\/template$/);
   await expect(page.locator('.page-incoming [data-template-slide]')).toHaveAttribute('data-template-slide', 'cover');
 });
 
 test('template supports independent themes, reversible steps, custom transitions and restart', async ({ page }, info) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto('/slides/template?start=1');
+  await page.goto('/template?start=1');
   const slide = page.locator('.page-incoming [data-template-slide]');
   await expect(slide).toHaveAttribute('data-template-slide', 'cover');
   await expect(slide).toHaveCSS('background-color', 'rgb(233, 229, 255)');

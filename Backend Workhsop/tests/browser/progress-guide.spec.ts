@@ -10,7 +10,7 @@ async function centered(page:Page){
 }
 
 test('progress guide browses independently, follows navigation, and is keyboard accessible',async({page,context})=>{
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,21);await centered(page);
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,21);await centered(page);
   const original=await page.locator(stage).boundingBox();
   const track=page.locator('.progress-track');
   const start=await track.getAttribute('style');
@@ -36,7 +36,7 @@ test('progress guide browses independently, follows navigation, and is keyboard 
 });
 
 test('progress motion retargets from its current pose and never moves the slide',async({page},testInfo)=>{
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,10);await centered(page);
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,10);await centered(page);
   const original=await page.locator(stage).boundingBox();
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.evaluate(()=>{

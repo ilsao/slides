@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { SlidePreview, useReducedMotion, type DeckDefinition } from './presentation';
 import { deckEntries, type DeckEntry } from './registry';
+import { sitePath } from './paths';
 
 const showcaseQuery = '(min-width: 900px)';
 const subscribeViewport = (changed: () => void) => {
@@ -51,7 +52,7 @@ function DeckCard({ entry, immediate }: {
     observer.observe(root.current!);
     return () => { alive = false; observer.disconnect(); };
   }, [entry]);
-  const href = `/slides/${entry.id}?start=1`;
+  const href = sitePath(`${entry.id}?start=1`);
   const artwork = <a className="deck-artwork" href={href} aria-label={`播放 ${entry.title}`}>
       {deck ? <div className="mosaic-grid" style={{ gridTemplateColumns: `repeat(${Math.min(3, Math.max(1, deck.previews.length))}, minmax(0, 1fr))` }}>{deck.previews.map((preview, i) => <SlidePreview key={`${preview.slideId}-${i}`} deck={deck} {...preview}/>)}</div>
         : <div className="gallery-placeholder" role="status">{failed ? '預覽暫時無法載入' : '載入投影片預覽…'}</div>}
@@ -142,7 +143,7 @@ export function Gallery() {
         }}>探索簡報<span aria-hidden="true">↓</span></motion.a>
     </section>
     <section ref={collection} id="collection" className="gallery-collection" aria-labelledby="collection-title">
-      <header className="site-header"><div className="site-header-inner"><a href="/" className="site-brand" aria-label="Slides 首頁">Slides.</a></div></header>
+      <header className="site-header"><div className="site-header-inner"><a href={sitePath()} className="site-brand" aria-label="Slides 首頁">Slides.</a></div></header>
       <div className="gallery-main">
         <h2 ref={title} id="collection-title" tabIndex={-1} className="collection-title">簡報</h2>
         <div className="deck-collection">{deckEntries.map((entry, index) => <DeckCard entry={entry} immediate={reduced || index < (desktop ? 2 : 1)} key={entry.id}/>)}</div>

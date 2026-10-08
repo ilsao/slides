@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-const viewer = '/slides/backend-workshop';
+const viewer = '/backend-workshop';
 const stage = '.stage[data-present="true"]';
 const key = 'slides:backend-workshop:progress';
 async function jump(page: Page, id: number) {
@@ -147,7 +147,7 @@ test('gallery entries start fresh, reload resumes, tabs remain independent, and 
 
 test('a separate deck has its own ratio, colors, navigation and transition', async ({ page }) => {
   await page.goto(viewer); await jump(page, 26); await page.keyboard.press('ArrowRight');
-  await page.goto('/slides/example?start=1');
+  await page.goto('/example?start=1');
   await expect(page.locator('.example-slide')).toHaveCSS('background-color', 'rgb(40, 32, 70)');
   const rect = await page.locator('.example-slide').boundingBox();
   expect(rect!.width / rect!.height).toBeCloseTo(4/3, 3);
@@ -179,7 +179,7 @@ test('a delayed deck download keeps the fresh-start signal until initialization 
 test('old presenter and unknown routes have usable destinations', async ({ page }) => {
   await page.goto('/presenter'); await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { name: 'asciibase64', level: 1 })).toBeVisible();
-  for (const path of ['/slides/missing', '/missing']) {
+  for (const path of ['/missing', '/missing/nested']) {
     await page.goto(path); await expect(page.getByRole('heading', { name: '找不到頁面' })).toBeVisible();
     await page.getByRole('link', { name: '返回首頁 →' }).click();
     await expect(page.getByRole('heading', { name: 'asciibase64', level: 1 })).toBeVisible();

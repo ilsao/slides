@@ -16,8 +16,8 @@ npm run dev
 ```
 
 - 首頁：http://localhost:5173/
-- Backend Workshop：http://localhost:5173/slides/backend-workshop
-- Template：http://localhost:5173/slides/template
+- Backend Workshop：http://localhost:5173/backend-workshop
+- Template：http://localhost:5173/template
 
 正式建置與本機預覽：
 
@@ -50,7 +50,7 @@ Backend Workshop 的休息頁首次進入會開始十分鐘倒數。倒數按時
 
 [Template](decks/template/README.md) 是首頁公開展示的可複製模板，包含七種頁面版型、主題與動畫示範，也能用來檢查首頁的多簡報捲動呈現。
 
-另外提供四套各五頁的獨立設計：[Editorial](decks/editorial/README.md)（雜誌排版）、[Signal](decks/signal/README.md)（技術介面）、[Prism](decks/prism/README.md)（幾何海報）、[Atlas](decks/atlas/README.md)（數據報告）。播放網址依序為 `/slides/template-editorial`、`/slides/template-signal`、`/slides/template-prism`、`/slides/template-atlas`。每套都有自己的版型、步驟動畫、轉場及複製指南。
+另外提供四套各五頁的獨立設計：[Editorial](decks/editorial/README.md)（雜誌排版）、[Signal](decks/signal/README.md)（技術介面）、[Prism](decks/prism/README.md)（幾何海報）、[Atlas](decks/atlas/README.md)（數據報告）。播放網址依序為 `/template-editorial`、`/template-signal`、`/template-prism`、`/template-atlas`。每套都有自己的版型、步驟動畫、轉場及複製指南。
 
 Backend Workshop 保留於 `Backend Workhsop/`，其中的 `sources/`、`scripts/`、`docs/` 與 `examples/` 維持教材來源與產生流程。`npm run content` 會更新該簡報的衍生教材及網站字型。
 
@@ -71,7 +71,28 @@ Python 範例驗證需要 Python 3。瀏覽器測試使用獨立的 5274 端口�
 
 ## 靜態部署
 
-將 `npm run build` 產生的 `dist/` 放到靜態網站服務。網站使用根路徑，主機須先回傳存在的檔案，其餘路徑回退至 `/index.html`，讓 `/slides/<slug>` 可直接開啟及重新整理。
+### GitHub Pages
+
+已提供 [部署工作流程](.github/workflows/pages.yml)：推送到 `main` 時自動安裝依賴、執行單元測試、建置並部署，也可在 Actions 頁面手動執行。建置使用 Node.js 22，並依 GitHub Pages 設定自動套用網站的 base path，支援專案子路徑及自訂網域。
+
+首次使用時，到 repository 的 **Settings → Pages → Build and deployment → Source** 選擇 **GitHub Actions**，再將這些變更推送到 `main`。部署成功後，網址會顯示在 Actions 的 `github-pages` environment；此 repository 的預設網址為 `https://ilsao.github.io/slides/`。
+
+簡報路徑為 `/<slug>`，部署到此 repository 後，例如 `https://ilsao.github.io/slides/backend-workshop`。
+
+工作流程會將首頁複製為 `404.html`，讓 GitHub Pages 在直接開啟或重新整理 `/<slug>` 時載入前端路由。這些網址仍會回傳 HTTP 404，但簡報可正常顯示與操作。其他靜態主機可使用下方的路由回退設定，回傳 HTTP 200。
+
+本機驗證 GitHub Pages 子路徑建置：
+
+```sh
+npm run build -- --base /slides/
+npm start
+```
+
+預覽首頁為 `http://localhost:5173/slides/`。
+
+### 其他靜態主機
+
+將 `npm run build` 產生的 `dist/` 放到靜態網站服務。網站使用根路徑，主機須先回傳存在的檔案，其餘路徑回退至 `/index.html`，讓 `/<slug>` 可直接開啟及重新整理。
 
 Nginx 範例：
 
@@ -87,4 +108,4 @@ location / {
 /* /index.html 200
 ```
 
-未知路徑與已移除的 `/presenter` 由前端處理。本專案目前提供本機啟動與建置，不包含自動發布。
+未知路徑與已移除的 `/presenter` 由前端處理。

@@ -33,7 +33,7 @@ function checkFrame(g: Awaited<ReturnType<typeof geometry>>) {
 }
 
 test('all explicit focus groups cover exact rendered rows forward and backward at three sizes', async ({ page }) => {
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible(); await page.evaluate(() => document.fonts.ready);
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible(); await page.evaluate(() => document.fonts.ready);
   for (const [width, height] of [[1920,1080],[1366,768],[1280,720]]) {
     await page.setViewportSize({ width, height });
     for (const slide of slides.filter(s => s.excerpt)) {
@@ -67,7 +67,7 @@ test('all explicit focus groups cover exact rendered rows forward and backward a
 });
 
 test('curl and Swagger are complete, centered and free of mock controls; wrap retains source flow', async ({ page }, info) => {
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for (const [width,height] of [[1920,1080],[1366,768],[1280,720]]) {
     await page.setViewportSize({width,height});
     await jump(page,30001);
@@ -105,7 +105,7 @@ test('curl and Swagger are complete, centered and free of mock controls; wrap re
 
 test('focus retargets rapid manual input, lands without replay and survives reload', async ({page,context})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,30001);
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();await jump(page,30001);
   checkFrame(await geometry(page));
   for(const key of ['ArrowRight','ArrowRight','ArrowLeft','ArrowRight','ArrowRight','ArrowRight'])await page.keyboard.press(key);
   await expect(page.locator(stage)).toHaveAttribute('data-step','4');

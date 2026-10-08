@@ -12,7 +12,7 @@ async function jump(page: Page, id: number) {
 }
 
 test('integrated HTTP and REST scenes retain every source line', async ({ page }, info) => {
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for (const width of [1920,1366,1280]) {
   await page.setViewportSize({width,height:width===1920?1080:width===1366?768:720});
   for (const [id, block, prefix] of [[13, 11, 'request'], [16, 12, 'response']] as const) {
@@ -52,7 +52,7 @@ test('integrated HTTP and REST scenes retain every source line', async ({ page }
 });
 
 test('Path and Query highlight in place; Endpoint and Route explain the same request', async ({ page }, info) => {
-  await page.goto('/slides/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
+  await page.goto('/backend-workshop'); await expect(page.locator('[data-ready="true"]')).toBeVisible();
   for (const width of [1920, 1366, 1280]) {
     await page.setViewportSize({ width, height: width === 1920 ? 1080 : width === 1366 ? 768 : 720 });
     await jump(page, 23001);

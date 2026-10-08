@@ -3,6 +3,7 @@ import { Gallery } from './Gallery';
 import { Player } from './presentation/Player';
 import type { DeckDefinition } from './presentation';
 import { deckEntries, type DeckEntry } from './registry';
+import { routePath, sitePath } from './paths';
 
 function DeckPage({ entry, fresh }: { entry: DeckEntry; fresh: boolean }) {
   const [deck, setDeck] = useState<DeckDefinition | null>(null);
@@ -19,17 +20,17 @@ function DeckPage({ entry, fresh }: { entry: DeckEntry; fresh: boolean }) {
 
 function Status({ title, description }: { title: string; description: string }) {
   useEffect(() => { document.title = `${title} · Slides`; }, [title]);
-  return <main className="route-status"><span>Slides.</span><h1>{title}</h1><p>{description}</p><a href="/">返回首頁 →</a></main>;
+  return <main className="route-status"><span>Slides.</span><h1>{title}</h1><p>{description}</p><a href={sitePath()}>返回首頁 →</a></main>;
 }
 
 export function App() {
-  const [route] = useState(() => ({ pathname: location.pathname.replace(/\/$/, '') || '/', fresh: new URLSearchParams(location.search).get('start') === '1' }));
+  const [route] = useState(() => ({ pathname: routePath(location.pathname), fresh: new URLSearchParams(location.search).get('start') === '1' }));
   useEffect(() => {
-    if (route.pathname === '/presenter') { location.replace('/'); return; }
+    if (route.pathname === '/presenter') { location.replace(sitePath()); return; }
   }, [route]);
   if (route.pathname === '/') return <Gallery/>;
   if (route.pathname === '/presenter') return <div className="route-loading" role="status">返回首頁…</div>;
-  const match = route.pathname.match(/^\/slides\/([a-z0-9-]+)$/);
+  const match = route.pathname.match(/^\/([a-z0-9-]+)$/);
   const entry = match && deckEntries.find(entry => entry.id === match[1]);
   return entry ? <DeckPage entry={entry} fresh={route.fresh}/> : <Status title="找不到頁面" description="這份簡報不存在，或網址已變更。"/>;
 }
