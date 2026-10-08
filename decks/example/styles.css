@@ -1,0 +1,10 @@
+:where([data-deck="example"]) .presentation-player { background: #19142b; }
+:where([data-deck="example"]) .example-slide { position: relative; width: 1200px; height: 900px; padding: 100px; overflow: hidden; color: #f8eacf; background: #282046; font-family: Georgia, 'Times New Roman', serif; }
+:where([data-deck="example"]) .example-label { position: relative; z-index: 1; font: 18px system-ui, sans-serif; letter-spacing: .16em; color: #c7b3e5; }
+:where([data-deck="example"]) h1 { position: relative; z-index: 1; font-size: 105px; font-weight: 400; line-height: 1.1; letter-spacing: -.055em; margin: 110px 0 50px; }
+:where([data-deck="example"]) p { position: relative; z-index: 1; font-size: 32px; line-height: 1.6; }
+:where([data-deck="example"]) .example-orbit { position: absolute; width: 700px; height: 700px; top: 250px; left: 720px; transform-origin: center; }
+:where([data-deck="example"]) .example-orbit i { position: absolute; width: 460px; height: 460px; border: 2px solid #bd927e; border-radius: 50%; }
+:where([data-deck="example"]) .example-orbit i:nth-child(2) { top: 130px; left: 130px; border-color: #e4c775; }
+:where([data-deck="example"]) .example-orbit i:nth-child(3) { top: -130px; left: 130px; border-color: #9d8baa; }
+:where([data-deck="example"]) .example-slide button { position: relative; z-index: 1; border: 1px solid #c7b3e5; padding: 18px 24px; margin-top: 40px; font: 22px system-ui, sans-serif; color: #f8eacf; background: transparent; cursor: pointer; }

@@ -1,0 +1,49 @@
+# Node.js dependencies, build output, and caches
+node_modules/
+dist/
+.preview-dist/
+*.tsbuildinfo
+.vite/
+.npm-cache/
+.sites-runtime/
+
+# Test reports and coverage
+test-results/
+playwright-report/
+coverage/
+
+# Runtime logs
+*.log
+
+# Local environment settings (keep example/template files)
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+
+# Python bytecode, virtual environments, and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local databases created by the Python examples
+examples/*.db
+examples/*.db-*
+examples/*.sqlite
+examples/*.sqlite-*
+examples/*.sqlite3
+examples/*.sqlite3-*
+
+# Operating system files and editor temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~

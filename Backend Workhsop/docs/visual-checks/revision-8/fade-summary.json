@@ -1,0 +1,22 @@
+{
+  "1920": {
+    "pairs": 89,
+    "directions": 178,
+    "frames": 534,
+    "maxMeanPixelError": 0.14441029513718556,
+    "brightnessRatio": [
+      0.9994484901864302,
+      1.0004766464903747
+    ]
+  },
+  "1366": {
+    "pairs": 89,
+    "directions": 178,
+    "frames": 534,
+    "maxMeanPixelError": 0.14164334716382113,
+    "brightnessRatio": [
+      0.9995259355373943,
+      1.000415603801299
+    ]
+  }
+}
