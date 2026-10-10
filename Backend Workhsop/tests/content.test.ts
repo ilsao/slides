@@ -10,12 +10,13 @@ describe('complete lesson material',()=>{
   it('uses frozen original page IDs and transfers their precise teaching time',()=>{
     expect(previousPages).toHaveLength(95);
     const before=(id:number)=>previousPages.find(p=>p.id===id)!.durationSeconds;
+    const added=new Map([[50001,45],[50002,30]]),transferred=new Map([[25,45],[29108,30]]);
     for(const [oldPage,id] of [[55,30001],[56,30005],[57,30011],[58,30015],[59,27],[66,41001],[67,41016],[68,41024],[75,40001],[76,42],[91,44],[92,45],[93,45001],[95,48]])
       expect(previousPages[oldPage-1].id).toBe(id);
     const merged=new Map([[30001,[30005,30011,30015]],[44,[45,45001]]]);
     for(const slide of slides){
       const extra=(merged.get(slide.id)??[]).reduce((sum,id)=>sum+before(id),0);
-      expect(slide.durationSeconds,slide.title).toBe(before(slide.id)+extra);
+      expect(slide.durationSeconds,slide.title).toBe(added.get(slide.id)??(before(slide.id)+extra-(transferred.get(slide.id)??0)));
     }
     for(const id of [5,16010,21001,22001,32,24001,34,30005,30011,30015,45,45001])expect(slides.some(s=>s.id===id)).toBe(false);
     const fn=slides.find(s=>s.id===7)!;
@@ -40,6 +41,30 @@ describe('complete lesson material',()=>{
         expect(line.slideIds).toEqual([diagram.slideId]);
       }
     }
+  });
+  it('places the call animation after create_course and separates JOIN data from its complete query',()=>{
+    const ids=slides.map(s=>s.id);
+    expect(ids.indexOf(25)+1).toBe(ids.indexOf(50001));
+    expect(ids.indexOf(29108)+1).toBe(ids.indexOf(50002));
+    for(const id of [50001,50002]){
+      expect(slides.find(s=>s.id===id)!.cues).toHaveLength(3);
+      expect(slides.find(s=>s.id===id)!.code).toEqual([]);
+    }
+    expect(ids.indexOf(40001)+1).toBe(ids.indexOf(41));
+    expect(ids.slice(53,55)).toEqual([29108,50002]);
+    expect(ids.slice(69,71)).toEqual([40001,41]);
+    const join=slides.find(s=>s.id===41)!;
+    expect(join.code).toEqual([]);
+    expect(join.excerpt).toBeNull();
+    expect(join.cues).toHaveLength(6);
+    expect(join.joinDemo!.stages.map(stage=>stage.sourceLine)).toEqual([2,3,4,5,1,6]);
+    expect(join.joinDemo!.enrollments).toHaveLength(3);
+    const sql=slides.find(s=>s.id===40001)!;
+    expect(sql.kind).toBe('code');
+    expect(sql.code[0].text).toBe(sources[29].code);
+    expect(sql.excerpt!.focusRanges.map(range=>range[0])).toEqual([2,3,4,5,1,6]);
+    expect(sql.cues).toEqual(join.cues);
+    expect(coverage.find(block=>block.sourceId==='notion-30')!.lines.every(line=>line.slideIds.length===1&&line.slideIds[0]===40001)).toBe(true);
   });
   it('splits the complete GET signature and body at syntax boundaries',()=>{
     const signature=slides.find(s=>s.id===29059)!.excerpt!,body=slides.find(s=>s.id===29072)!.excerpt!;
@@ -100,7 +125,7 @@ describe('complete lesson material',()=>{
     expect(slides.find(s=>s.id===44)!.durationSeconds).toBe(138);
     expect(coverage.find(s=>s.sourceId==='notion-35')!.lines[0].slideIds).toEqual([44]);
     const sql=slides.slice(slides.findIndex(s=>s.id===40),slides.findIndex(s=>s.id===42)+1);
-    expect(sql.map(s=>s.id)).toEqual([40,36001,37001,38001,39001,41,40001,41001,41016,41024,42]);
+    expect(sql.map(s=>s.id)).toEqual([40,36001,37001,38001,39001,40001,41,41001,41016,41024,42]);
     expect(sql.every(s=>s.chapter.id==='sql')).toBe(true);
   });
   it('renders the source text itself, including continuation rows',()=>{
@@ -141,7 +166,7 @@ describe('complete lesson material',()=>{
     expect(new Set(allSlides.map(s=>s.id)).size).toBe(allSlides.length);
   });
   it('uses one schedule totaling exactly 180 minutes',()=>{
-    expect(slides.length).toBe(90);expect(slides[0].id).toBe(49);
+    expect(slides.length).toBe(92);expect(slides[0].id).toBe(49);
     expect(slides[0].durationSeconds).toBe(20);expect(slides[1].id).toBe(1);
     expect(totalSeconds).toBe(10800);
     for(const c of chapters)expect(slides.filter(s=>s.chapter.id===c.id).reduce((n,s)=>n+s.durationSeconds,0)).toBe(c.seconds);

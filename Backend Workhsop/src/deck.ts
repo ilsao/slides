@@ -1,7 +1,7 @@
 import lessons from './lessons.json' with { type: 'json' };
 import schedule from './schedule.json' with { type: 'json' };
 export const HANDOUT = 'https://app.notion.com/p/sdc-nycu/Backend-Workshop-3dc7dadd804080cab18bc4f2017f8fe3';
-export const DECK_VERSION = 8;
+export const DECK_VERSION = 12;
 export const allSlides = lessons;
 export const slides = allSlides.filter(s => !s.hidden);
 export type Slide = typeof allSlides[number];

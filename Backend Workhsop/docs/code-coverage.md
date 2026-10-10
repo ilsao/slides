@@ -194,231 +194,231 @@
 | notion-19 | Pydantic Validation | 94 | 51 / 25 | 程式碼 |
 | notion-19 | Pydantic Validation | 95 | 51 / 25 | 程式碼 |
 | notion-19 | Pydantic Validation | 96 | 51 / 25 | 程式碼 |
-| notion-19 | Pydantic Validation | 99 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 100 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 101 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 102 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 103 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 105 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 106 | 52 / 26 | 程式碼 |
-| notion-19 | Pydantic Validation | 108 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 109 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 110 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 111 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 112 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 113 | 53 / 29108 | 程式碼 |
-| notion-19 | Pydantic Validation | 116 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 117 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 118 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 119 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 120 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 121 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 122 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 123 | 54 / 29116 | 程式碼 |
-| notion-19 | Pydantic Validation | 124 | 54 / 29116 | 程式碼 |
-| notion-20 | Pydantic Validation | 1 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 3 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 5 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 6 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 7 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 8 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 9 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 11 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 12 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 13 | 55 / 30001 | 程式碼 |
-| notion-20 | Pydantic Validation | 15 | 55 / 30001 | 程式碼 |
-| notion-21 | Swagger UI | 1 | 56 / 27 | 整合示意 / swagger-valid-body / 0 |
-| notion-21 | Swagger UI | 2 | 56 / 27 | 整合示意 / swagger-valid-body / 0 |
-| notion-21 | Swagger UI | 3 | 56 / 27 | 整合示意 / swagger-valid-body / 0 |
-| notion-21 | Swagger UI | 4 | 56 / 27 | 整合示意 / swagger-valid-body / 0 |
-| notion-22 | Swagger UI | 1 | 56 / 27 | 整合示意 / swagger-invalid-body / 0 |
-| notion-22 | Swagger UI | 2 | 56 / 27 | 整合示意 / swagger-invalid-body / 0 |
-| notion-22 | Swagger UI | 3 | 56 / 27 | 整合示意 / swagger-invalid-body / 0 |
-| notion-22 | Swagger UI | 4 | 56 / 27 | 整合示意 / swagger-invalid-body / 0 |
-| notion-23 | Database | 1 | 58 / 36 | 圖解 / diagram / 0 |
-| notion-23 | Database | 2 | 58 / 36 | 圖解 / edge-2 / 0 |
-| notion-23 | Database | 3 | 58 / 36 | 圖解 / edge-3 / 1 |
-| notion-23 | Database | 4 | 58 / 36 | 圖解 / edge-4 / 2 |
-| notion-23 | Database | 5 | 58 / 36 | 圖解 / edge-5 / 3 |
-| notion-23 | Database | 6 | 58 / 36 | 圖解 / edge-6 / 3 |
-| notion-24 | Schema, Table, Row, Column | 1 | 60 / 34001 | 程式碼 |
-| notion-24 | Schema, Table, Row, Column | 2 | 60 / 34001 | 程式碼 |
-| notion-24 | Schema, Table, Row, Column | 3 | 60 / 34001 | 程式碼 |
-| notion-24 | Schema, Table, Row, Column | 4 | 60 / 34001 | 程式碼 |
-| notion-24 | Schema, Table, Row, Column | 5 | 60 / 34001 | 程式碼 |
-| notion-24 | Schema, Table, Row, Column | 6 | 60 / 34001 | 程式碼 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 1 | 62 / 39 | 圖解 / diagram / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 2 | 62 / 39 | 圖解 / edge-2 / 1 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 3 | 62 / 39 | 圖解 / edge-3 / 1 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 4 | 62 / 39 | 圖解 / node-MEMBERS / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 5 | 62 / 39 | 圖解 / MEMBERS-id / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 6 | 62 / 39 | 圖解 / MEMBERS-name / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 7 | 62 / 39 | 圖解 / MEMBERS-email / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 8 | 62 / 39 | 圖解 / node-MEMBERS / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 9 | 62 / 39 | 圖解 / node-COURSES / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 10 | 62 / 39 | 圖解 / COURSES-id / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 11 | 62 / 39 | 圖解 / COURSES-title / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 12 | 62 / 39 | 圖解 / COURSES-capacity / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 13 | 62 / 39 | 圖解 / node-COURSES / 0 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 14 | 62 / 39 | 圖解 / node-ENROLLMENTS / 1 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 15 | 62 / 39 | 圖解 / ENROLLMENTS-member_id / 2 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 16 | 62 / 39 | 圖解 / ENROLLMENTS-course_id / 2 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 17 | 62 / 39 | 圖解 / ENROLLMENTS-status / 2 |
-| notion-25 | Primary Key, Foreign Key, Constraints | 18 | 62 / 39 | 圖解 / node-ENROLLMENTS / 1 |
-| notion-26 | SQL Basic | 1 | 64 / 36001 | 程式碼 |
-| notion-26 | SQL Basic | 2 | 64 / 36001 | 程式碼 |
-| notion-26 | SQL Basic | 3 | 64 / 36001 | 程式碼 |
-| notion-27 | SQL Basic | 1 | 65 / 37001 | 程式碼 |
-| notion-27 | SQL Basic | 2 | 65 / 37001 | 程式碼 |
-| notion-27 | SQL Basic | 3 | 65 / 37001 | 程式碼 |
-| notion-27 | SQL Basic | 4 | 65 / 37001 | 程式碼 |
-| notion-28 | SQL Basic | 1 | 66 / 38001 | 程式碼 |
-| notion-28 | SQL Basic | 2 | 66 / 38001 | 程式碼 |
-| notion-28 | SQL Basic | 3 | 66 / 38001 | 程式碼 |
-| notion-28 | SQL Basic | 4 | 66 / 38001 | 程式碼 |
-| notion-29 | SQL Basic | 1 | 67 / 39001 | 程式碼 |
-| notion-29 | SQL Basic | 2 | 67 / 39001 | 程式碼 |
-| notion-29 | SQL Basic | 3 | 67 / 39001 | 程式碼 |
-| notion-30 | SQL Basic | 1 | 69 / 40001 | 程式碼 |
-| notion-30 | SQL Basic | 2 | 69 / 40001 | 程式碼 |
-| notion-30 | SQL Basic | 3 | 69 / 40001 | 程式碼 |
-| notion-30 | SQL Basic | 4 | 69 / 40001 | 程式碼 |
-| notion-30 | SQL Basic | 5 | 69 / 40001 | 程式碼 |
-| notion-30 | SQL Basic | 6 | 69 / 40001 | 程式碼 |
-| notion-31 | SQL Basic | 1 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 2 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 4 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 6 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 7 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 8 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 9 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 10 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 11 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 12 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 13 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 14 | 70 / 41001 | 程式碼 |
-| notion-31 | SQL Basic | 16 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 17 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 18 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 19 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 20 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 21 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 22 | 71 / 41016 | 程式碼 |
-| notion-31 | SQL Basic | 24 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 25 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 26 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 27 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 28 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 29 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 30 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 31 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 32 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 33 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 34 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 35 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 36 | 72 / 41024 | 程式碼 |
-| notion-31 | SQL Basic | 38 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 39 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 40 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 41 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 42 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 43 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 44 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 45 | 73 / 42 | 程式碼 |
-| notion-31 | SQL Basic | 47 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 48 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 49 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 50 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 51 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 52 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 53 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 54 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 55 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 56 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 57 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 58 | 74 / 41047 | 程式碼 |
-| notion-31 | SQL Basic | 59 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 60 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 61 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 62 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 63 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 64 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 65 | 75 / 41059 | 程式碼 |
-| notion-31 | SQL Basic | 67 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 68 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 69 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 70 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 71 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 72 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 73 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 74 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 75 | 76 / 41067 | 程式碼 |
-| notion-31 | SQL Basic | 77 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 78 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 79 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 80 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 81 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 82 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 83 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 84 | 77 / 41077 | 程式碼 |
-| notion-31 | SQL Basic | 85 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 86 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 87 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 88 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 89 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 90 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 91 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 92 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 93 | 78 / 41091 | 程式碼 |
-| notion-31 | SQL Basic | 95 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 96 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 97 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 98 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 99 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 100 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 101 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 102 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 103 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 104 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 105 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 106 | 79 / 41095 | 程式碼 |
-| notion-31 | SQL Basic | 108 | 80 / 41109 | 程式碼 |
-| notion-31 | SQL Basic | 109 | 80 / 41109 | 程式碼 |
-| notion-31 | SQL Basic | 111 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 112 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 113 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 114 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 115 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 116 | 81 / 41111 | 程式碼 |
-| notion-31 | SQL Basic | 118 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 119 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 120 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 121 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 122 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 123 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 124 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 125 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 126 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 127 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 128 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 129 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 130 | 82 / 41118 | 程式碼 |
-| notion-31 | SQL Basic | 132 | 83 / 41132 | 程式碼 |
-| notion-31 | SQL Basic | 133 | 83 / 41132 | 程式碼 |
-| notion-31 | SQL Basic | 134 | 83 / 41132 | 程式碼 |
-| notion-31 | SQL Basic | 135 | 83 / 41132 | 程式碼 |
-| notion-32 | SQL Basic | 1 | 84 / 42001 | 程式碼 |
-| notion-32 | SQL Basic | 2 | 84 / 42001 | 程式碼 |
-| notion-33 | SQL Basic | 1 | 85 / 43001 | 程式碼 |
-| notion-33 | SQL Basic | 2 | 85 / 43001 | 程式碼 |
-| notion-33 | SQL Basic | 3 | 85 / 43001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 1 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 2 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 3 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 4 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 5 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 6 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 7 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 8 | 87 / 44001 | 程式碼 |
-| notion-34 | Exercise: Write a Query | 9 | 87 / 44001 | 程式碼 |
-| notion-35 | What's Next? | 1 | 88 / 44 | 整合示意 / request-flow / 7 |
+| notion-19 | Pydantic Validation | 99 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 100 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 101 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 102 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 103 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 105 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 106 | 53 / 26 | 程式碼 |
+| notion-19 | Pydantic Validation | 108 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 109 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 110 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 111 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 112 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 113 | 54 / 29108 | 程式碼 |
+| notion-19 | Pydantic Validation | 116 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 117 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 118 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 119 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 120 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 121 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 122 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 123 | 56 / 29116 | 程式碼 |
+| notion-19 | Pydantic Validation | 124 | 56 / 29116 | 程式碼 |
+| notion-20 | Pydantic Validation | 1 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 3 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 5 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 6 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 7 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 8 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 9 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 11 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 12 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 13 | 57 / 30001 | 程式碼 |
+| notion-20 | Pydantic Validation | 15 | 57 / 30001 | 程式碼 |
+| notion-21 | Swagger UI | 1 | 58 / 27 | 整合示意 / swagger-valid-body / 0 |
+| notion-21 | Swagger UI | 2 | 58 / 27 | 整合示意 / swagger-valid-body / 0 |
+| notion-21 | Swagger UI | 3 | 58 / 27 | 整合示意 / swagger-valid-body / 0 |
+| notion-21 | Swagger UI | 4 | 58 / 27 | 整合示意 / swagger-valid-body / 0 |
+| notion-22 | Swagger UI | 1 | 58 / 27 | 整合示意 / swagger-invalid-body / 0 |
+| notion-22 | Swagger UI | 2 | 58 / 27 | 整合示意 / swagger-invalid-body / 0 |
+| notion-22 | Swagger UI | 3 | 58 / 27 | 整合示意 / swagger-invalid-body / 0 |
+| notion-22 | Swagger UI | 4 | 58 / 27 | 整合示意 / swagger-invalid-body / 0 |
+| notion-23 | Database | 1 | 60 / 36 | 圖解 / diagram / 0 |
+| notion-23 | Database | 2 | 60 / 36 | 圖解 / edge-2 / 0 |
+| notion-23 | Database | 3 | 60 / 36 | 圖解 / edge-3 / 1 |
+| notion-23 | Database | 4 | 60 / 36 | 圖解 / edge-4 / 2 |
+| notion-23 | Database | 5 | 60 / 36 | 圖解 / edge-5 / 3 |
+| notion-23 | Database | 6 | 60 / 36 | 圖解 / edge-6 / 3 |
+| notion-24 | Schema, Table, Row, Column | 1 | 62 / 34001 | 程式碼 |
+| notion-24 | Schema, Table, Row, Column | 2 | 62 / 34001 | 程式碼 |
+| notion-24 | Schema, Table, Row, Column | 3 | 62 / 34001 | 程式碼 |
+| notion-24 | Schema, Table, Row, Column | 4 | 62 / 34001 | 程式碼 |
+| notion-24 | Schema, Table, Row, Column | 5 | 62 / 34001 | 程式碼 |
+| notion-24 | Schema, Table, Row, Column | 6 | 62 / 34001 | 程式碼 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 1 | 64 / 39 | 圖解 / diagram / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 2 | 64 / 39 | 圖解 / edge-2 / 1 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 3 | 64 / 39 | 圖解 / edge-3 / 1 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 4 | 64 / 39 | 圖解 / node-MEMBERS / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 5 | 64 / 39 | 圖解 / MEMBERS-id / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 6 | 64 / 39 | 圖解 / MEMBERS-name / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 7 | 64 / 39 | 圖解 / MEMBERS-email / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 8 | 64 / 39 | 圖解 / node-MEMBERS / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 9 | 64 / 39 | 圖解 / node-COURSES / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 10 | 64 / 39 | 圖解 / COURSES-id / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 11 | 64 / 39 | 圖解 / COURSES-title / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 12 | 64 / 39 | 圖解 / COURSES-capacity / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 13 | 64 / 39 | 圖解 / node-COURSES / 0 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 14 | 64 / 39 | 圖解 / node-ENROLLMENTS / 1 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 15 | 64 / 39 | 圖解 / ENROLLMENTS-member_id / 2 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 16 | 64 / 39 | 圖解 / ENROLLMENTS-course_id / 2 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 17 | 64 / 39 | 圖解 / ENROLLMENTS-status / 2 |
+| notion-25 | Primary Key, Foreign Key, Constraints | 18 | 64 / 39 | 圖解 / node-ENROLLMENTS / 1 |
+| notion-26 | SQL Basic | 1 | 66 / 36001 | 程式碼 |
+| notion-26 | SQL Basic | 2 | 66 / 36001 | 程式碼 |
+| notion-26 | SQL Basic | 3 | 66 / 36001 | 程式碼 |
+| notion-27 | SQL Basic | 1 | 67 / 37001 | 程式碼 |
+| notion-27 | SQL Basic | 2 | 67 / 37001 | 程式碼 |
+| notion-27 | SQL Basic | 3 | 67 / 37001 | 程式碼 |
+| notion-27 | SQL Basic | 4 | 67 / 37001 | 程式碼 |
+| notion-28 | SQL Basic | 1 | 68 / 38001 | 程式碼 |
+| notion-28 | SQL Basic | 2 | 68 / 38001 | 程式碼 |
+| notion-28 | SQL Basic | 3 | 68 / 38001 | 程式碼 |
+| notion-28 | SQL Basic | 4 | 68 / 38001 | 程式碼 |
+| notion-29 | SQL Basic | 1 | 69 / 39001 | 程式碼 |
+| notion-29 | SQL Basic | 2 | 69 / 39001 | 程式碼 |
+| notion-29 | SQL Basic | 3 | 69 / 39001 | 程式碼 |
+| notion-30 | SQL Basic | 1 | 70 / 40001 | 程式碼 |
+| notion-30 | SQL Basic | 2 | 70 / 40001 | 程式碼 |
+| notion-30 | SQL Basic | 3 | 70 / 40001 | 程式碼 |
+| notion-30 | SQL Basic | 4 | 70 / 40001 | 程式碼 |
+| notion-30 | SQL Basic | 5 | 70 / 40001 | 程式碼 |
+| notion-30 | SQL Basic | 6 | 70 / 40001 | 程式碼 |
+| notion-31 | SQL Basic | 1 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 2 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 4 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 6 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 7 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 8 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 9 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 10 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 11 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 12 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 13 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 14 | 72 / 41001 | 程式碼 |
+| notion-31 | SQL Basic | 16 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 17 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 18 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 19 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 20 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 21 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 22 | 73 / 41016 | 程式碼 |
+| notion-31 | SQL Basic | 24 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 25 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 26 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 27 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 28 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 29 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 30 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 31 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 32 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 33 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 34 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 35 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 36 | 74 / 41024 | 程式碼 |
+| notion-31 | SQL Basic | 38 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 39 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 40 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 41 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 42 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 43 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 44 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 45 | 75 / 42 | 程式碼 |
+| notion-31 | SQL Basic | 47 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 48 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 49 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 50 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 51 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 52 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 53 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 54 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 55 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 56 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 57 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 58 | 76 / 41047 | 程式碼 |
+| notion-31 | SQL Basic | 59 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 60 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 61 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 62 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 63 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 64 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 65 | 77 / 41059 | 程式碼 |
+| notion-31 | SQL Basic | 67 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 68 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 69 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 70 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 71 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 72 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 73 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 74 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 75 | 78 / 41067 | 程式碼 |
+| notion-31 | SQL Basic | 77 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 78 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 79 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 80 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 81 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 82 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 83 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 84 | 79 / 41077 | 程式碼 |
+| notion-31 | SQL Basic | 85 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 86 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 87 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 88 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 89 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 90 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 91 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 92 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 93 | 80 / 41091 | 程式碼 |
+| notion-31 | SQL Basic | 95 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 96 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 97 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 98 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 99 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 100 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 101 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 102 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 103 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 104 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 105 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 106 | 81 / 41095 | 程式碼 |
+| notion-31 | SQL Basic | 108 | 82 / 41109 | 程式碼 |
+| notion-31 | SQL Basic | 109 | 82 / 41109 | 程式碼 |
+| notion-31 | SQL Basic | 111 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 112 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 113 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 114 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 115 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 116 | 83 / 41111 | 程式碼 |
+| notion-31 | SQL Basic | 118 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 119 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 120 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 121 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 122 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 123 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 124 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 125 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 126 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 127 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 128 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 129 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 130 | 84 / 41118 | 程式碼 |
+| notion-31 | SQL Basic | 132 | 85 / 41132 | 程式碼 |
+| notion-31 | SQL Basic | 133 | 85 / 41132 | 程式碼 |
+| notion-31 | SQL Basic | 134 | 85 / 41132 | 程式碼 |
+| notion-31 | SQL Basic | 135 | 85 / 41132 | 程式碼 |
+| notion-32 | SQL Basic | 1 | 86 / 42001 | 程式碼 |
+| notion-32 | SQL Basic | 2 | 86 / 42001 | 程式碼 |
+| notion-33 | SQL Basic | 1 | 87 / 43001 | 程式碼 |
+| notion-33 | SQL Basic | 2 | 87 / 43001 | 程式碼 |
+| notion-33 | SQL Basic | 3 | 87 / 43001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 1 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 2 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 3 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 4 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 5 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 6 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 7 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 8 | 89 / 44001 | 程式碼 |
+| notion-34 | Exercise: Write a Query | 9 | 89 / 44001 | 程式碼 |
+| notion-35 | What's Next? | 1 | 90 / 44 | 整合示意 / request-flow / 7 |

@@ -21,8 +21,8 @@ except ValueError as error:
 def filter_courses(
     courses: list[dict], minimum_capacity: int
 ) -> list[dict]:
-    return [
-        course
-        for course in courses
-        if course["capacity"] >= minimum_capacity
-    ]
+    result = []
+    for course in courses:
+        if course["capacity"] >= minimum_capacity:
+            result.append(course)
+    return result

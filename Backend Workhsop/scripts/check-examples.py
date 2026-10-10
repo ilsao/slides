@@ -78,4 +78,23 @@ with tempfile.TemporaryDirectory(prefix="backend-workshop-") as temporary:
     assert [row["capacity"] for row in namespace["courses"]] == [35]
     db.close()
 
-print("PASS: 4 Python examples parse; Python lookup, exceptions, type hints and filtering; SQLite repeat run, constraints, rollback and SQL exercise.")
+# Verify the animation's shared multi-row fixture against the published SQL.
+join_demo = json.loads((ROOT / "sources" / "join-demo.json").read_text(encoding="utf-8"))
+source = json.loads((ROOT / "sources" / "notion-code.json").read_text(encoding="utf-8"))
+with sqlite3.connect(":memory:") as db:
+    db.row_factory = sqlite3.Row
+    db.executescript("CREATE TABLE members(id INTEGER PRIMARY KEY, name TEXT);"
+                     "CREATE TABLE courses(id INTEGER PRIMARY KEY, title TEXT, capacity INTEGER);"
+                     "CREATE TABLE enrollments(member_id INTEGER, course_id INTEGER, status TEXT);")
+    db.executemany("INSERT INTO members VALUES (:id,:name)", join_demo["members"])
+    db.executemany("INSERT INTO courses VALUES (:id,:title,:capacity)", join_demo["courses"])
+    db.executemany("INSERT INTO enrollments VALUES (:member_id,:course_id,:status)", join_demo["enrollments"])
+    rows = [dict(row) for row in db.execute(source[29]["code"], (join_demo["parameter"],))]
+    assert rows == [
+        {"name": "王小明", "title": "Backend Workshop", "capacity": 30, "status": "enrolled"},
+        {"name": "陳怡君", "title": "Backend Workshop", "capacity": 30, "status": "enrolled"},
+    ], rows
+    assert db.execute(source[29]["code"], (99,)).fetchall() == []
+    assert len(db.execute(source[29]["code"], (2,)).fetchall()) == 1
+
+print("PASS: 4 Python examples parse; Python lookup, exceptions, type hints and filtering; SQLite repeat run, constraints, rollback, SQL exercise and JOIN animation data.")

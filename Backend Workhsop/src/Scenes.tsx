@@ -1,16 +1,10 @@
 import { useReducedMotion } from './useReducedMotion';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Check, Database, Globe, Layers, Server, X } from 'lucide-react';
-import hljs from 'highlight.js/lib/core';
-import python from 'highlight.js/lib/languages/python';
-import sql from 'highlight.js/lib/languages/sql';
-import json from 'highlight.js/lib/languages/json';
-import http from 'highlight.js/lib/languages/http';
+import { highlightRows } from './code-highlighting';
 import { type Slide } from './deck';
 import sources from '../sources/notion-code.json';
-hljs.registerLanguage('python', python); hljs.registerLanguage('sql', sql);
-hljs.registerLanguage('json', json); hljs.registerLanguage('http', http);
 
 const SceneContext = createContext({ step: 0, still: false });
 export function Reveal({ at = 0, children, className = '' }: { at?: number; children: ReactNode; className?: string }) {
@@ -20,9 +14,9 @@ export function Reveal({ at = 0, children, className = '' }: { at?: number; chil
   return <motion.div className={className} aria-hidden={!show} initial={still || reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: show ? 1 : 0, y: show ? 0 : 10 }} transition={{ duration: still || reduced ? 0 : .45, ease: [.22, 1, .36, 1] }} style={{ pointerEvents: show ? 'auto' : 'none', visibility: show ? 'visible' : 'hidden' }}>{children}</motion.div>;
 }
 export function Code({ text, lang = 'python', active, label, className = '' }: { text: string; lang?: string; active?: number[]; label?: string; className?: string }) {
-  return <div className={`code-panel ${className}`}><div className="code-label"><span>{label ?? (lang === 'python' ? 'main.py' : lang.toUpperCase())}</span><span className="code-dots">•••</span></div><pre><code>{text.split('\n').map((line, i) => <span key={i} className={`code-line ${active && !active.includes(i + 1) ? 'dim' : ''}`} data-line={i + 1}><span className="line-number">{String(i + 1).padStart(2, '0')}</span><span className="line-text" dangerouslySetInnerHTML={{ __html: hljs.getLanguage(lang) ? hljs.highlight(line || ' ', { language: lang }).value : escapeHTML(line || ' ') }} /></span>)}</code></pre></div>;
+  const highlighted=useMemo(()=>highlightRows(text,lang),[text,lang]);
+  return <div className={`code-panel ${className}`}><div className="code-label"><span>{label ?? (lang === 'python' ? 'main.py' : lang.toUpperCase())}</span><span className="code-dots">•••</span></div><pre><code>{text.split('\n').map((line, i) => <span key={i} className={`code-line ${active && !active.includes(i + 1) ? 'dim' : ''}`} data-line={i + 1}><span className="line-number">{String(i + 1).padStart(2, '0')}</span><span className="line-text" dangerouslySetInnerHTML={{ __html: highlighted[i] }} /></span>)}</code></pre></div>;
 }
-function escapeHTML(s: string) { return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 export function Flow({ labels = ['Client', 'HTTP', 'FastAPI', 'SQL', 'Database'], active = 4, large = false }: { labels?: string[]; active?: number; large?: boolean }) {
   const { still } = useContext(SceneContext);
   const reduced = useReducedMotion();

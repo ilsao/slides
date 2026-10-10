@@ -762,25 +762,24 @@
   },
   {
     "id": 41,
-    "title": "JOIN：把關係重新組成答案",
+    "title": "JOIN：資料如何變成結果",
     "minutes": 4,
     "hidden": false,
     "notes": [
-      "從想回答的問題開始：「這堂課有哪些人報名？」需要三張 table 的欄位。",
-      "`FROM enrollments` 以關係表為起點，兩次 JOIN 依 foreign key 找到 member 與 course。",
-      "`WHERE c.id = ?` 限定目標課程；`ORDER BY` 讓結果順序穩定。",
-      "`?` 是參數 placeholder，值另外傳入，避免自己拼接 SQL 字串。"
+      "以資料處理的概念順序解釋完整查詢，不將 SQL 當成逐行執行的程式。",
+      "FROM 先取三筆 enrollments；member_id 依序為 3、2、1。",
+      "JOIN members 依 m.id = e.member_id 補上姓名；JOIN courses 依 c.id = e.course_id 補上課程名稱與容量。",
+      "WHERE c.id = ? 的參數為 1，移除李小華報名 Database Training 的那筆資料，三筆變兩筆。",
+      "SELECT 只留下 name、title、capacity、status，配對用的兩個 ID 不列入結果。",
+      "ORDER BY m.id 將社員順序由 3、1 改成 1、3，最終為王小明、陳怡君。",
+      "? 是參數 placeholder；查詢字串與參數分開傳入，下一段 Python 程式會展示實際執行方式。"
     ],
     "motion": [
-      "三張迷你 table 先分開；JOIN 行被高亮時，對應 columns 以細線連接。",
-      "最後只保留選出的四個欄位，合成結果卡。"
+      "來源表固定可見，下方結果表使用完整頁寬；完整 SQL 已於前頁呈現。",
+      "對應鍵高亮後補入欄位；未符合資料先淡出，保留列再平移補位。SELECT 隱藏 ID，ORDER BY 平順調整列序。",
+      "每個欄位與資料列保持同一節點，只使用單層位移與透明度；所有步驟可返回，減少動態效果直接呈現結果。"
     ],
-    "code": [
-      {
-        "lang": "sql",
-        "text": "SELECT m.name, c.title, c.capacity, e.status\nFROM enrollments AS e\nJOIN members AS m ON m.id = e.member_id\nJOIN courses AS c ON c.id = e.course_id\nWHERE c.id = ?\nORDER BY m.id;"
-      }
-    ]
+    "code": []
   },
   {
     "id": 42,

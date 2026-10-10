@@ -52,8 +52,8 @@
     "id": "notion-08",
     "section": "Exercise: Filter Courses",
     "lang": "python",
-    "original": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    return [\n        course\n        for course in courses\n        if course[\"capacity\"] >= minimum_capacity\n    ]",
-    "code": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    return [\n        course\n        for course in courses\n        if course[\"capacity\"] >= minimum_capacity\n    ]"
+    "original": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    result = []\n    for course in courses:\n        if course[\"capacity\"] >= minimum_capacity:\n            result.append(course)\n    return result",
+    "code": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    result = []\n    for course in courses:\n        if course[\"capacity\"] >= minimum_capacity:\n            result.append(course)\n    return result"
   },
   {
     "id": "notion-09",

@@ -217,7 +217,9 @@
           1,
           "確認 Python 版本"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 25,
     "chapter": {
@@ -241,7 +243,11 @@
       "建立虛擬環境"
     ],
     "notes": [
-      "先建立資料夾，再建立 .venv。",
+      "專案資料夾放程式碼",
+      "backend-workshop 是專案目錄；之後的 main.py 放在這裡，與 .venv 並列。",
+      ".venv 是這個專案的 Python 環境",
+      "存放專案專用的 Python 執行環境與套件，隔離不同專案的套件版本。",
+      "建立完成會出現 .venv/ 資料夾；目前終端機還沒有啟用它。",
       "來源：Notion「Prerequisites」，區塊 2，第 1–3 行。"
     ],
     "motion": [
@@ -294,7 +300,9 @@
           3,
           "建立虛擬環境"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 37,
     "chapter": {
@@ -317,7 +325,10 @@
       "啟用 macOS／Linux 虛擬環境"
     ],
     "notes": [
-      "啟用後統一使用 python 執行指令。",
+      "在專案目錄執行 source .venv/bin/activate。",
+      "提示符前通常會出現 (.venv)；後續 python 與 python -m pip 使用這個環境。",
+      "只作用於目前終端機；新開終端機需要再次啟用。",
+      "成功提示符示意：(.venv) backend-workshop %",
       "來源：Notion「Prerequisites」，區塊 3，第 1–1 行。"
     ],
     "motion": [
@@ -353,7 +364,15 @@
           1,
           "啟用 macOS／Linux 虛擬環境"
         ]
-      ]
+      ],
+      "explanations": [
+        {
+          "title": "啟用成功的提示符",
+          "lines": [],
+          "prompt": "backend-workshop %"
+        }
+      ],
+      "exerciseExamples": []
     },
     "durationSeconds": 21,
     "chapter": {
@@ -377,6 +396,9 @@
     ],
     "notes": [
       "在專案目錄執行 Activate.ps1。",
+      "提示符前通常會出現 (.venv)；後續 python 與 python -m pip 使用這個環境。",
+      "只作用於目前終端機；新開終端機需要再次啟用。",
+      "成功提示符示意：(.venv) PS C:\\...\\backend-workshop>",
       "來源：Notion「Prerequisites」，區塊 4，第 1–1 行。"
     ],
     "motion": [
@@ -412,7 +434,15 @@
           1,
           "啟用 PowerShell 虛擬環境"
         ]
-      ]
+      ],
+      "explanations": [
+        {
+          "title": "啟用成功的提示符",
+          "lines": [],
+          "prompt": "PS C:\\...\\backend-workshop>"
+        }
+      ],
+      "exerciseExamples": []
     },
     "durationSeconds": 22,
     "chapter": {
@@ -472,7 +502,9 @@
           1,
           "在虛擬環境安裝 FastAPI"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 29,
     "chapter": {
@@ -615,7 +647,9 @@
           7,
           "找不到時拋出 ValueError"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 288,
     "chapter": {
@@ -789,7 +823,9 @@
           11,
           "捕捉 ValueError"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 212,
     "chapter": {
@@ -811,11 +847,13 @@
     "cues": [
       "先作答，再揭露解答",
       "清單、容量門檻與回傳型別",
-      "依容量條件組成新清單"
+      "以 for、if 篩選並回傳新清單"
     ],
     "notes": [
       "先留 45 秒作答，再展示參考解答。",
       "保留容量大於等於 minimum_capacity 的課程，回傳 list[dict]。",
+      "輸入 courses：1 / Backend Workshop / 30；2 / Database Workshop / 25",
+      "預期結果：25 / [1, 2]；30 / [1]；31 / []",
       "來源：Notion「Exercise: Filter Courses」，區塊 8，第 1–8 行。"
     ],
     "motion": [
@@ -824,7 +862,7 @@
     "code": [
       {
         "lang": "python",
-        "text": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    return [\n        course\n        for course in courses\n        if course[\"capacity\"] >= minimum_capacity\n    ]"
+        "text": "def filter_courses(\n    courses: list[dict], minimum_capacity: int\n) -> list[dict]:\n    result = []\n    for course in courses:\n        if course[\"capacity\"] >= minimum_capacity:\n            result.append(course)\n    return result"
       }
     ],
     "animation": "question",
@@ -853,31 +891,31 @@
           "sourceLine": 3
         },
         {
-          "text": "    return [",
+          "text": "    result = []",
           "continuation": false,
           "continuationIndent": 0,
           "sourceLine": 4
         },
         {
-          "text": "        course",
+          "text": "    for course in courses:",
           "continuation": false,
           "continuationIndent": 0,
           "sourceLine": 5
         },
         {
-          "text": "        for course in courses",
+          "text": "        if course[\"capacity\"] >= minimum_capacity:",
           "continuation": false,
           "continuationIndent": 0,
           "sourceLine": 6
         },
         {
-          "text": "        if course[\"capacity\"] >= minimum_capacity",
+          "text": "            result.append(course)",
           "continuation": false,
           "continuationIndent": 0,
           "sourceLine": 7
         },
         {
-          "text": "    ]",
+          "text": "    return result",
           "continuation": false,
           "continuationIndent": 0,
           "sourceLine": 8
@@ -896,8 +934,52 @@
         [
           4,
           8,
-          "依容量條件組成新清單"
+          "以 for、if 篩選並回傳新清單"
         ]
+      ],
+      "explanations": [],
+      "exerciseExamples": [
+        {
+          "title": "輸入 courses",
+          "columns": [
+            "ID",
+            "課程",
+            "容量"
+          ],
+          "rows": [
+            [
+              "1",
+              "Backend Workshop",
+              "30"
+            ],
+            [
+              "2",
+              "Database Workshop",
+              "25"
+            ]
+          ]
+        },
+        {
+          "title": "預期結果",
+          "columns": [
+            "minimum_capacity",
+            "回傳課程 ID"
+          ],
+          "rows": [
+            [
+              "25",
+              "[1, 2]"
+            ],
+            [
+              "30",
+              "[1]"
+            ],
+            [
+              "31",
+              "[]"
+            ]
+          ]
+        }
       ]
     },
     "durationSeconds": 230,
@@ -1526,7 +1608,9 @@
           11,
           "回傳 dict，由 FastAPI 轉成 JSON"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 168,
     "chapter": {
@@ -1586,7 +1670,9 @@
           1,
           "啟動 main.py"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 37,
     "chapter": {
@@ -1697,7 +1783,9 @@
           4,
           "建立初始課程清單"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 61,
     "chapter": {
@@ -1823,7 +1911,9 @@
           16,
           "以關鍵字篩選並回傳清單"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 153,
     "chapter": {
@@ -1963,7 +2053,9 @@
           24,
           "初版的錯誤 dict 仍回傳 200"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 91,
     "chapter": {
@@ -2153,7 +2245,9 @@
           7,
           "匯入模型與欄位驗證工具"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 146,
     "chapter": {
@@ -2290,7 +2384,9 @@
           20,
           "建立含 title 與 capacity 的模型"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 250,
     "chapter": {
@@ -2419,7 +2515,9 @@
           33,
           "可省略且有範圍限制的 capacity"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 230,
     "chapter": {
@@ -2484,7 +2582,9 @@
           37,
           "回傳模型加入 id"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 66,
     "chapter": {
@@ -2652,7 +2752,9 @@
           6,
           "建立 Course API"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 103,
     "chapter": {
@@ -2760,7 +2862,9 @@
           44,
           "記錄下一個可用 id"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 103,
     "chapter": {
@@ -2856,7 +2960,9 @@
           51,
           "回傳找到的 Course"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 74,
     "chapter": {
@@ -2927,7 +3033,9 @@
           56,
           "根路徑回傳啟動訊息"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 41,
     "chapter": {
@@ -3023,7 +3131,9 @@
           63,
           "容量限制與回傳型別"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 100,
     "chapter": {
@@ -3173,7 +3283,9 @@
           75,
           "篩選容量並回傳"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 179,
     "chapter": {
@@ -3244,7 +3356,9 @@
           80,
           "宣告回應模型並共用查找函式"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 59,
     "chapter": {
@@ -3395,9 +3509,11 @@
           96,
           "設定 Location 並回傳課程"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
-    "durationSeconds": 206,
+    "durationSeconds": 161,
     "chapter": {
       "id": "crud",
       "name": "完整 CRUD 與測試",
@@ -3406,6 +3522,39 @@
       "flowStage": 2,
       "color": "purple",
       "start": 25
+    },
+    "flowStage": 2
+  },
+  {
+    "id": 50001,
+    "title": "**：dict 展開成具名參數",
+    "kind": "scene",
+    "hidden": false,
+    "cues": [
+      "Course 呼叫與來源 dict",
+      "** 帶入 dict 欄位",
+      "展開為具名參數"
+    ],
+    "notes": [
+      "payload.model_dump() 回傳 title 與 capacity 的 dict。",
+      "** 在函式呼叫中把 dict 展開為具名參數；id=3 由 Server 提供。"
+    ],
+    "motion": [
+      "手動推進時，程式碼中的 ** 運算式展開來源 dict；key 與 value 移入實際參數或 dict 欄位，返回時還原前一步。"
+    ],
+    "code": [],
+    "excerpt": null,
+    "exercise": null,
+    "animation": "unpack",
+    "durationSeconds": 45,
+    "chapter": {
+      "id": "crud",
+      "name": "完整 CRUD 與測試",
+      "en": "Course API",
+      "seconds": 1536,
+      "flowStage": 2,
+      "color": "purple",
+      "start": 50001
     },
     "flowStage": 2
   },
@@ -3517,7 +3666,9 @@
           106,
           "擷取提供的欄位並拒絕空更新"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 133,
     "chapter": {
@@ -3614,9 +3765,11 @@
           113,
           "保存與回傳"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
-    "durationSeconds": 88,
+    "durationSeconds": 58,
     "chapter": {
       "id": "crud",
       "name": "完整 CRUD 與測試",
@@ -3625,6 +3778,39 @@
       "flowStage": 2,
       "color": "purple",
       "start": 29108
+    },
+    "flowStage": 2
+  },
+  {
+    "id": 50002,
+    "title": "**：合併 dict 與覆蓋欄位",
+    "kind": "scene",
+    "hidden": false,
+    "cues": [
+      "兩份 dict 與合併運算式",
+      "展開左側舊資料",
+      "展開右側並覆蓋 capacity"
+    ],
+    "notes": [
+      "舊資料保留 id=1、title=Backend Workshop、capacity=30。",
+      "changes 只有 capacity=35；右側同名欄位覆蓋左側，id 與 title 保持不變。"
+    ],
+    "motion": [
+      "手動推進時，程式碼中的 ** 運算式展開來源 dict；key 與 value 移入實際參數或 dict 欄位，返回時還原前一步。"
+    ],
+    "code": [],
+    "excerpt": null,
+    "exercise": null,
+    "animation": "merge",
+    "durationSeconds": 30,
+    "chapter": {
+      "id": "crud",
+      "name": "完整 CRUD 與測試",
+      "en": "Course API",
+      "seconds": 1536,
+      "flowStage": 2,
+      "color": "purple",
+      "start": 50002
     },
     "flowStage": 2
   },
@@ -3729,7 +3915,9 @@
           124,
           "查找、刪除並回傳 204"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 132,
     "chapter": {
@@ -3893,7 +4081,9 @@
           15,
           "DELETE：刪除課程 2"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 141,
     "chapter": {
@@ -4152,7 +4342,9 @@
           6,
           "capacity：整數欄位，結束定義"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 71,
     "chapter": {
@@ -4337,7 +4529,9 @@
           3,
           "INSERT 指定欄位與新增的值"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 32,
     "chapter": {
@@ -4420,7 +4614,9 @@
           4,
           "WHERE 限制要查詢的社員"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 32,
     "chapter": {
@@ -4503,7 +4699,9 @@
           4,
           "WHERE 限制更新範圍"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 32,
     "chapter": {
@@ -4574,7 +4772,9 @@
           3,
           "DELETE 只刪除符合條件的社員"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 32,
     "chapter": {
@@ -4589,58 +4789,22 @@
     "flowStage": 3
   },
   {
-    "id": 41,
-    "title": "使用 JOIN 查詢報名資料",
-    "hidden": false,
-    "notes": [
-      "從想回答的問題開始：「這堂課有哪些人報名？」需要三張 table 的欄位。",
-      "`FROM enrollments` 以關係表為起點，兩次 JOIN 依 foreign key 找到 member 與 course。",
-      "`WHERE c.id = ?` 限定目標課程；`ORDER BY` 讓結果順序穩定。",
-      "`?` 是參數 placeholder，值另外傳入，避免自己拼接 SQL 字串。"
-    ],
-    "motion": [
-      "依序以同一藍色配對兩個外鍵；最後顯示 JOIN 產生的結果資料列。"
-    ],
-    "code": [
-      {
-        "lang": "sql",
-        "text": "SELECT m.name, c.title, c.capacity, e.status\nFROM enrollments AS e\nJOIN members AS m ON m.id = e.member_id\nJOIN courses AS c ON c.id = e.course_id\nWHERE c.id = ?\nORDER BY m.id;"
-      }
-    ],
-    "kind": "scene",
-    "cues": [
-      "enrollments",
-      "配對 members",
-      "配對 courses",
-      "結果資料列"
-    ],
-    "animation": "join",
-    "excerpt": null,
-    "exercise": null,
-    "durationSeconds": 96,
-    "chapter": {
-      "id": "sql",
-      "name": "SQL 與 SQLite 程式",
-      "en": "SQL & SQLite",
-      "seconds": 1759,
-      "flowStage": 3,
-      "color": "green",
-      "start": 41
-    },
-    "flowStage": 3
-  },
-  {
     "id": 40001,
     "title": "JOIN 的完整查詢",
     "kind": "code",
     "hidden": false,
     "cues": [
-      "從報名表選出所需欄位",
-      "用外鍵 JOIN 社員與課程",
-      "指定課程並排序"
+      "FROM：從 3 筆報名開始",
+      "JOIN members：member_id → name",
+      "JOIN courses：course_id → title、capacity",
+      "WHERE：課程 1，3 筆 → 2 筆",
+      "SELECT：只留下 4 個欄位",
+      "ORDER BY：社員 ID 3、1 → 1、3"
     ],
     "notes": [
-      "m、c、e 是別名；WHERE 使用參數，ORDER BY 按社員 id 排序。",
+      "先逐段聚焦完整 SQL，下一頁以多筆資料展示查詢作用。",
+      "m、c、e 是別名；? = 1，只保留 Backend Workshop 的報名。",
+      "FROM、JOIN、WHERE、SELECT、ORDER BY 是理解資料處理的概念順序。",
       "來源：Notion「SQL Basic」，區塊 30，第 1–6 行。"
     ],
     "motion": [
@@ -4698,25 +4862,42 @@
       ],
       "part": 1,
       "parts": 1,
-      "context": "",
-      "focus": 3,
+      "context": "? = 1",
+      "focus": 6,
       "focusRanges": [
         [
-          1,
           2,
-          "從報名表選出所需欄位"
+          2,
+          "FROM：從 3 筆報名開始"
         ],
         [
           3,
+          3,
+          "JOIN members：member_id → name"
+        ],
+        [
           4,
-          "用外鍵 JOIN 社員與課程"
+          4,
+          "JOIN courses：course_id → title、capacity"
         ],
         [
           5,
+          5,
+          "WHERE：課程 1，3 筆 → 2 筆"
+        ],
+        [
+          1,
+          1,
+          "SELECT：只留下 4 個欄位"
+        ],
+        [
           6,
-          "指定課程並排序"
+          6,
+          "ORDER BY：社員 ID 3、1 → 1、3"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 48,
     "chapter": {
@@ -4727,6 +4908,120 @@
       "flowStage": 3,
       "color": "green",
       "start": 40001
+    },
+    "flowStage": 3
+  },
+  {
+    "id": 41,
+    "title": "JOIN：資料如何變成結果",
+    "hidden": false,
+    "notes": [
+      "以資料處理的概念順序解釋完整查詢，不將 SQL 當成逐行執行的程式。",
+      "FROM 先取三筆 enrollments；member_id 依序為 3、2、1。",
+      "JOIN members 依 m.id = e.member_id 補上姓名；JOIN courses 依 c.id = e.course_id 補上課程名稱與容量。",
+      "WHERE c.id = ? 的參數為 1，移除李小華報名 Database Training 的那筆資料，三筆變兩筆。",
+      "SELECT 只留下 name、title、capacity、status，配對用的兩個 ID 不列入結果。",
+      "ORDER BY m.id 將社員順序由 3、1 改成 1、3，最終為王小明、陳怡君。",
+      "? 是參數 placeholder；查詢字串與參數分開傳入，下一段 Python 程式會展示實際執行方式。"
+    ],
+    "motion": [
+      "三張來源表與結果表上下呈現；依 FROM、兩次 JOIN、WHERE、SELECT、ORDER BY 手動推進。",
+      "結果儲存格與資料列始終保留同一節點；只以單層位移和透明度補欄位、移除未符合資料、投影及排序，返回可逆。"
+    ],
+    "code": [],
+    "kind": "scene",
+    "cues": [
+      "FROM：從 3 筆報名開始",
+      "JOIN members：member_id → name",
+      "JOIN courses：course_id → title、capacity",
+      "WHERE：課程 1，3 筆 → 2 筆",
+      "SELECT：只留下 4 個欄位",
+      "ORDER BY：社員 ID 3、1 → 1、3"
+    ],
+    "animation": "join-query",
+    "excerpt": null,
+    "exercise": null,
+    "joinDemo": {
+      "parameter": 1,
+      "members": [
+        {
+          "id": 1,
+          "name": "王小明"
+        },
+        {
+          "id": 2,
+          "name": "李小華"
+        },
+        {
+          "id": 3,
+          "name": "陳怡君"
+        }
+      ],
+      "courses": [
+        {
+          "id": 1,
+          "title": "Backend Workshop",
+          "capacity": 30
+        },
+        {
+          "id": 2,
+          "title": "Database Training",
+          "capacity": 25
+        }
+      ],
+      "enrollments": [
+        {
+          "member_id": 3,
+          "course_id": 1,
+          "status": "enrolled"
+        },
+        {
+          "member_id": 2,
+          "course_id": 2,
+          "status": "enrolled"
+        },
+        {
+          "member_id": 1,
+          "course_id": 1,
+          "status": "enrolled"
+        }
+      ],
+      "stages": [
+        {
+          "sourceLine": 2,
+          "label": "FROM：從 3 筆報名開始"
+        },
+        {
+          "sourceLine": 3,
+          "label": "JOIN members：member_id → name"
+        },
+        {
+          "sourceLine": 4,
+          "label": "JOIN courses：course_id → title、capacity"
+        },
+        {
+          "sourceLine": 5,
+          "label": "WHERE：課程 1，3 筆 → 2 筆"
+        },
+        {
+          "sourceLine": 1,
+          "label": "SELECT：只留下 4 個欄位"
+        },
+        {
+          "sourceLine": 6,
+          "label": "ORDER BY：社員 ID 3、1 → 1、3"
+        }
+      ]
+    },
+    "durationSeconds": 96,
+    "chapter": {
+      "id": "sql",
+      "name": "SQL 與 SQLite 程式",
+      "en": "SQL & SQLite",
+      "seconds": 1759,
+      "flowStage": 3,
+      "color": "green",
+      "start": 41
     },
     "flowStage": 3
   },
@@ -4867,7 +5162,9 @@
           14,
           "姓名、Email 與加入時間的限制"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 166,
     "chapter": {
@@ -4981,7 +5278,9 @@
           22,
           "預設建立時間，結束資料表定義"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 95,
     "chapter": {
@@ -5131,7 +5430,9 @@
           36,
           "外鍵與連帶刪除，結束 SCHEMA 字串"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 154,
     "chapter": {
@@ -5258,7 +5559,9 @@
           45,
           "執行完整 SCHEMA"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 90,
     "chapter": {
@@ -5396,7 +5699,9 @@
           58,
           "參數化 INSERT 與重複 id 的處理"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 120,
     "chapter": {
@@ -5492,7 +5797,9 @@
           65,
           "以參數建立課程，重複 id 不再新增"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 70,
     "chapter": {
@@ -5613,7 +5920,9 @@
           75,
           "確認初始化資料存在"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 90,
     "chapter": {
@@ -5714,7 +6023,9 @@
           84,
           "檢查社員是否已報名該課程"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 140,
     "chapter": {
@@ -5827,7 +6138,9 @@
           93,
           "帶入兩個 id 建立報名"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 40,
     "chapter": {
@@ -5952,7 +6265,9 @@
           106,
           "執行 JOIN、帶入 Course ID 並取回所有結果"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 140,
     "chapter": {
@@ -6017,7 +6332,9 @@
           109,
           "逐筆把 Row 轉為 dict 並輸出"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 40,
     "chapter": {
@@ -6113,7 +6430,9 @@
           116,
           "用 rowcount 查看影響筆數"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 60,
     "chapter": {
@@ -6264,7 +6583,9 @@
           130,
           "查看刪除筆數"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 130,
     "chapter": {
@@ -6348,7 +6669,9 @@
           135,
           "finally 關閉連線"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 40,
     "chapter": {
@@ -6420,7 +6743,9 @@
           2,
           "使用同一資料庫再次執行"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 24,
     "chapter": {
@@ -6511,7 +6836,9 @@
           3,
           "DELETE 影響一筆"
         ]
-      ]
+      ],
+      "explanations": [],
+      "exerciseExamples": []
     },
     "durationSeconds": 40,
     "chapter": {
@@ -6576,6 +6903,8 @@
     ],
     "notes": [
       "先討論 45 秒，再逐步揭露 SELECT、WHERE、ORDER BY 及參數 tuple。",
+      "範例輸入 courses：2 / Database Workshop / 20；3 / Web Workshop / 10；1 / Backend Workshop / 30",
+      "預期結果（容量 ≥ 20）：1 / Backend Workshop / 30；2 / Database Workshop / 20",
       "來源：Notion「Exercise: Write a Query」，區塊 34，第 1–9 行。"
     ],
     "motion": [
@@ -6659,6 +6988,54 @@
           9,
           "參數化容量篩選、排序並取回結果"
         ]
+      ],
+      "explanations": [],
+      "exerciseExamples": [
+        {
+          "title": "範例輸入 courses",
+          "columns": [
+            "ID",
+            "課程",
+            "容量"
+          ],
+          "rows": [
+            [
+              "2",
+              "Database Workshop",
+              "20"
+            ],
+            [
+              "3",
+              "Web Workshop",
+              "10"
+            ],
+            [
+              "1",
+              "Backend Workshop",
+              "30"
+            ]
+          ]
+        },
+        {
+          "title": "預期結果（容量 ≥ 20）",
+          "columns": [
+            "ID",
+            "課程",
+            "容量"
+          ],
+          "rows": [
+            [
+              "1",
+              "Backend Workshop",
+              "30"
+            ],
+            [
+              "2",
+              "Database Workshop",
+              "20"
+            ]
+          ]
+        }
       ]
     },
     "durationSeconds": 224,

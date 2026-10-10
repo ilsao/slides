@@ -71,7 +71,11 @@ python3 --version
 
 穩定 ID：12001｜00:04:35–00:05:12
 
-- 先建立資料夾，再建立 .venv。
+- 專案資料夾放程式碼
+- backend-workshop 是專案目錄；之後的 main.py 放在這裡，與 .venv 並列。
+- .venv 是這個專案的 Python 環境
+- 存放專案專用的 Python 執行環境與套件，隔離不同專案的套件版本。
+- 建立完成會出現 .venv/ 資料夾；目前終端機還沒有啟用它。
 - 來源：Notion「Prerequisites」，區塊 2，第 1–3 行。
 
 步驟：建立並進入專案資料夾 → 建立虛擬環境
@@ -86,7 +90,10 @@ python3 -m venv .venv
 
 穩定 ID：13001｜00:05:12–00:05:33
 
-- 啟用後統一使用 python 執行指令。
+- 在專案目錄執行 source .venv/bin/activate。
+- 提示符前通常會出現 (.venv)；後續 python 與 python -m pip 使用這個環境。
+- 只作用於目前終端機；新開終端機需要再次啟用。
+- 成功提示符示意：(.venv) backend-workshop %
 - 來源：Notion「Prerequisites」，區塊 3，第 1–1 行。
 
 步驟：啟用 macOS／Linux 虛擬環境
@@ -100,6 +107,9 @@ source .venv/bin/activate
 穩定 ID：14001｜00:05:33–00:05:55
 
 - 在專案目錄執行 Activate.ps1。
+- 提示符前通常會出現 (.venv)；後續 python 與 python -m pip 使用這個環境。
+- 只作用於目前終端機；新開終端機需要再次啟用。
+- 成功提示符示意：(.venv) PS C:\...\backend-workshop>
 - 來源：Notion「Prerequisites」，區塊 4，第 1–1 行。
 
 步驟：啟用 PowerShell 虛擬環境
@@ -192,19 +202,21 @@ except ValueError as error:
 
 - 先留 45 秒作答，再展示參考解答。
 - 保留容量大於等於 minimum_capacity 的課程，回傳 list[dict]。
+- 輸入 courses：1 / Backend Workshop / 30；2 / Database Workshop / 25
+- 預期結果：25 / [1, 2]；30 / [1]；31 / []
 - 來源：Notion「Exercise: Filter Courses」，區塊 8，第 1–8 行。
 
-步驟：先作答，再揭露解答 → 清單、容量門檻與回傳型別 → 依容量條件組成新清單
+步驟：先作答，再揭露解答 → 清單、容量門檻與回傳型別 → 以 for、if 篩選並回傳新清單
 
 ~~~python
 def filter_courses(
     courses: list[dict], minimum_capacity: int
 ) -> list[dict]:
-    return [
-        course
-        for course in courses
-        if course["capacity"] >= minimum_capacity
-    ]
+    result = []
+    for course in courses:
+        if course["capacity"] >= minimum_capacity:
+            result.append(course)
+    return result
 ~~~
 
 ## 16 — Client 與 Server
@@ -727,7 +739,7 @@ def get_course(course_id: CourseId) -> Course:
 
 ## 51 — POST：建立課程
 
-穩定 ID：25｜01:47:23–01:50:49
+穩定 ID：25｜01:47:23–01:50:04
 
 - body 先通過 CourseCreate，再配發 id、保存資料。
 - 201 與 Location 告知新資源的位置；完整 decorators、headers 與 return 皆保留。
@@ -753,7 +765,16 @@ def create_course(payload: CourseCreate, response: Response) -> Course:
     return course
 ~~~
 
-## 52 — PATCH：驗證更新內容
+## 52 — **：dict 展開成具名參數
+
+穩定 ID：50001｜01:50:04–01:50:49
+
+- payload.model_dump() 回傳 title 與 capacity 的 dict。
+- ** 在函式呼叫中把 dict 展開為具名參數；id=3 由 Server 提供。
+
+步驟：Course 呼叫與來源 dict → ** 帶入 dict 欄位 → 展開為具名參數
+
+## 53 — PATCH：驗證更新內容
 
 穩定 ID：26｜01:50:49–01:53:02
 
@@ -777,9 +798,9 @@ def update_course(course_id: CourseId, payload: CourseUpdate) -> Course:
             update")
 ~~~
 
-## 53 — PATCH：合併、儲存與回傳
+## 54 — PATCH：合併、儲存與回傳
 
-穩定 ID：29108｜01:53:02–01:54:30
+穩定 ID：29108｜01:53:02–01:54:00
 
 - 接續上一頁的 update_course 函式，沿用 stored_course 與 changes。
 - 用 changes 覆蓋舊資料，重新驗證後寫回 courses 並回傳。
@@ -797,7 +818,16 @@ def update_course(course_id: CourseId, payload: CourseUpdate) -> Course:
     return updated_course
 ~~~
 
-## 54 — DELETE：刪除課程
+## 55 — **：合併 dict 與覆蓋欄位
+
+穩定 ID：50002｜01:54:00–01:54:30
+
+- 舊資料保留 id=1、title=Backend Workshop、capacity=30。
+- changes 只有 capacity=35；右側同名欄位覆蓋左側，id 與 title 保持不變。
+
+步驟：兩份 dict 與合併運算式 → 展開左側舊資料 → 展開右側並覆蓋 capacity
+
+## 56 — DELETE：刪除課程
 
 穩定 ID：29116｜01:54:30–01:56:42
 
@@ -820,7 +850,7 @@ def delete_course(course_id: CourseId) -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 ~~~
 
-## 55 — 使用 curl 測試 Course API
+## 57 — 使用 curl 測試 Course API
 
 穩定 ID：30001｜01:56:42–01:59:03
 
@@ -849,7 +879,7 @@ curl -X PATCH http://127.0.0.1:8000/courses/1 \
 curl -i -X DELETE http://127.0.0.1:8000/courses/2
 ~~~
 
-## 56 — 使用 Swagger UI 查看與測試 API
+## 58 — 使用 Swagger UI 查看與測試 API
 
 穩定 ID：27｜01:59:03–02:02:00
 
@@ -861,7 +891,7 @@ curl -i -X DELETE http://127.0.0.1:8000/courses/2
 
 步驟：開啟 /docs，自行測試兩種 Request Body
 
-## 57 — 記憶體儲存的限制
+## 59 — 記憶體儲存的限制
 
 穩定 ID：35｜02:02:00–02:03:06
 
@@ -871,7 +901,7 @@ curl -i -X DELETE http://127.0.0.1:8000/courses/2
 
 步驟：記憶體資料 → 重新啟動 → 持久儲存
 
-## 58 — Database、DBMS 與資料檔案
+## 60 — Database、DBMS 與資料檔案
 
 穩定 ID：36｜02:03:06–02:04:32
 
@@ -883,7 +913,7 @@ curl -i -X DELETE http://127.0.0.1:8000/courses/2
 
 步驟：Client 與 FastAPI → SQL 到 SQLite → 讀寫 workshop.db → Rows 與 JSON 傳回 Client
 
-## 59 — Table、Column 與 Row
+## 61 — Table、Column 與 Row
 
 穩定 ID：37｜02:04:32–02:05:48
 
@@ -893,7 +923,7 @@ curl -i -X DELETE http://127.0.0.1:8000/courses/2
 
 步驟：Table → Column：capacity → Row：完整第一筆
 
-## 60 — Schema：用 SQL 定義資料表
+## 62 — Schema：用 SQL 定義資料表
 
 穩定 ID：34001｜02:05:48–02:06:59
 
@@ -913,7 +943,7 @@ CREATE TABLE courses (
 );
 ~~~
 
-## 61 — 資料庫的鍵與限制條件
+## 63 — 資料庫的鍵與限制條件
 
 穩定 ID：38｜02:06:59–02:08:33
 
@@ -924,7 +954,7 @@ CREATE TABLE courses (
 
 步驟：PRIMARY KEY → FOREIGN KEY → NOT NULL / UNIQUE → CHECK / DEFAULT
 
-## 62 — 用關聯表表示課程報名
+## 64 — 用關聯表表示課程報名
 
 穩定 ID：39｜02:08:33–02:11:05
 
@@ -936,7 +966,7 @@ CREATE TABLE courses (
 
 步驟：多對多 → 中介表 → 複合主鍵
 
-## 63 — SQL 的 CRUD
+## 65 — SQL 的 CRUD
 
 穩定 ID：40｜02:11:05–02:11:53
 
@@ -947,7 +977,7 @@ CREATE TABLE courses (
 
 步驟：INSERT → SELECT → UPDATE → DELETE
 
-## 64 — INSERT：新增社員
+## 66 — INSERT：新增社員
 
 穩定 ID：36001｜02:11:53–02:12:25
 
@@ -962,7 +992,7 @@ INSERT INTO members (id, name, email)
 VALUES (1, 'Alice', 'alice@example.com');
 ~~~
 
-## 65 — SELECT：查詢社員
+## 67 — SELECT：查詢社員
 
 穩定 ID：37001｜02:12:25–02:12:57
 
@@ -978,7 +1008,7 @@ FROM members
 WHERE id = 1;
 ~~~
 
-## 66 — UPDATE：修改 Email
+## 68 — UPDATE：修改 Email
 
 穩定 ID：38001｜02:12:57–02:13:29
 
@@ -994,7 +1024,7 @@ SET email = 'alice_new@example.com'
 WHERE id = 1;
 ~~~
 
-## 67 — DELETE：刪除社員
+## 69 — DELETE：刪除社員
 
 穩定 ID：39001｜02:13:29–02:14:01
 
@@ -1009,25 +1039,16 @@ DELETE FROM members
 WHERE id = 1;
 ~~~
 
-## 68 — 使用 JOIN 查詢報名資料
+## 70 — JOIN 的完整查詢
 
-穩定 ID：41｜02:14:01–02:15:37
+穩定 ID：40001｜02:14:01–02:14:49
 
-- 從想回答的問題開始：「這堂課有哪些人報名？」需要三張 table 的欄位。
-- `FROM enrollments` 以關係表為起點，兩次 JOIN 依 foreign key 找到 member 與 course。
-- `WHERE c.id = ?` 限定目標課程；`ORDER BY` 讓結果順序穩定。
-- `?` 是參數 placeholder，值另外傳入，避免自己拼接 SQL 字串。
-
-步驟：enrollments → 配對 members → 配對 courses → 結果資料列
-
-## 69 — JOIN 的完整查詢
-
-穩定 ID：40001｜02:15:37–02:16:25
-
-- m、c、e 是別名；WHERE 使用參數，ORDER BY 按社員 id 排序。
+- 先逐段聚焦完整 SQL，下一頁以多筆資料展示查詢作用。
+- m、c、e 是別名；? = 1，只保留 Backend Workshop 的報名。
+- FROM、JOIN、WHERE、SELECT、ORDER BY 是理解資料處理的概念順序。
 - 來源：Notion「SQL Basic」，區塊 30，第 1–6 行。
 
-步驟：從報名表選出所需欄位 → 用外鍵 JOIN 社員與課程 → 指定課程並排序
+步驟：FROM：從 3 筆報名開始 → JOIN members：member_id → name → JOIN courses：course_id → title、capacity → WHERE：課程 1，3 筆 → 2 筆 → SELECT：只留下 4 個欄位 → ORDER BY：社員 ID 3、1 → 1、3
 
 ~~~sql
 SELECT m.name, c.title, c.capacity, e.status
@@ -1038,7 +1059,21 @@ WHERE c.id = ?
 ORDER BY m.id
 ~~~
 
-## 70 — SQLite 程式：路徑與 members Schema
+## 71 — JOIN：資料如何變成結果
+
+穩定 ID：41｜02:14:49–02:16:25
+
+- 以資料處理的概念順序解釋完整查詢，不將 SQL 當成逐行執行的程式。
+- FROM 先取三筆 enrollments；member_id 依序為 3、2、1。
+- JOIN members 依 m.id = e.member_id 補上姓名；JOIN courses 依 c.id = e.course_id 補上課程名稱與容量。
+- WHERE c.id = ? 的參數為 1，移除李小華報名 Database Training 的那筆資料，三筆變兩筆。
+- SELECT 只留下 name、title、capacity、status，配對用的兩個 ID 不列入結果。
+- ORDER BY m.id 將社員順序由 3、1 改成 1、3，最終為王小明、陳怡君。
+- ? 是參數 placeholder；查詢字串與參數分開傳入，下一段 Python 程式會展示實際執行方式。
+
+步驟：FROM：從 3 筆報名開始 → JOIN members：member_id → name → JOIN courses：course_id → title、capacity → WHERE：課程 1，3 筆 → 2 筆 → SELECT：只留下 4 個欄位 → ORDER BY：社員 ID 3、1 → 1、3
+
+## 72 — SQLite 程式：路徑與 members Schema
 
 穩定 ID：41001｜02:16:25–02:19:11
 
@@ -1066,7 +1101,7 @@ CREATE TABLE IF NOT EXISTS members (
 );
 ~~~
 
-## 71 — courses Schema：限制容量與標題
+## 73 — courses Schema：限制容量與標題
 
 穩定 ID：41016｜02:19:11–02:20:46
 
@@ -1087,7 +1122,7 @@ CREATE TABLE IF NOT EXISTS courses (
 );
 ~~~
 
-## 72 — enrollments Schema：主鍵與外鍵
+## 74 — enrollments Schema：主鍵與外鍵
 
 穩定 ID：41024｜02:20:46–02:23:20
 
@@ -1114,7 +1149,7 @@ CREATE TABLE IF NOT EXISTS enrollments (
 """
 ~~~
 
-## 73 — 連線、Row 與外鍵檢查
+## 75 — 連線、Row 與外鍵檢查
 
 穩定 ID：42｜02:23:20–02:24:50
 
@@ -1137,7 +1172,7 @@ connection.execute("PRAGMA foreign_keys = ON")
 connection.executescript(SCHEMA)
 ~~~
 
-## 74 — 初始化資料：建立社員
+## 76 — 初始化資料：建立社員
 
 穩定 ID：41047｜02:24:50–02:26:50
 
@@ -1163,7 +1198,7 @@ try:
         )
 ~~~
 
-## 75 — 初始化資料：建立課程
+## 77 — 初始化資料：建立課程
 
 穩定 ID：41059｜02:26:50–02:28:00
 
@@ -1183,7 +1218,7 @@ try:
         )
 ~~~
 
-## 76 — 取得 Member 與 Course
+## 78 — 取得 Member 與 Course
 
 穩定 ID：41067｜02:28:00–02:29:30
 
@@ -1206,7 +1241,7 @@ try:
     assert member is not None and course is not None
 ~~~
 
-## 77 — 查詢是否已報名
+## 79 — 查詢是否已報名
 
 穩定 ID：41077｜02:29:30–02:31:50
 
@@ -1226,7 +1261,7 @@ try:
     ).fetchone()
 ~~~
 
-## 78 — 尚未報名時新增 Enrollment
+## 80 — 尚未報名時新增 Enrollment
 
 穩定 ID：41091｜02:31:50–02:32:30
 
@@ -1247,7 +1282,7 @@ try:
             )
 ~~~
 
-## 79 — 執行 JOIN 並取得結果
+## 81 — 執行 JOIN 並取得結果
 
 穩定 ID：41095｜02:32:30–02:34:50
 
@@ -1271,7 +1306,7 @@ try:
     ).fetchall() # fetchall retrieves all rows returned by the query.
 ~~~
 
-## 80 — 逐筆輸出查詢結果
+## 82 — 逐筆輸出查詢結果
 
 穩定 ID：41109｜02:34:50–02:35:30
 
@@ -1285,7 +1320,7 @@ try:
         print(dict(row))
 ~~~
 
-## 81 — 更新容量並檢查影響筆數
+## 83 — 更新容量並檢查影響筆數
 
 穩定 ID：41111｜02:35:30–02:36:30
 
@@ -1304,7 +1339,7 @@ try:
     print(f"updated rows: {cursor.rowcount}")
 ~~~
 
-## 82 — 建立暫時課程，再刪除
+## 84 — 建立暫時課程，再刪除
 
 穩定 ID：41118｜02:36:30–02:38:40
 
@@ -1331,7 +1366,7 @@ try:
     print(f"deleted rows: {cursor.rowcount}")
 ~~~
 
-## 83 — 處理限制錯誤並關閉連線
+## 85 — 處理限制錯誤並關閉連線
 
 穩定 ID：41132｜02:38:40–02:39:20
 
@@ -1348,7 +1383,7 @@ finally:
     connection.close()
 ~~~
 
-## 84 — 連續執行兩次，檢查資料保存
+## 86 — 連續執行兩次，檢查資料保存
 
 穩定 ID：42001｜02:39:20–02:39:44
 
@@ -1363,7 +1398,7 @@ python database_demo.py
 python database_demo.py
 ~~~
 
-## 85 — 第一次執行的輸出
+## 87 — 第一次執行的輸出
 
 穩定 ID：43001｜02:39:44–02:40:24
 
@@ -1381,7 +1416,7 @@ updated rows: 1
 deleted rows: 1
 ~~~
 
-## 86 — Transaction：提交與還原
+## 88 — Transaction：提交與還原
 
 穩定 ID：43｜02:40:24–02:43:04
 
@@ -1391,11 +1426,13 @@ deleted rows: 1
 
 步驟：交易前的狀態 → 兩次寫入暫存 → 成功：COMMIT → 失敗：ROLLBACK
 
-## 87 — 練習：查詢容量至少 20 的課程
+## 89 — 練習：查詢容量至少 20 的課程
 
 穩定 ID：44001｜02:43:04–02:46:48
 
 - 先討論 45 秒，再逐步揭露 SELECT、WHERE、ORDER BY 及參數 tuple。
+- 範例輸入 courses：2 / Database Workshop / 20；3 / Web Workshop / 10；1 / Backend Workshop / 30
+- 預期結果（容量 ≥ 20）：1 / Backend Workshop / 30；2 / Database Workshop / 20
 - 來源：Notion「Exercise: Write a Query」，區塊 34，第 1–9 行。
 
 步驟：先作答，再揭露解答 → 參數化容量篩選、排序並取回結果
@@ -1412,7 +1449,7 @@ courses = connection.execute(
 ).fetchall()
 ~~~
 
-## 88 — 報名請求的完整處理流程
+## 90 — 報名請求的完整處理流程
 
 穩定 ID：44｜02:46:48–02:49:06
 
@@ -1424,7 +1461,7 @@ courses = connection.execute(
 
 步驟：Client → HTTP → FastAPI Route → Validation → Business Logic → SQL → Database → Response
 
-## 89 — 延伸學習
+## 91 — 延伸學習
 
 穩定 ID：47｜02:49:06–02:50:00
 
@@ -1433,7 +1470,7 @@ courses = connection.execute(
 
 步驟：Database Design → Migration → Auth → Testing → Production
 
-## 90 — 問答
+## 92 — 問答
 
 穩定 ID：48｜02:50:00–03:00:00
 

@@ -1,18 +1,17 @@
 import { useReducedMotion } from './useReducedMotion';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Check, Database, Globe, Server, Code2, Braces, X, CornerDownRight } from 'lucide-react';
-import hljs from 'highlight.js/lib/core';
-import bash from 'highlight.js/lib/languages/bash';
-import powershell from 'highlight.js/lib/languages/powershell';
 import { Scene as LegacyScene } from './Scenes';
 import { chapters, type Slide } from './deck';
 import sources from '../sources/notion-code.json';
 import { CodeFocusRail } from './CodeFocusRail';
+import { highlightRows } from './code-highlighting';
 import { Cover, OpeningJourney } from './Opening';
+import { Unpacking } from './DataAnimations';
+import { JoinQuery } from './JoinQuery';
 import { HttpAnatomy, ParameterOverview, RouteOverview, RestComparison } from './ConceptScenes';
 import { QueryScene, PathScene, DiagramScene, SqlOverview } from './LessonScenes';
-hljs.registerLanguage('bash', bash);hljs.registerLanguage('powershell', powershell);
 const Still = createContext(false);
 function useTiming() { const still=useContext(Still), reduced=useReducedMotion();return {duration:still||reduced?0:.5,ease:[.22,1,.36,1] as [number,number,number,number]}; }
 function Reveal({show=true,children,mode='rise',className=''}:{show?:boolean;children:ReactNode;mode?:'mask'|'rise'|'scale';className?:string}) {
@@ -20,7 +19,6 @@ function Reveal({show=true,children,mode='rise',className=''}:{show?:boolean;chi
   return <motion.div className={className} initial={false} aria-hidden={!show} animate={{opacity:show?1:0,y:!show?10:0,clipPath:mode==='mask'?(show?'inset(0% 0% 0% 0%)':'inset(0% 100% 0% 0%)'):'inset(0% 0% 0% 0%)'}} transition={transition} style={{visibility:show?'visible':'hidden'}}>{children}</motion.div>;
 }
 const raw = (block:number) => sources[block-1].code;
-const html = (text:string,lang:string) => hljs.getLanguage(lang)?hljs.highlight(text||' ',{language:lang}).value:text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 
 export function Continuity({slide}:{slide:Slide}) {
   const endpoint=slide.chapter.flowStage===2||slide.chapter.id==='rest'||slide.id===17;
@@ -30,22 +28,39 @@ export function Continuity({slide}:{slide:Slide}) {
 function CodePage({slide,step}:{slide:Slide;step:number}) {
   const show=!slide.exercise||step>0;
   return <div className="source-scene" data-source={slide.excerpt!.sourceId}>
-    {!show?<div className="code-exercise"><span className="section-number">練習</span><h2>{slide.exercise}</h2><div className="exercise-rule"/><p>先想想輸入、篩選條件與回傳型別。</p><small>按下一步揭露解答</small></div>:
+    {!show?<div className="code-exercise"><span className="section-number">練習</span><h2>{slide.exercise}</h2><div className="exercise-rule"/><ExerciseExamples tables={slide.excerpt!.exerciseExamples}/><small>按下一步揭露解答</small></div>:
       <SourceEditor key={slide.id} slide={slide} focusStep={Math.max(0,step-(slide.exercise?1:0))}/>}
   </div>;
+}
+function ExerciseExamples({tables}:{tables:{title:string;columns:string[];rows:string[][]}[]}) {
+  return <div className="exercise-examples">{tables.map(table=><section key={table.title}>
+    <h3>{table.title}</h3>
+    <table><thead><tr>{table.columns.map(column=><th key={column} scope="col">{column}</th>)}</tr></thead>
+      <tbody>{table.rows.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody>
+    </table>
+  </section>)}</div>;
 }
 function SourceEditor({slide,focusStep}:{slide:Slide;focusStep:number}) {
   const e=slide.excerpt!,transition=useTiming();
   const range=e.focusRanges[focusStep];
   const selected=(line:number)=>line>=Number(range[0])&&line<=Number(range[1]);
   const language=slide.code[0].lang==='plain text'?'text':slide.code[0].lang;
+  const highlighted=useMemo(()=>highlightRows(sources[e.block-1].code,language,e.rows),[e,language]);
   return <><div className="source-meta"><span><i className="editor-dots"><i/><i/><i/></i>{e.filename}</span><span>{e.context||slide.code[0].lang.toUpperCase()}</span><b>{e.rows[0].sourceLine}–{e.rows.at(-1)!.sourceLine}</b></div>
     <div className="source-code">
       <CodeFocusRail selection={String(focusStep)} duration={transition.duration}/>
-      <pre><code>{e.rows.map((row,i)=><span className={'source-row '+(selected(row.sourceLine)?'focused':'')} data-source-line={row.sourceLine} data-display-row={i} key={i} style={{opacity:selected(row.sourceLine)?1:.7,transition:transition.duration?'opacity .5s cubic-bezier(.22,1,.36,1)':'none'}}><span className="source-line-no">{row.continuation?<CornerDownRight size={15}/>:String(row.sourceLine).padStart(2,'0')}</span><span className="source-text" dangerouslySetInnerHTML={{__html:html(row.text,language)}}/></span>)}</code></pre>
+      <pre><code>{e.rows.map((row,i)=><span className={'source-row '+(selected(row.sourceLine)?'focused':'')} data-source-line={row.sourceLine} data-display-row={i} key={i} style={{opacity:selected(row.sourceLine)?1:.7,transition:transition.duration?'opacity .5s cubic-bezier(.22,1,.36,1)':'none'}}><span className="source-line-no">{row.continuation?<CornerDownRight size={15}/>:String(row.sourceLine).padStart(2,'0')}</span><span className="source-text" dangerouslySetInnerHTML={{__html:highlighted[i]}}/></span>)}</code></pre>
     </div>
+    {e.explanations.length>0&&<EnvironmentExplanation explanation={e.explanations[focusStep]}/>}
     {e.block===24&&<SchemaBridge step={focusStep}/>}
   </>;
+}
+function EnvironmentExplanation({explanation}:{explanation:{title:string;lines:string[];prompt:string}}) {
+  return <aside className="environment-explanation" aria-label={explanation.title}>
+    <h2>{explanation.title}</h2>
+    {explanation.prompt&&<div className="environment-prompt"><code><strong>(.venv)</strong> {explanation.prompt}</code></div>}
+    {explanation.lines.map(line=><p key={line}>{line}</p>)}
+  </aside>;
 }
 function SchemaBridge({step}:{step:number}) {
   const t=useTiming();
@@ -77,10 +92,6 @@ function Erd({step}:{step:number}) {
   const t=useTiming();
   return <div className="new-erd"><svg className="erd-wires" viewBox="0 0 1300 400">{step>0&&<g className="erd-cardinality"><text x="350" y="130">1</text><text x="447" y="175">*</text><text x="836" y="175">*</text><text x="940" y="130">1</text></g>}<motion.path initial={false} animate={{pathLength:step?1:0}} transition={t} d="M310 150 C450 150 400 200 480 200"/><motion.path initial={false} animate={{pathLength:step?1:0}} transition={t} d="M820 200 C900 200 850 150 990 150"/>{!step&&<path d="M310 150 C650 -50 650 -50 990 150" className="erd-many"/>}</svg><div className="erd-boxes">{[['members','id  PK','name','email  UNIQUE'],['enrollments','member_id  PK, FK','course_id  PK, FK','status'],['courses','id  PK','title','capacity']].map(([name,...fields],i)=><motion.div className={'erd-entity '+(i===1?'bridge':'')} key={name} initial={false} animate={{opacity:i===1&&!step?0:1,y:i===1&&!step?10:0}} transition={t}><h3>{name}</h3>{fields.map(f=><div key={f}>{f}</div>)}</motion.div>)}</div><div className="erd-explanation">{step===0?'一位社員可報名多門課，一門課也有多位社員。':'一個多對多關係，拆成兩個一對多關係。'}</div><Reveal show={step>=2}><div className="erd-key"><span>PRIMARY KEY</span><code>(member_id, course_id)</code><p>同一社員與課程的配對不可重複。</p></div></Reveal></div>;
 }
-function Join({step}:{step:number}) {
-  const t=useTiming();
-  return <div className="new-join"><div className="join-sources">{[['enrollments','member_id: 1','course_id: 1','status: enrolled'],['members','id: 1','name: 王小明'],['courses','id: 1','title: Backend Workshop','capacity: 30']].map(([name,...values],i)=><motion.div key={name} initial={false} animate={{opacity:step>=i?1:.22,borderColor:step===i?'var(--blue)':'var(--border)'}} transition={t}><h3>{name}</h3>{values.map(v=><code key={v}>{v}</code>)}</motion.div>)}</div><div className="join-bindings"><Reveal show={step>=1}>e.member_id = m.id</Reveal><Reveal show={step>=2}>e.course_id = c.id</Reveal></div><div className="join-query"><code>{['FROM enrollments AS e','JOIN members AS m ON m.id = e.member_id','JOIN courses AS c ON c.id = e.course_id','WHERE c.id = ?  ·  ORDER BY m.id'][step]}</code></div><div className="join-output"><span>查詢結果</span>{['王小明','Backend Workshop','30','enrolled'].map((s,i)=><motion.div key={s} initial={false} animate={{opacity:step>=3?1:0,y:step>=3?0:10}} transition={t}>{s}</motion.div>)}</div></div>;
-}
 function Transaction({step}:{step:number}) {
   const t=useTiming();
   return <div className={'new-transaction state-'+step}><div className="transaction-phases">{['開始','暫存變更','COMMIT','ROLLBACK'].map((name,i)=><span key={name} className={step===i?'active':''}>{name}</span>)}</div><div className="transaction-workspace"><div className="transaction-bracket"><span>with connection:</span>{['INSERT members','INSERT courses'].map((value,i)=><motion.div className="transaction-record" key={value} initial={false} animate={{x:step===2?769:0,opacity:step===0?.25:1,backgroundColor:step===3?'var(--error-bg)':step===2?'var(--success-bg)':'var(--surface)'}} transition={t}><code>{value}</code><b>{step===0?'待執行':step===3?(i===0?'已還原':'capacity = 0：CHECK 失敗'):i===0?'王小明':'Backend Workshop'}</b></motion.div>)}</div><div className="transaction-database"><Database size={64} strokeWidth={1}/><h3>workshop.db</h3><strong>{step===2?'2 筆':'0 筆'}</strong><span>{step===2?'已保存':'本次新增且已保存的資料'}</span></div></div><motion.div className="transaction-verdict" initial={false} animate={{borderColor:step===3?'var(--red)':step===2?'var(--green)':'var(--border)'}} transition={t}><b>{['交易前','等待交易結果','所有寫入一起保存','所有寫入一起還原'][step]}</b><p>{['建立社員與課程，放在同一個 transaction。','成功結束前，先把變更視為一組。','正常離開 with connection，執行 commit。','另一個失敗情境：課程容量違反限制，社員寫入也 rollback。'][step]}</p></motion.div></div>;
@@ -108,7 +119,9 @@ export function WorkshopScene(props:{slide:Slide;step:number;still?:boolean;rema
     case 37:body=<CourseTable step={step}/>;break;
     case 39:body=<Erd step={step}/>;break;
     case 40:body=<SqlOverview step={step}/>;break;
-    case 41:body=<Join step={step}/>;break;
+    case 41:body=<JoinQuery step={step} still={still} demo={slide.joinDemo!}/>;break;
+    case 50001:body=<Unpacking step={step} still={still}/>;break;
+    case 50002:body=<Unpacking step={step} still={still} merge/>;break;
     case 43:body=<Transaction step={step}/>;break;
     case 44:body=<PacketScene step={step} whole/>;break;
     case 48:body=<End/>;break;

@@ -667,6 +667,8 @@ class CourseCreate(BaseModel):
 
 **畫面內容**
 
+本頁完整 create_course 程式碼之後，以獨立三步動畫呈現 Course(id=3, **payload.model_dump())、** 帶入 dict、展開為 title 與 capacity 的具名參數。
+
 ```python
 @app.post("/courses", response_model=Course, status_code=201)
 def create_course(payload: CourseCreate, response: Response) -> Course:
@@ -696,6 +698,8 @@ def create_course(payload: CourseCreate, response: Response) -> Course:
 **建議時間：5 分鐘｜累計：95 分鐘**
 
 **畫面內容**
+
+在 PATCH 合併程式碼前，以實際 {**stored_course.model_dump(), **changes} 運算式呈現兩份 dict、展開左側、展開右側；capacity=35 覆蓋舊值 30，id 與 title 保留。
 
 左右雙欄：
 
@@ -1108,34 +1112,31 @@ Enrollment 卡內顯示：`member_id`、`course_id`、`status`
 
 ---
 
-## 41 — JOIN：把關係重新組成答案
+## 41 — JOIN：資料如何變成結果
 
 **建議時間：4 分鐘｜累計：164 分鐘**
 
 **畫面內容**
 
-```sql
-SELECT m.name, c.title, c.capacity, e.status
-FROM enrollments AS e
-JOIN members AS m ON m.id = e.member_id
-JOIN courses AS c ON c.id = e.course_id
-WHERE c.id = ?
-ORDER BY m.id;
-```
-
-右側結果卡：`王小明｜Backend Workshop｜30｜enrolled`
+三張來源表放在上方，當下資料放在下方。報名輸入順序為社員 3／課程 1、社員 2／課程 2、社員 1／課程 1。
+依 FROM → JOIN members → JOIN courses → WHERE → SELECT → ORDER BY 手動推進，只以短標籤提示當下操作。對照前頁的完整 SQL，沿用相同順序展示資料變化。
+參數 ? = 1；最後只留下王小明、陳怡君的 Backend Workshop 報名，capacity=30、status=enrolled。
 
 **講者筆記**
 
-- 從想回答的問題開始：「這堂課有哪些人報名？」需要三張 table 的欄位。
-- `FROM enrollments` 以關係表為起點，兩次 JOIN 依 foreign key 找到 member 與 course。
-- `WHERE c.id = ?` 限定目標課程；`ORDER BY` 讓結果順序穩定。
-- `?` 是參數 placeholder，值另外傳入，避免自己拼接 SQL 字串。
+- 以資料處理的概念順序解釋完整查詢，不將 SQL 當成逐行執行的程式。
+- FROM 先取三筆 enrollments；member_id 依序為 3、2、1。
+- JOIN members 依 m.id = e.member_id 補上姓名；JOIN courses 依 c.id = e.course_id 補上課程名稱與容量。
+- WHERE c.id = ? 的參數為 1，移除李小華報名 Database Training 的那筆資料，三筆變兩筆。
+- SELECT 只留下 name、title、capacity、status，配對用的兩個 ID 不列入結果。
+- ORDER BY m.id 將社員順序由 3、1 改成 1、3，最終為王小明、陳怡君。
+- ? 是參數 placeholder；查詢字串與參數分開傳入，下一段 Python 程式會展示實際執行方式。
 
 **動畫／轉場**
 
-- 三張迷你 table 先分開；JOIN 行被高亮時，對應 columns 以細線連接。
-- 最後只保留選出的四個欄位，合成結果卡。
+- 來源表固定可見，下方結果表使用完整頁寬；完整 SQL 已於前頁呈現。
+- 對應鍵高亮後補入欄位；未符合資料先淡出，保留列再平移補位。SELECT 隱藏 ID，ORDER BY 平順調整列序。
+- 每個欄位與資料列保持同一節點，只使用單層位移與透明度；所有步驟可返回，減少動態效果直接呈現結果。
 
 ---
 

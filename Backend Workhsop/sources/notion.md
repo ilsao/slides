@@ -56,19 +56,29 @@ Notion 講義快照
 python3 --version
 ```
 建立專案與 Virtual Environment：
+`backend-workshop` 是專案目錄；程式碼（例如 `main.py`）放在這裡，與 `.venv` 並列。
+`.venv` 存放專案專用的 Python 執行環境與套件，用來隔離不同專案的套件版本。
 ```bash
 mkdir backend-workshop
 cd backend-workshop
 python3 -m venv .venv
 ```
+建立完成會出現 `.venv/` 資料夾，但目前終端機還沒有啟用它。
+
 macOS／Linux 啟用方式：
 ```bash
 source .venv/bin/activate
 ```
+啟用成功後，提示符通常會像這樣：`(.venv) backend-workshop %`（示意）。
+
 Windows PowerShell 啟用方式：
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
+啟用成功後，提示符通常會像這樣：`(.venv) PS C:\...\backend-workshop>`（示意）。
+
+提示符前通常會出現 `(.venv)`；後續 `python` 與 `python -m pip` 使用這個環境。啟用只作用於目前終端機，新開終端機需要再次啟用。
+
 安裝 FastAPI 與開發伺服器：
 ```bash
 python -m pip install "fastapi[standard]"
@@ -108,17 +118,33 @@ except ValueError as error:
 -  `dict` 用 Key-Value 儲存資料，並使用 Key 來檢索
 ## Exercise: Filter Courses
 實作 `filter_courses(courses, minimum_capacity)`，回傳容量大於等於 `minimum_capacity` 的課程，並補上 Type Hint。
+
+輸入 courses
+
+| ID | 課程 | 容量 |
+| --- | --- | --- |
+| 1 | Backend Workshop | 30 |
+| 2 | Database Workshop | 25 |
+
+預期結果
+
+| minimum_capacity | 回傳課程 ID |
+| --- | --- |
+| 25 | [1, 2] |
+| 30 | [1] |
+| 31 | [] |
+
 <details>
 <summary>參考解答</summary>
 	```python
 def filter_courses(
     courses: list[dict], minimum_capacity: int
 ) -> list[dict]:
-    return [
-        course
-        for course in courses
-        if course["capacity"] >= minimum_capacity
-    ]
+    result = []
+    for course in courses:
+        if course["capacity"] >= minimum_capacity:
+            result.append(course)
+    return result
 	```
 </details>
 # Backend & Web Overview
@@ -405,6 +431,10 @@ class Course(CourseCreate):
 - `CourseCreate`：Client 建立課程時必須提供 `title`、`capacity`。
 - `CourseUpdate`：所有欄位都可省略；本例也接受 `null`，並將它視為不修改，適合部分更新。
 - `Course`：Response 比建立輸入多了由 Server 產生的 `id`。
+`**payload.model_dump()`：dict 的 title、capacity 展開為具名參數，例如 `Course(id=3, title="Backend Workshop", capacity=30)`。
+
+`{**stored_course.model_dump(), **changes}`：合併兩份 dict，右側覆蓋同名欄位。例如 changes 的 capacity=35 取代舊值 30，id 與 title 保留。
+
 以下是本次工作坊可直接執行的完整 `main.py`。這是課前提供與課後查閱的 Reference Implementation；課堂中只逐步實作核心 Route。請用它取代前面的練習版本：
 ```python
 from typing import Annotated
@@ -753,6 +783,22 @@ JOIN courses AS c ON c.id = e.course_id
 WHERE c.id = ?
 ORDER BY m.id
 ```
+本機投影片先聚焦完整 SQL，再於下一頁展示資料變化。範例資料：
+
+| enrollments.member_id | course_id | status |
+|---|---|---|
+| 3 | 1 | enrolled |
+| 2 | 2 | enrolled |
+| 1 | 1 | enrolled |
+
+社員 1／王小明、2／李小華、3／陳怡君；課程 1／Backend Workshop／30，課程 2／Database Training／25。
+`FROM` 取出三筆報名，兩次 `JOIN` 補上姓名、課程與容量；參數 `? = 1` 讓 `WHERE` 移除課程 2 的報名。`SELECT` 留下四個欄位，`ORDER BY m.id` 將社員順序從 3、1 排成 1、3。
+
+| name | title | capacity | status |
+|---|---|---|---|
+| 王小明 | Backend Workshop | 30 | enrolled |
+| 陳怡君 | Backend Workshop | 30 | enrolled |
+
 下面的程式展示了如何在 Python 中使用 SQL。這邊我們使用的 DBMS 是 SQLite。
 創建一個檔案 `database_demo.py` ，並貼上下面的程式：
 ```python
@@ -906,6 +952,22 @@ deleted rows: 1
 第二次執行時，課程容量已在第一次被更新為 `35`，因此第一行會顯示 `35`。這正是 Persistence：Process 結束後資料仍存在。
 ## Exercise: Write a Query
 寫出參數化查詢，列出容量至少為 `20` 的課程，並依容量由大到小排序。
+
+範例輸入 courses
+
+| ID | 課程 | 容量 |
+| --- | --- | --- |
+| 2 | Database Workshop | 20 |
+| 3 | Web Workshop | 10 |
+| 1 | Backend Workshop | 30 |
+
+預期結果（容量 ≥ 20）
+
+| ID | 課程 | 容量 |
+| --- | --- | --- |
+| 1 | Backend Workshop | 30 |
+| 2 | Database Workshop | 20 |
+
 <details>
 <summary>參考解答</summary>
 	```python

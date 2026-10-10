@@ -1,5 +1,6 @@
 // Explicit teaching groups: original source lines, inclusive, and presenter cue.
 // Wrapped display rows inherit their source line's selection.
+import joinDemo from '../sources/join-demo.json' with { type: 'json' };
 export const codeFocus = {
   11001: [[1,1,'確認 Python 版本']],
   12001: [[1,2,'建立並進入專案資料夾'],[3,3,'建立虛擬環境']],
@@ -8,7 +9,7 @@ export const codeFocus = {
   15001: [[1,1,'在虛擬環境安裝 FastAPI']],
   7: [[1,1,'參數與回傳型別'],[2,4,'逐筆查找並回傳'],[6,7,'找不到時拋出 ValueError']],
   9: [[1,4,'以 list 與 dict 保存課程'],[6,9,'呼叫查找函式'],[10,11,'捕捉 ValueError']],
-  18001: [[1,3,'清單、容量門檻與回傳型別'],[4,8,'依容量條件組成新清單']],
+  18001: [[1,3,'清單、容量門檻與回傳型別'],[4,8,'以 for、if 篩選並回傳新清單']],
   18: [[1,4,'匯入並建立 FastAPI'],[7,9,'用 decorator 宣告路由'],[10,11,'回傳 dict，由 FastAPI 轉成 JSON']],
   26001: [[1,1,'啟動 main.py']],
   27001: [[1,4,'建立初始課程清單']],
@@ -35,7 +36,7 @@ export const codeFocus = {
   37001: [[1,3,'SELECT 指定欄位與資料表'],[4,4,'WHERE 限制要查詢的社員']],
   38001: [[1,3,'UPDATE 設定新 Email'],[4,4,'WHERE 限制更新範圍']],
   39001: [[1,3,'DELETE 只刪除符合條件的社員']],
-  40001: [[1,2,'從報名表選出所需欄位'],[3,4,'用外鍵 JOIN 社員與課程'],[5,6,'指定課程並排序']],
+  40001: joinDemo.stages.map(stage => [stage.sourceLine, stage.sourceLine, stage.label]),
   41001: [[1,4,'匯入 SQLite 並設定檔案路徑'],[6,9,'以多行字串定義 members 與主鍵'],[10,14,'姓名、Email 與加入時間的限制']],
   41016: [[16,18,'課程主鍵與非空白標題'],[19,20,'容量必須是 1–500 的整數'],[21,22,'預設建立時間，結束資料表定義']],
   41024: [[24,29,'報名欄位、狀態限制與預設時間'],[30,31,'複合主鍵避免重複報名'],[32,36,'外鍵與連帶刪除，結束 SCHEMA 字串']],

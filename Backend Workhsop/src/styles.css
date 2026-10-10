@@ -2236,6 +2236,36 @@
   font-weight: 400;
   color: var(--code-ink);
 }
+:where([data-deck="backend-workshop"]) .environment-explanation {
+  margin-top: 24px;
+  padding: 24px 30px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+:where([data-deck="backend-workshop"]) .environment-explanation h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+  line-height: 1.4;
+}
+:where([data-deck="backend-workshop"]) .environment-explanation p {
+  margin: 8px 0 0;
+  font-size: 24px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+:where([data-deck="backend-workshop"]) .environment-prompt {
+  margin-bottom: 16px;
+  font-size: 27px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+:where([data-deck="backend-workshop"]) .environment-prompt strong {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--focus-bg);
+  color: var(--ink);
+}
 :where([data-deck="backend-workshop"]) .source-row {
   height: 34px;
   min-height: 34px;
@@ -2272,16 +2302,16 @@
   pointer-events: none;
 }
 :where([data-deck="backend-workshop"]) .code-exercise {
-  padding: 45px 60px;
+  padding: 24px 40px;
 }
 :where([data-deck="backend-workshop"]) .section-number {
   font-size: 22px;
   color: var(--muted);
 }
 :where([data-deck="backend-workshop"]) .code-exercise h2 {
-  font-size: 45px;
-  line-height: 1.6;
-  margin-top: 24px;
+  font-size: 36px;
+  line-height: 1.4;
+  margin: 16px 0;
   font-weight: 500;
   max-width: 1100px;
 }
@@ -2289,7 +2319,7 @@
   width: 80px;
   height: 2px;
   background: var(--border);
-  margin: 37px 0;
+  margin: 20px 0;
 }
 :where([data-deck="backend-workshop"]) .code-exercise p {
   font-size: 28px;
@@ -2299,7 +2329,34 @@
   font-size: 19px;
   color: var(--muted);
   display: block;
-  margin-top: 55px;
+  margin-top: 24px;
+}
+:where([data-deck="backend-workshop"]) .exercise-examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+:where([data-deck="backend-workshop"]) .exercise-examples h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 500;
+}
+:where([data-deck="backend-workshop"]) .exercise-examples table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 22px;
+  line-height: 1.5;
+}
+:where([data-deck="backend-workshop"]) .exercise-examples th,
+:where([data-deck="backend-workshop"]) .exercise-examples td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+:where([data-deck="backend-workshop"]) .exercise-examples th {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 500;
 }
 :where([data-deck="backend-workshop"]) .schema-bridge {
   display: grid;
@@ -4090,3 +4147,101 @@
 
 :where([data-deck="backend-workshop"]) .preview *,:where([data-deck="backend-workshop"]) .preview *::before,:where([data-deck="backend-workshop"]) .preview *::after { animation: none !important; transition: none !important; }
 :where([data-deck="backend-workshop"]) .backend-rest-controls { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #deded9; border-radius: 12px; background: #fffffff2; white-space: nowrap; box-shadow: 0 4px 20px #0001; }
+
+/* Source tables and data operations use the full slide width. */
+:where([data-deck="backend-workshop"]) .join-query-scene {
+  height: 100%; display: grid; grid-template-rows: 240px 360px; gap: 32px; align-content: center;
+}
+:where([data-deck="backend-workshop"]) .join-query-sources {
+  display: grid; grid-template-columns: 1.05fr .75fr 1.6fr; gap: 32px;
+}
+:where([data-deck="backend-workshop"]) .join-query-sources section { min-width: 0; }
+:where([data-deck="backend-workshop"]) .join-query-sources h2 {
+  margin: 0 0 10px; font: 26px/1.4 var(--font-code); display: flex; justify-content: space-between; align-items: baseline;
+}
+:where([data-deck="backend-workshop"]) .join-query-sources h2 span { font-size: 18px; color: var(--muted); }
+:where([data-deck="backend-workshop"]) .join-query-sources table {
+  width: 100%; border-collapse: collapse; font: 22px/30px var(--font-code);
+}
+:where([data-deck="backend-workshop"]) .join-query-sources th {
+  text-align: left; color: var(--muted); font-size: 18px; font-weight: 400; border-top: 1px solid var(--border);
+}
+:where([data-deck="backend-workshop"]) .join-query-sources th,
+:where([data-deck="backend-workshop"]) .join-query-sources td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+:where([data-deck="backend-workshop"]) .join-query-output { min-width: 0; }
+:where([data-deck="backend-workshop"]) .join-query-output-heading { display: flex; align-items: baseline; justify-content: space-between; height: 50px; }
+:where([data-deck="backend-workshop"]) .join-query-output-heading h2 { font-size: 30px; font-weight: 500; margin: 0; }
+:where([data-deck="backend-workshop"]) .join-query-output-heading span { color: var(--muted); font-size: 22px; }
+:where([data-deck="backend-workshop"]) .join-query-grid { position: relative; height: 248px; }
+:where([data-deck="backend-workshop"]) .join-query-grid-header { height: 48px; border-bottom: 1px solid var(--border); }
+:where([data-deck="backend-workshop"]) .join-query-grid-header > div {
+  position: absolute; top: 0; left: 0; padding: 10px 12px; font: 18px/28px var(--font-code); color: var(--muted);
+}
+:where([data-deck="backend-workshop"]) .join-query-grid-row {
+  position: absolute; left: 0; top: 48px; width: 100%; height: 60px; background: var(--canvas); border-bottom: 1px solid var(--border);
+}
+:where([data-deck="backend-workshop"]) .join-query-cell { position: absolute; left: 0; top: 0; padding: 14px 12px; font: 24px/32px var(--font-code); white-space: nowrap; }
+:where([data-deck="backend-workshop"]) .join-query-caption { position: relative; height: 62px; padding-top: 14px; border-top: 1px solid var(--border); }
+:where([data-deck="backend-workshop"]) .join-query-caption p { position: absolute; top: 14px; left: 0; margin: 0; font-size: 24px; line-height: 1.4; color: var(--muted); }
+
+/* Fixed code anchors with a single transform layer for travelling fields. */
+:where([data-deck="backend-workshop"]) .unpack-workspace {
+  position: relative; height: 100%; display: grid; align-content: center; gap: 24px;
+}
+:where([data-deck="backend-workshop"]) .unpack-call {
+  grid-template-columns: 500px 1fr; grid-template-rows: 340px 36px; column-gap: 32px;
+}
+:where([data-deck="backend-workshop"]) .unpack-merge {
+  grid-template-rows: 240px 314px 36px; gap: 16px;
+}
+:where([data-deck="backend-workshop"]) .unpack-sources { display: flex; gap: 64px; }
+:where([data-deck="backend-workshop"]) .unpack-sources section { flex: 1; min-width: 0; }
+:where([data-deck="backend-workshop"]) .unpack-sources h2 {
+  margin: 0 0 12px; font: 22px/1.5 var(--font-code); color: var(--muted);
+}
+:where([data-deck="backend-workshop"]) .unpack-literal,
+:where([data-deck="backend-workshop"]) .unpack-evaluation,
+:where([data-deck="backend-workshop"]) .unpack-moving-fields {
+  font: 26px/39px var(--font-code);
+}
+:where([data-deck="backend-workshop"]) .unpack-operation { min-width: 0; }
+:where([data-deck="backend-workshop"]) .unpack-call .unpack-operation {
+  border-left: 2px solid var(--border); padding-left: 32px; height: 340px;
+}
+:where([data-deck="backend-workshop"]) .unpack-merge .unpack-operation {
+  border-top: 2px solid var(--border); padding-top: 22px;
+}
+:where([data-deck="backend-workshop"]) .unpack-line { height: 39px; white-space: nowrap; }
+:where([data-deck="backend-workshop"]) .unpack-line.indent { padding-left: 1.25em; }
+:where([data-deck="backend-workshop"]) .unpack-source-reference {
+  display: inline-block; color: var(--muted);
+}
+:where([data-deck="backend-workshop"]) .unpack-evaluation { position: relative; height: 273px; }
+:where([data-deck="backend-workshop"]) .unpack-code-line,
+:where([data-deck="backend-workshop"]) .unpack-field-target {
+  position: absolute; top: 0; left: 0; white-space: nowrap; line-height: 39px;
+}
+:where([data-deck="backend-workshop"]) .unpack-field-target { visibility: hidden; }
+:where([data-deck="backend-workshop"]) .unpack-moving-fields {
+  position: absolute; inset: 0; pointer-events: none;
+}
+:where([data-deck="backend-workshop"]) .unpack-token {
+  position: absolute; top: 0; left: 0; height: 39px; white-space: nowrap;
+}
+:where([data-deck="backend-workshop"]) .unpack-token > span,
+:where([data-deck="backend-workshop"]) .unpack-punctuation > span {
+  position: absolute; top: 0; left: 0;
+}
+:where([data-deck="backend-workshop"]) .unpack-value { color: var(--blue); }
+:where([data-deck="backend-workshop"]) .unpack-punctuation { color: var(--muted); }
+:where([data-deck="backend-workshop"]) .unpack-operator { color: var(--blue); font-weight: 600; }
+:where([data-deck="backend-workshop"]) .unpack-new-value { color: #7b3fb3; }
+:where([data-deck="backend-workshop"]) .unpack-expression {
+  font: 26px/1.5 var(--font-code); margin-bottom: 16px;
+}
+:where([data-deck="backend-workshop"]) .unpack-caption {
+  position: relative; grid-column: 1 / -1; margin: 0; font-size: 24px; line-height: 1.5; color: var(--muted);
+}
+:where([data-deck="backend-workshop"]) .unpack-caption > span { position: absolute; top: 0; left: 0; }

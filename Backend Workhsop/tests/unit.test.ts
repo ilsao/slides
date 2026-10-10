@@ -6,7 +6,7 @@ import type { DeckDefinition } from '../../src/presentation/types';
 
 describe('workshop content', () => {
   it('preserves every source slide and hides only the unfinished lab', () => {
-    expect(allSlides.length).toBe(slides.length+1); expect(slides.length).toBe(90);
+    expect(allSlides.length).toBe(slides.length+1); expect(slides.length).toBe(92);
     expect(allSlides.filter(s=>s.hidden).map(s=>s.id)).toEqual([46]);
     expect(new Set(allSlides.map(s=>s.id)).size).toBe(allSlides.length);
     for(const s of allSlides) { expect(s.notes.length).toBeGreaterThan(0); expect(s.cues.length).toBeGreaterThan(0); expect(s.notes.join(' ')).not.toContain('teach.md'); }

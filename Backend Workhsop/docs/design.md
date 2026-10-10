@@ -53,6 +53,7 @@ curl 五條指令共用一個 14 行編輯器，以五個手動步驟聚焦，�
 - 概念與圖解：學習目標改為三欄大字；Python 概念與環境確認使用開放留白；Route 對照使用文字與細線。比較和資料分組才使用面板。
 - HTTP：各部分組成連續的訊息閱讀面，標籤與引線靠近對應內容；目前區段保留淺藍焦點。
 - 程式：共用固定標題、深灰編輯器、來源行號與大型聚焦框。14 行上限與來源分段不變。
+- 程式高亮：`code-highlighting.ts` 先解析完整來源，再依來源行與折行位置切分，保留註解、字串與跨頁上下文。Python 中的 SQL 字串另用 SQL 語法高亮；Python 引號、一般字串與插值保留原本樣式。
 - 資料模型：放大欄位矩陣與模型欄寬；相同行名在 Create、Update、Response 之間直接對照。
 - Table、Schema、ERD、JOIN：白底、細分隔線，欄位名稱與關係線可直接對照。
 - 操作介面由根目錄的共用播放器提供；Workshop 專屬色彩、字型與頁面幾何限定於 `data-deck="backend-workshop"`。
@@ -63,4 +64,4 @@ curl 五條指令共用一個 14 行編輯器，以五個手動步驟聚焦，�
 
 跨頁仍為 0.3 秒淡化：不透明的新頁在下方，舊頁在上方淡出。舞台容器持續存在。快速操作取代過期動畫，首頁預覽靜態，減少動態效果時直接切換。
 
-教材版本為 8、90 頁與 180 分鐘。curl 合併保留 ID 30001，Schema 移到 CRUD 與 JOIN 之後、Connection 之前；刪除回顧頁的來源流程整合至 ID 44。HTTP、Path／Query、Route／Endpoint 與 REST 仍由 ConceptScenes.tsx 呈現。升版保留穩定 ID 與計時，步驟回到起點，已移除頁面導回對應保留頁。
+教材版本為 12、92 頁與 180 分鐘。JOIN 資料動畫保留 ID 41，三張來源表與結果表上下排列；完整 SQL 保留 ID 40001，先於 P70 依六步聚焦，再於 P71 展示資料變化。SQL 與動畫頁分別為 48 秒與 96 秒。PATCH 合併程式頁為 P54，dict 合併動畫移至 P55。curl 合併保留 ID 30001，Schema 移到 CRUD 與 JOIN 之後、Connection 之前；刪除回顧頁的來源流程整合至 ID 44。HTTP、Path／Query、Route／Endpoint 與 REST 仍由 ConceptScenes.tsx 呈現。升版保留穩定 ID 與計時，步驟回到起點，已移除頁面導回對應保留頁。

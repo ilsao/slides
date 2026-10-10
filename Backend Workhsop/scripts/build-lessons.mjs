@@ -5,6 +5,7 @@ const read = p => JSON.parse(readFileSync(new URL('../' + p, import.meta.url), '
 const write = (p, value) => writeFileSync(new URL('../' + p, import.meta.url), typeof value === 'string' ? value : JSON.stringify(value, null, 2) + '\n');
 const base = read('src/content.json');
 const sources = read('sources/notion-code.json');
+const joinDemo = read('sources/join-demo.json');
 // Freeze page numbers and timing before this revision; never infer IDs from
 // the already-regenerated deck when rebuilding.
 const previousPages = read('sources/revision-7-pages.json');
@@ -57,7 +58,7 @@ const titles = {
   26:'PATCH：部分更新課程',27:'使用 Swagger UI 查看與測試 API',28:'休息十分鐘',29:'比較兩種 API 路徑設計',
   30:'REST：Resource 與 HTTP Method',31:'Collection 與 Item',32:'Path、Query 與 Body 的用途',33:'Stateless：獨立處理每個請求',
   34:'練習：設計 Enrollment API',35:'記憶體儲存的限制',36:'Database、DBMS 與資料檔案',37:'Table、Column 與 Row',
-  38:'資料庫的鍵與限制條件',39:'用關聯表表示課程報名',40:'SQL 的 CRUD',41:'使用 JOIN 查詢報名資料',
+  38:'資料庫的鍵與限制條件',39:'用關聯表表示課程報名',40:'SQL 的 CRUD',41:'JOIN：資料如何變成結果',
   42:'在 Python 中執行參數化 SQL',43:'Transaction：提交與還原',44:'報名請求的完整處理流程',45:'課程重點回顧',46:'Final Lab',47:'延伸學習',
 };
 const cues = {
@@ -75,7 +76,7 @@ const cues = {
   34:['先討論 60–90 秒','Method、Path 與 Body','201 Created','409 Conflict'],35:['記憶體資料','重新啟動','持久儲存'],
   36:['Client 與 FastAPI','SQL 到 SQLite','讀寫 workshop.db','Rows 與 JSON 傳回 Client'],37:['Table','Column：capacity','Row：完整第一筆'],
   38:['PRIMARY KEY','FOREIGN KEY','NOT NULL / UNIQUE','CHECK / DEFAULT'],39:['多對多','中介表','複合主鍵'],
-  40:['INSERT','SELECT','UPDATE','DELETE'],41:['enrollments','配對 members','配對 courses','結果資料列'],
+  40:['INSERT','SELECT','UPDATE','DELETE'],41:joinDemo.stages.map(stage=>stage.label),
   43:['交易前的狀態','兩次寫入暫存','成功：COMMIT','失敗：ROLLBACK'],
   44:['Client','HTTP','FastAPI Route','Validation','Business Logic','SQL','Database','Response'],45:['HTTP','Backend','Database'],
   46:['未列入播放'],47:['Database Design','Migration','Auth','Testing','Production'],
@@ -114,7 +115,7 @@ const sceneMotion = {
   27:'整頁一次顯示操作步驟、兩份 JSON 與預期結果；沒有模擬介面、送出動畫或答案揭露。請學員在自己的 /docs 實際操作。',
   37:'Column 的 capacity 與 Row 的第一筆資料，分別將對應儲存格完整填入淺藍底。',
   39:'先展示兩端資料表，再揭露中介表與一對多關係；最後呈現完整欄位、PK 與 FK。',
-  41:'依序以同一藍色配對兩個外鍵；最後顯示 JOIN 產生的結果資料列。',
+  41:'三張來源表固定可見；高亮配對鍵、補上欄位、篩選、投影，最後調整列序。對照前頁的完整 SQL。',
   43:'暫存變更保留在左側，COMMIT 移入右側資料庫；獨立失敗情境回到左側並顯示還原。',
   47:'五個等距學習方向與引言在內容區垂直置中；手動逐項揭露，連線止於首尾節點中心。',
   44:'藍色標記沿固定節點移動，依序說明報名請求的八個處理環節。',
@@ -165,6 +166,16 @@ function wrap(text) {
   rows.push({text:remaining,continuation,continuationIndent:continuation?indent:0});return rows;
 }
 function source(id) { return sources[id-1]; }
+const exerciseExamples = {
+  8: [
+    {"title":"輸入 courses","columns":["ID","課程","容量"],"rows":[["1","Backend Workshop","30"],["2","Database Workshop","25"]]},
+    {"title":"預期結果","columns":["minimum_capacity","回傳課程 ID"],"rows":[["25","[1, 2]"],["30","[1]"],["31","[]"]]},
+  ],
+  34: [
+    {"title":"範例輸入 courses","columns":["ID","課程","容量"],"rows":[["2","Database Workshop","20"],["3","Web Workshop","10"],["1","Backend Workshop","30"]]},
+    {"title":"預期結果（容量 ≥ 20）","columns":["ID","課程","容量"],"rows":[["1","Backend Workshop","30"],["2","Database Workshop","20"]]},
+  ],
+};
 function code(id, start, end, group, title, notes, options={}) {
   const s=source(id), lines=s.code.split('\n');end=end??lines.length;
   const rows=lines.slice(start-1,end).flatMap((line,i)=>options.omitBlankLines?.includes(start+i)&&!line.trim()?[]:wrap(line).map(r=>({...r,sourceLine:start+i})));
@@ -195,12 +206,12 @@ function code(id, start, end, group, title, notes, options={}) {
     pages.push({
       id:pageId,title:pageTitle,group,kind:'code',hidden:false,weight:options.weight??Math.max(.5,rs.length/8),
       cues:prompt?['先作答，再揭露解答',...codeCues]:codeCues,
-      notes:[...notes,...(options.result?[options.result]:[]),'來源：Notion「'+s.section+'」，區塊 '+id+'，第 '+rs[0].sourceLine+'–'+rs.at(-1).sourceLine+' 行。',
+      notes:[...notes,...(exerciseExamples[id]??[]).map(table=>table.title+'：'+table.rows.map(row=>row.join(' / ')).join('；')),...(options.result?[options.result]:[]),'來源：Notion「'+s.section+'」，區塊 '+id+'，第 '+rs[0].sourceLine+'–'+rs.at(-1).sourceLine+' 行。',
         ...(part>0?['接續前頁同一份程式；縮排與行號保持原始上下文。']:[])],
       motion:['逐段移動程式碼聚焦框。'+(prompt?'答案只在講者手動推進後揭露。':'')],
       code:[{lang:s.lang,text:rs.map(r=>r.text).join('\n')}],
       animation:prompt?'question':'code',exercise:prompt,
-      excerpt:{sourceId:s.id,block:id,filename:options.filename??(id===19?'main.py':id===31?'database_demo.py':s.lang==='python'?'main.py':s.lang==='sql'?'schema.sql':'terminal'),rows:rs,part:part+1,parts:chunks.length,context:options.context??'',focus,focusRanges},
+      excerpt:{sourceId:s.id,block:id,filename:options.filename??(id===19?'main.py':id===31?'database_demo.py':s.lang==='python'?'main.py':s.lang==='sql'?'schema.sql':'terminal'),rows:rs,part:part+1,parts:chunks.length,context:options.context??'',focus,focusRanges,explanations:options.explanations??[],exerciseExamples:exerciseExamples[id]??[]},
     });
     for(const r of rs)if(r.text.trim()){
       const list=usage.get(s.id).get(r.sourceLine)??[];
@@ -215,9 +226,17 @@ scene(1,'intro',1);scene(2,'intro',.8);scene(3,'intro',.7);scene(4,'intro',.5);
 pages.find(p=>p.id===1).animation='journey';
 pages.find(p=>p.id===1).motion=['五個狀態各自手動推進：提問、送出、處理、保存、成功。Client 固定在左，Server 與資料表依序出現。','細線標示請求方向，藍色標記抵達處理節點；保存後才顯示 201 回傳與成功按鈕。一般揭露 0.45 秒，請求移動 0.65 秒。退回呈現對應狀態，首頁預覽不播放。'];
 all(1,'intro','確認 Python 版本',['macOS／Linux 使用 python3；Windows 可使用 py。','需要 Python 3.10 以上。'],{weight:.25});
-all(2,'intro','建立專案與虛擬環境',['先建立資料夾，再建立 .venv。'],{weight:.4});
-all(3,'intro','啟用環境：macOS／Linux',['啟用後統一使用 python 執行指令。'],{weight:.2});
-all(4,'intro','啟用環境：Windows PowerShell',['在專案目錄執行 Activate.ps1。'],{weight:.2});
+const environmentSetup = [
+  {title:'專案資料夾放程式碼',lines:['backend-workshop 是專案目錄；之後的 main.py 放在這裡，與 .venv 並列。'],prompt:''},
+  {title:'.venv 是這個專案的 Python 環境',lines:['存放專案專用的 Python 執行環境與套件，隔離不同專案的套件版本。','建立完成會出現 .venv/ 資料夾；目前終端機還沒有啟用它。'],prompt:''},
+];
+const environmentActivation = {
+  title:'啟用成功的提示符',
+  lines:['提示符前通常會出現 (.venv)；後續 python 與 python -m pip 使用這個環境。','只作用於目前終端機；新開終端機需要再次啟用。'],
+};
+all(2,'intro','建立專案與虛擬環境',environmentSetup.flatMap(item=>[item.title,...item.lines]),{weight:.4});
+all(3,'intro','啟用環境：macOS／Linux',['在專案目錄執行 source .venv/bin/activate。',...environmentActivation.lines,'成功提示符示意：(.venv) backend-workshop %'],{weight:.2,explanations:[{...environmentActivation,lines:[],prompt:'backend-workshop %'}]});
+all(4,'intro','啟用環境：Windows PowerShell',['在專案目錄執行 Activate.ps1。',...environmentActivation.lines,'成功提示符示意：(.venv) PS C:\\...\\backend-workshop>'],{weight:.2,explanations:[{...environmentActivation,lines:[],prompt:'PS C:\\...\\backend-workshop>'}]});
 all(5,'intro','安裝 FastAPI',['fastapi[standard] 包含課程使用的開發伺服器。SQLite 已在 Python 標準函式庫。'],{weight:.3,result:'fastapi[standard] 會一併安裝本課使用的開發伺服器；SQLite 已在 Python 標準函式庫。'});
 scene(6,'python',.7);
 code(6,1,7,'python','Function',['courses: list[dict] 接收課程清單；course_id: int 接收要查找的 ID；-> dict 表示回傳一筆課程。Type Hint 本身不進行執行期驗證。','依序比較 id；找到便回傳整筆 dict。','迴圈結束仍沒找到時，拋出 ValueError。'],{id:7,filename:'python_recap.py'});
@@ -260,9 +279,14 @@ code(19,54,56,'crud','完整版的根路徑',['完整版本的回應訊息改為
 code(19,59,63,'crud','GET 清單：路由與參數',['q 限制長度 1–50；min_capacity 限制至少為 1。','先定義輸入；下一頁接續同一個函式本體。'],{id:29059,weight:.85,context:'list_courses · 1/2'});
 code(19,64,75,'crud','GET 清單：排序、篩選與回傳',['沿用上一頁的 q 與 min_capacity，讀取排序後的課程。','q 有值時以 casefold 比對；min_capacity 有值時篩選容量，最後回傳 result。'],{id:29072,weight:1.525,context:'list_courses · 2/2'});
 code(19,78,80,'crud','GET 單筆：共用查找與回應模型',['CourseId 已在前面定義；找不到由 find_course 統一回 404。'],{weight:.5});
+function unpackingScene(id,title,cues,notes,animation) {
+  pages.push({id,title,group:'crud',kind:'scene',hidden:false,cues,notes,motion:['手動推進時，程式碼中的 ** 運算式展開來源 dict；key 與 value 移入實際參數或 dict 欄位，返回時還原前一步。'],code:[],excerpt:null,exercise:null,animation});
+}
 code(19,83,96,'crud','POST：建立課程',['body 先通過 CourseCreate，再配發 id、保存資料。','201 與 Location 告知新資源的位置；完整 decorators、headers 與 return 皆保留。'],{id:25,result:'201 Created  ·  Location: /courses/3'});
+unpackingScene(50001,'**：dict 展開成具名參數',['Course 呼叫與來源 dict','** 帶入 dict 欄位','展開為具名參數'],['payload.model_dump() 回傳 title 與 capacity 的 dict。','** 在函式呼叫中把 dict 展開為具名參數；id=3 由 Server 提供。'],'unpack');
 code(19,99,107,'crud','PATCH：驗證更新內容',['先查找資料；不存在回 404。','exclude_unset 與 exclude_none 只留下要修改的值；沒有修改內容回 400。','下一頁接續同一函式，合併、保存並回傳。'],{id:26,context:'update_course · 1/2',result:'changes 只保留本次提供且非 null 的欄位'});
 code(19,108,113,'crud','PATCH：合併、儲存與回傳',['接續上一頁的 update_course 函式，沿用 stored_course 與 changes。','用 changes 覆蓋舊資料，重新驗證後寫回 courses 並回傳。'],{context:'update_course · 2/2',result:'合併 stored_course 與 changes，驗證後保存並回傳 updated_course'});
+unpackingScene(50002,'**：合併 dict 與覆蓋欄位',['兩份 dict 與合併運算式','展開左側舊資料','展開右側並覆蓋 capacity'],['舊資料保留 id=1、title=Backend Workshop、capacity=30。','changes 只有 capacity=35；右側同名欄位覆蓋左側，id 與 title 保持不變。'],'merge');
 code(19,116,124,'crud','DELETE：刪除課程',['先用 find_course 確認存在；不存在回 404。','del 移除資料；回傳 204，沒有 Response Body。'],{context:'delete_course(course_id)',result:'204 No Content  ·  Response Body 為空'});
 all(20,'crud','使用 curl 測試 Course API',['GET 取得清單；q 與 min_capacity 篩選課程。','-i 顯示 Response Headers；-X 指定 Method；-H 與 -d 傳入 JSON。','POST 建立 API Design；PATCH 將課程 1 的 capacity 改為 35；DELETE 刪除課程 2。','請在自己的終端機執行；此頁只聚焦指令，不模擬送出或回應。'],{id:30001,omitBlankLines:[2]});
 scene(27,'crud',1);
@@ -277,8 +301,11 @@ integrateDiagram(25,39,.6);
 scene(40,'sql',.6);
 for(const [id,title] of [[26,'INSERT：新增社員'],[27,'SELECT：查詢社員'],[28,'UPDATE：修改 Email'],[29,'DELETE：刪除社員']])
   all(id,'sql',title,['使用講義原本的 members 範例。注意資料值與 WHERE 範圍。'],{weight:.4});
+all(30,'sql','JOIN 的完整查詢',['先逐段聚焦完整 SQL，下一頁以多筆資料展示查詢作用。','m、c、e 是別名；? = 1，只保留 Backend Workshop 的報名。','FROM、JOIN、WHERE、SELECT、ORDER BY 是理解資料處理的概念順序。'],{weight:.6,context:'? = 1'});
 scene(41,'sql',1.2);
-all(30,'sql','JOIN 的完整查詢',['m、c、e 是別名；WHERE 使用參數，ORDER BY 按社員 id 排序。'],{weight:.6});
+const joinPage=pages.find(p=>p.id===41);
+joinPage.code=[];joinPage.animation='join-query';joinPage.joinDemo=joinDemo;
+joinPage.motion=['三張來源表與結果表上下呈現；依 FROM、兩次 JOIN、WHERE、SELECT、ORDER BY 手動推進。','結果儲存格與資料列始終保留同一節點；只以單層位移和透明度補欄位、移除未符合資料、投影及排序，返回可逆。'];
 code(31,1,14,'sql','SQLite 程式：路徑與 members Schema',['database_demo.py 與 workshop.db 位於同一資料夾。','SCHEMA 是多行 SQL 字串，接下來兩頁繼續定義資料表。'],{context:'SCHEMA = """',result:'name 不可空白 · email 不可重複 · joined_at 有預設值'});
 code(31,16,22,'sql','courses Schema：限制容量與標題',['typeof(capacity) 確保整數；容量範圍為 1–500。','created_at 使用 CURRENT_TIMESTAMP。'],{context:'SCHEMA 多行字串（接續）'});
 code(31,24,36,'sql','enrollments Schema：主鍵與外鍵',['複合主鍵防止重複報名；外鍵確保 Member 與 Course 存在。','ON DELETE CASCADE 會連帶刪除相關報名；status 僅允許 enrolled 或 completed。'],{context:'SCHEMA 多行字串（接續並結束）'});
@@ -314,9 +341,12 @@ for(let line=9;line<=35;line++){
   usage.get('notion-19').set(line,targets.map(p=>p.id));
   if(!match.length)targets[0].notes.push('完整版對應註解：'+main[line-1].trim().replace(/^#\s*/,''));
 }
+const newSceneSeconds=new Map([[50001,45],[50002,30]]);
+const transferredSeconds=new Map([[25,45],[29108,30]]);
 for(const p of pages.filter(p=>!p.hidden)){
+  if(newSceneSeconds.has(p.id)){p.durationSeconds=newSceneSeconds.get(p.id);continue;}
   if(!previousSeconds.has(p.id))throw new Error('Missing revision-7 timing for '+p.id);
-  p.durationSeconds=previousSeconds.get(p.id)+(absorbedPages.get(p.id)??[]).reduce((sum,id)=>sum+previousSeconds.get(id),0);
+  p.durationSeconds=previousSeconds.get(p.id)+(absorbedPages.get(p.id)??[]).reduce((sum,id)=>sum+previousSeconds.get(id),0)-(transferredSeconds.get(p.id)??0);
 }
 for(const g of groups){
   const total=pages.filter(p=>p.group===g.id&&!p.hidden).reduce((sum,p)=>sum+p.durationSeconds,0);
@@ -335,7 +365,7 @@ const missing=coverage.flatMap(s=>s.lines.filter(l=>!l.slideIds.length).map(l=>s
 if(missing.length)throw new Error('Uncovered code: '+missing.join(', '));
 if(new Set(pages.map(p=>p.id)).size!==pages.length)throw new Error('Duplicate slide IDs');
 const visible=pages.filter(p=>!p.hidden);
-if(visible.length!==90)throw new Error('Expected 90 visible slides');
+if(visible.length!==92)throw new Error('Expected 92 visible slides');
 if(visible.reduce((s,p)=>s+p.durationSeconds,0)!==10800)throw new Error('Schedule must total 180 minutes');
 for(const p of pages){
   const g=groups.find(g=>g.id===p.group);
