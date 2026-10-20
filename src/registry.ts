@@ -4,6 +4,10 @@ export type DeckEntry = { id: string; title: string; load: () => Promise<DeckDef
 
 export const deckEntries: DeckEntry[] = [
   {
+    id: 'titanfuzz', title: 'TitanFuzz',
+    load: () => import('../decks/titanfuzz/deck').then(module => module.titanFuzzDeck),
+  },
+  {
     id: 'backend-workshop', title: 'Backend Workshop',
     load: () => import('../Backend Workhsop/src/definition').then(module => module.backendWorkshop),
   },
