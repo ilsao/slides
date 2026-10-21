@@ -43,7 +43,6 @@ function MutationOperators() {
       <div><dt>Suffix</dt><dd>改寫或延伸目標 API 後的程式</dd></div>
       <div><dt>Method</dt><dd>替換 library API 名稱，保留參數</dd></div>
     </dl>
-    <p className="tf-operator-variants">延伸：Keyword insertion<br/>組合：Prefix + Argument<br/>　　　 Suffix + Argument</p>
   </div>;
 }
 

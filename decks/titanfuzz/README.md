@@ -26,7 +26,7 @@
 
 - 保留黑底、柔白文字、TitanFuzz 藍 `#a6b4ff` 與 DeepREL 薄荷 `#9bdeca`。1600×900 畫布；中文使用思源黑體 TW，英文統一 Helvetica Neue（標題、正文、程式與數字），結尾保留 Allura 花體。
 - 研究問題保持白色置中標題與置中兩欄；背景、DeepREL、Experiments、Metrics 均一次顯示，沒有頁內動畫。
-- 方法共十二步，保留原生 SVG 連續鏡頭。選 seed 後新增四種基本 mutation operator 與延伸組合，再以 Thompson Sampling 說明初始化、各 operator 抽樣、argmax 選擇及遮蔽生成。回饋步驟說明只更新選中 operator 的成功／失敗計數，成功須有效且不重複。FitnessFunction 與抽樣、更新公式使用原生 MathML。Thompson Sampling 的兩條公式以共用 MathML 表格對齊關係符號；非聚焦元件與文字以淺灰色顯示。
+- 方法共十二步，保留原生 SVG 連續鏡頭。選 seed 後以四個等高文字列呈現基本 mutation operator，延伸與組合僅保留於講稿，再以 Thompson Sampling 說明初始化、各 operator 抽樣、argmax 選擇及遮蔽生成。回饋步驟說明只更新選中 operator 的成功／失敗計數，成功須有效且不重複。FitnessFunction 與抽樣、更新公式使用原生 MathML。Thompson Sampling 的兩條公式以共用 MathML 表格對齊關係符號；非聚焦元件與文字以淺灰色顯示。
 - 第 10 頁進場後 500／920／1340 ms 開始三組圖表，長條各展開 650 ms；數字與差值淡入。回到此頁會重播一次，無循環或手動揭露。
 - 換頁沿用 440 ms 轉場。靜態縮圖與減少動態效果模式直接呈現完成狀態，不播放動畫。
 - 本次 report 頁面不再顯示左下引用；原論文引用仍保留。

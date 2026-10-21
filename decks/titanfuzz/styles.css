@@ -171,11 +171,11 @@
 [data-deck="titanfuzz"] .tf-search-formula dd { margin:0; font-size:24px; line-height:1.5; }
 [data-deck="titanfuzz"] .tf-formula-initial { font-size:22px; margin:26px 0; }
 [data-deck="titanfuzz"] .tf-search-formula .tf-formula-update { font-size:26px; }
-[data-deck="titanfuzz"] .tf-operators dl { margin:0; }
-[data-deck="titanfuzz"] .tf-operators dl>div { border-bottom:1px solid var(--tf-line); padding:14px 0; }
-[data-deck="titanfuzz"] .tf-operators dt { color:var(--tf-blue); font-size:29px; line-height:1.3; }
-[data-deck="titanfuzz"] .tf-operators dd { margin:8px 0 0; font-size:24px; line-height:1.5; }
-[data-deck="titanfuzz"] .tf-operator-variants { margin-top:24px; font-size:22px; line-height:1.6; }
+[data-deck="titanfuzz"] .tf-operators dl { display:grid; grid-template-rows:repeat(4,1fr); height:560px; margin:0; }
+[data-deck="titanfuzz"] .tf-operators dl>div { display:flex; flex-direction:column; justify-content:center; border-bottom:1px solid var(--tf-line); }
+[data-deck="titanfuzz"] .tf-operators dl>div:last-child { border-bottom:0; }
+[data-deck="titanfuzz"] .tf-operators dt { color:var(--tf-blue); font-size:32px; line-height:1.3; }
+[data-deck="titanfuzz"] .tf-operators dd { margin:12px 0 0; font-size:25px; line-height:1.5; }
 [data-deck="titanfuzz"] .tf-formula-prior { font-size:23px; line-height:1.6; }
 [data-deck="titanfuzz"] .tf-selection-process { padding-left:28px; margin-top:38px; font-size:24px; line-height:1.6; }
 [data-deck="titanfuzz"] .tf-selection-process li { padding-left:6px; margin:16px 0; }
