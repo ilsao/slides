@@ -5,7 +5,7 @@ import { titanFuzzDeck as deck } from '../decks/titanfuzz/deck';
 import { initialState, reduce, restore } from '../src/presentation/state';
 import type { SlideRenderProps } from '../src/presentation/types';
 
-it('traverses all 20 states forward and backward without entering retired pages', () => {
+it('traverses all 22 states forward and backward without entering retired pages', () => {
   expect(deck.slides).toHaveLength(11);
   let state = initialState(deck);
   const visited = [`${state.slideId}:${state.step}`];
@@ -15,8 +15,8 @@ it('traverses all 20 states forward and backward without entering retired pages'
     state = next;
     visited.push(`${state.slideId}:${state.step}`);
   }
-  expect(visited).toHaveLength(20);
-  expect(visited.filter(id => id.startsWith('method:'))).toHaveLength(10);
+  expect(visited).toHaveLength(22);
+  expect(visited.filter(id => id.startsWith('method:'))).toHaveLength(12);
   expect(state.slideId).toBe('closing');
   for (const expected of visited.slice(0, -1).reverse()) {
     state = reduce(deck, state, { type: 'previous' });
@@ -27,9 +27,10 @@ it('traverses all 20 states forward and backward without entering retired pages'
   }
 });
 
-it('restores retained v8 pages and resets progress that points to retired pages', () => {
-  const old = { ...initialState(deck), deckVersion: 8, slideId: 'metrics', step: 0 };
-  expect(restore(deck, old)).toMatchObject({ deckVersion: 9, slideId: 'metrics', step: 0 });
+it('restores retained v9 pages and resets progress that points to retired pages', () => {
+  const old = { ...initialState(deck), deckVersion: 9, slideId: 'metrics', step: 0 };
+  expect(restore(deck, old)).toMatchObject({ deckVersion: 10, slideId: 'metrics', step: 0 });
+  expect(restore(deck, { ...old, slideId: 'method', step: 7 })).toMatchObject({ deckVersion: 10, slideId: 'method', step: 0 });
   expect(restore(deck, { ...old, slideId: 'oracle' })).toEqual(initialState(deck));
 });
 
@@ -49,7 +50,7 @@ it('renders still states without animated markers, hidden charts or nested previ
       const html = renderToStaticMarkup(createElement(deck.RenderSlide, props));
       expect(html).toContain('data-still="true"');
       expect(html).not.toContain('<circle');
-      if (slide.id === 'method' && [2, 7].includes(step)) expect(html).toContain('<math');
+      if (slide.id === 'method' && [2, 4, 9].includes(step)) expect(html).toContain('<math');
       if (slide.id === 'results') {
         expect(html.match(/data-ready="true"/g)).toHaveLength(3);
         expect(html).not.toContain('scaleX(0)');

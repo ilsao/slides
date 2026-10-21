@@ -9,7 +9,7 @@ const pages = [
   ['testing-before', 'TitanFuzz 之前，如何測試 DL framework？', 1],
   ['api-level', 'API-level：單一呼叫之外呢？', 1],
   ['model-level', 'Model-level：模型能有多自由？', 1],
-  ['method', '一個測試，如何走完整個流程？', 10],
+  ['method', '一個測試，如何走完整個流程？', 12],
   ['question', '探索更廣，測試一定會更好？', 1],
   ['deeprel', 'DeepREL', 1],
   ['experiment', 'Experiments', 1],
@@ -68,7 +68,7 @@ function Experiment() {
   const rows = [
     ['執行環境', 'PyTorch 2.6.0 / Python 3.11'],
     ['測試對象', '30 APIs：六類各五個'],
-    ['重複與配對', '10 次配對重複 · 300 組配對 / 600 次搜尋'],
+    ['重複', '每個 API 重複 10 次實驗'],
     ['起始程式', '90 seeds · Codex CLI 協助撰寫，先依規格驗證'],
     ['比較工具', 'TitanFuzz（InCoder-1B）與 DeepREL'],
     ['運算資源', 'NVIDIA H200 × 1'],
@@ -80,7 +80,7 @@ function Metrics() {
   return <div className="tf-metrics-grid">
     <div><span className="tf-metric-unit">行</span><h2>新增 Python 覆蓋</h2><p>有效程式觸及的<br/>PyTorch Python 原始碼行。</p></div>
     <div><span className="tf-metric-unit">種</span><h2>新增 ATen 名稱</h2><p>有效程式觸及的<br/>ATen 運算子名稱。</p></div>
-    <div><span className="tf-metric-unit">%</span><h2>有效產出</h2><p>有效程式數 ÷ <strong>50</strong><br/>不足 50 個也不縮小分母。</p></div>
+    <div><span className="tf-metric-unit">%</span><h2>有效產出</h2><p>固定候選名額中，成功執行<br/>且呼叫目標 API 的程式比例。</p></div>
   </div>;
 }
 
@@ -129,7 +129,7 @@ function Slide(r: SlideRenderProps) {
 }
 
 export const titanFuzzDeck = defineDeck({
-  id:'titanfuzz', title:'TitanFuzz', version:9,
+  id:'titanfuzz', title:'TitanFuzz', version:10,
   description:'以大型語言模型測試 PyTorch。探索、重現與驗證。',
   size:{width:1600,height:900}, slides:pages.map(([id,title,steps])=>({id,title,steps})),
   RenderSlide:Slide, transition:titanTransition, freezeEntranceOnNavigation:false,

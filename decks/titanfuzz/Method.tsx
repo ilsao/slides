@@ -23,7 +23,9 @@ const edges = [
 const frames = [
   { title:'從可執行程式開始', view:'-40 -70 1490 850', nodes:[], edges:[] },
   { title:'Codex 建立有效起點', view:'-130 -15 820 470', nodes:['codex','bank'], edges:['generate'] },
-  { title:'選一個 seed，選一種 mutation', view:'-5 90 820 470', nodes:['bank','search'], edges:['select'] },
+  { title:'依 fitness 選一個 seed', view:'-5 90 820 470', nodes:['bank','search'], edges:['select'] },
+  { title:'Mutation operators：四種基本類型', view:'340 90 820 470', nodes:['search','incoder'], edges:[] },
+  { title:'選擇 operator：Thompson Sampling', view:'-5 90 820 470', nodes:['search'], edges:[] },
   { title:'只遮蔽 arguments', view:'340 90 820 470', nodes:['search','incoder'], edges:['infill'] },
   { title:'InCoder 補成新的候選', view:'670 90 820 470', nodes:['incoder','execute'], edges:['check'] },
   { title:'執行，才知道能否保留', view:'670 195 820 470', nodes:['execute','valid'], edges:['retain'] },
@@ -33,26 +35,42 @@ const frames = [
   { title:'搜尋持續，警告另行判讀', view:'-40 -70 1490 850', nodes:[], edges:[] },
 ];
 
-function SearchFormula({ kind }: { kind:'fitness'|'mutation' }) {
+function MutationOperators() {
+  return <div className="tf-operators">
+    <dl>
+      <div><dt>Argument</dt><dd>替換 API 的參數列表</dd></div>
+      <div><dt>Prefix</dt><dd>替換目標 API 前的程式片段</dd></div>
+      <div><dt>Suffix</dt><dd>改寫或延伸目標 API 後的程式</dd></div>
+      <div><dt>Method</dt><dd>替換 library API 名稱，保留參數</dd></div>
+    </dl>
+    <p className="tf-operator-variants">延伸：Keyword insertion<br/>組合：Prefix + Argument<br/>　　　 Suffix + Argument</p>
+  </div>;
+}
+
+function SearchFormula({ kind }: { kind:'fitness'|'selection'|'feedback' }) {
   return <div className="tf-search-formula">
-    <h3>{kind==='fitness'?'Seed fitness':'Thompson Sampling'}</h3>
+    <h3>{kind==='fitness'?'Seed fitness':kind==='selection'?'每個 operator 各自抽樣':'更新本輪選中的 operator'}</h3>
     {kind==='fitness'?<>
       <math display="block" aria-label="FitnessFunction C 等於 D 加 U 減 R"><mi mathvariant="normal">FitnessFunction</mi><mo>(</mo><mi>C</mi><mo>)</mo><mo>=</mo><mi>D</mi><mo>+</mo><mi>U</mi><mo>−</mo><mi>R</mi></math>
       <dl><div><dt>D</dt><dd>資料流圖深度</dd></div><div><dt>U</dt><dd>不同 API 的數量</dd></div><div><dt>R</dt><dd>相同輸入的重複呼叫</dd></div></dl>
-    </>:<>
+    </>:kind==='selection'?<>
+      <p className="tf-formula-prior">每次 API 搜尋先設 m.S = m.F = 1</p>
       <math display="block" className="tf-sampling-formula" aria-label="各 mutation 從 Beta 分布抽樣 theta，選擇 theta 最大者">
         <mtable columnalign="right center left" rowspacing="0.8em">
           <mtr><mtd><msub><mi>θ</mi><mi>m</mi></msub></mtd><mtd><mo>∼</mo></mtd><mtd><mi mathvariant="normal">Beta</mi><mo>(</mo><mi mathvariant="normal">m.S</mi><mo>,</mo><mi mathvariant="normal">m.F</mi><mo>)</mo></mtd></mtr>
           <mtr><mtd><msup><mi>m</mi><mo>⋆</mo></msup></mtd><mtd><mo>=</mo></mtd><mtd><munder><mo lspace="0">argmax</mo><mi>m</mi></munder><msub><mi>θ</mi><mi>m</mi></msub></mtd></mtr>
         </mtable>
       </math>
-      <p className="tf-formula-initial">初始值：m.S = m.F = 1</p>
+      <ol className="tf-selection-process"><li>各從自己的 Beta 分布抽取 θ。</li><li>選取本輪 θ 最大的 operator。</li><li>遮蔽程式，再交給 InCoder 補齊。</li></ol>
+    </>:<>
       <math display="block" className="tf-formula-update" aria-label="更新成功與失敗計數">
         <mtable columnalign="right center left" rowspacing="0.6em">
           <mtr><mtd><mi mathvariant="normal">m.S</mi></mtd><mtd><mo>←</mo></mtd><mtd><mi mathvariant="normal">m.S</mi><mo>+</mo><mi mathvariant="normal">NumValid</mi></mtd></mtr>
           <mtr><mtd><mi mathvariant="normal">m.F</mi></mtd><mtd><mo>←</mo></mtd><mtd><mi mathvariant="normal">m.F</mi><mo>+</mo><mi mathvariant="normal">NumInvalid</mi></mtd></mtr>
         </mtable>
       </math>
+      <p className="tf-formula-initial">成功：有效且不重複<br/>失敗：未達成功條件</p>
+      <p className="tf-feedback-next">只更新本輪選中的 m。<br/>下一輪從各自更新後的分布重新抽樣。</p>
     </>}
   </div>;
 }
@@ -61,9 +79,9 @@ function SearchFormula({ kind }: { kind:'fitness'|'mutation' }) {
 export function Method({ step, off }: { step:number; off:boolean }) {
   const uid=useId().replace(/:/g,'');
   const frame=frames[step];
-  const overview=step===0 || step===9;
-  const variant=step>=4;
-  const args=step===3?'<SPAN>':variant?'a, b[:, :1]':'a, b';
+  const overview=step===0 || step===11;
+  const variant=step>=6;
+  const args=step===5?'<SPAN>':variant?'a, b[:, :1]':'a, b';
   return <div className="tf-method-story" data-phase={step}>
     <div className="tf-method-heading"><h2>{frame.title}</h2></div>
     <div className="tf-method-layout">
@@ -80,14 +98,14 @@ export function Method({ step, off }: { step:number; off:boolean }) {
         </g>)}
       </motion.svg>
       <div className="tf-method-example">
-        {step===2 || step===7 ? <SearchFormula kind={step===2?'fitness':'mutation'}/> : <>
+        {step===3 ? <MutationOperators/> : [2,4,9].includes(step) ? <SearchFormula kind={step===2?'fitness':step===4?'selection':'feedback'}/> : <>
         <p className="tf-example-label">torch.mm</p>
-        <pre className="tf-flow-code"><code><span className="tf-code-context">{'a = torch.randn(2, 3)\nb = torch.randn(3, 2)\n\n'}</span>{'y = torch.mm('}<span className="tf-flow-args" data-state={step===3?'masked':step===4?'candidate':step>=5?'valid':'seed'}>{args}</span>{')'}</code></pre>
+        <pre className="tf-flow-code"><code><span className="tf-code-context">{'a = torch.randn(2, 3)\nb = torch.randn(3, 2)\n\n'}</span>{'y = torch.mm('}<span className="tf-flow-args" data-state={step===5?'masked':step===6?'candidate':step>=7?'valid':'seed'}>{args}</span>{')'}</code></pre>
         <motion.div className="tf-method-detail" key={step} initial={off?false:{opacity:0}} animate={{opacity:1}} transition={{duration:off?0:.25,delay:off?0:.15}}>
           {step===1 && <><div className="tf-flow-shapes">(2×3) @ (3×2)</div><p><b className="tf-success">輸出 shape (2, 2)</b></p></>}
-          {step===4 && <><div className="tf-flow-shapes">(2×3) @ (3×1)</div></>}
-          {step===5 && <div className="tf-candidate-outcomes"><div><strong>保留</strong><code>a, b[:, :1]</code><span>輸出 (2, 1)</span></div><div><strong>淘汰</strong><code>a, b.T</code><span>3 ≠ 2，維度不相容</span></div></div>}
-          {step===8 && <><div className="tf-device-pair"><span>CPU</span><span>GPU</span></div></>}
+          {step===6 && <><div className="tf-flow-shapes">(2×3) @ (3×1)</div></>}
+          {step===7 && <div className="tf-candidate-outcomes"><div><strong>保留</strong><code>a, b[:, :1]</code><span>輸出 (2, 1)</span></div><div><strong>淘汰</strong><code>a, b.T</code><span>3 ≠ 2，維度不相容</span></div></div>}
+          {step===10 && <><div className="tf-device-pair"><span>CPU</span><span>GPU</span></div></>}
         </motion.div>
         </>}
       </div>
