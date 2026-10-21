@@ -1,0 +1,193 @@
+{
+  "states": [
+    {
+      "errors": [],
+      "slide": "cover",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "question",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "question",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "challenge",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "challenge",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "challenge",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "3"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "4"
+    },
+    {
+      "errors": [],
+      "slide": "method",
+      "step": "5"
+    },
+    {
+      "errors": [],
+      "slide": "mutation",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "mutation",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "mutation",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "mutation",
+      "step": "3"
+    },
+    {
+      "errors": [],
+      "slide": "mutation",
+      "step": "4"
+    },
+    {
+      "errors": [],
+      "slide": "experiment",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "experiment",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "experiment",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "metrics",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "metrics",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "metrics",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "metrics",
+      "step": "3"
+    },
+    {
+      "errors": [],
+      "slide": "results",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "results",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "results",
+      "step": "2"
+    },
+    {
+      "errors": [],
+      "slide": "distribution",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "distribution",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "oracle",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "oracle",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "assertion",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "assertion",
+      "step": "1"
+    },
+    {
+      "errors": [],
+      "slide": "closing",
+      "step": "0"
+    },
+    {
+      "errors": [],
+      "slide": "closing",
+      "step": "1"
+    }
+  ],
+  "rapidNavigation": {
+    "outgoing": 0,
+    "slide": "oracle"
+  },
+  "reload": {
+    "errors": [],
+    "slide": "oracle",
+    "step": "0"
+  },
+  "notes": [
+    "35 states inspected at current browser viewport",
+    "Earlier wide-screen inspection and first-bar replay check completed",
+    "Reduced-motion support checked in implementation, not media-emulated"
+  ]
+}

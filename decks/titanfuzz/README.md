@@ -1,55 +1,57 @@
 # TitanFuzz
 
-10 頁繁體中文研究簡報，Editorial Design：暖白底、深藍字與語義配色。預覽：`/titanfuzz?start=1`。
+11 頁繁體中文研究報告、20 個放映狀態，版本 9。預覽：`/titanfuzz?start=1`。
 
-以 `114550195_tool_study.pdf` 為主要內容來源，已核對原始 PDF §1–4、Table 1，以及 `report_bundle` 的彙整資料與規格判讀。這是針對 PyTorch 2.6.0 的重現研究，不能視為原論文全部實驗的重跑。
+以 `114550195_tool_study.pdf` 的 PyTorch 2.6.0 重現研究為主軸；背景與搜尋公式依 TitanFuzz 原論文，DeepREL 定位依其原論文。不能將本次研究視為原論文全部實驗的重跑。
 
-## 講述節奏
+## 頁面與節奏
 
-| 頁 | 內容 | 時間 |
-| --- | --- | --- |
-| 1 | 封面 | 0:10 |
-| 2 | 定義研究問題與評估範圍 | 0:30 |
-| 3 | 同一個 torch.mm 的維度限制 | 0:45 |
-| 4 | TitanFuzz 架構與兩條回饋路徑 | 1:05 |
-| 5 | 完整 argument mutation 與選擇策略 | 1:15 |
-| 6 | 配對、預算、重現差異與控制限制 | 1:00 |
-| 7 | 覆蓋、運算子與固定名額產出 | 1:10 |
-| 8 | 平均值、逐 API 差異與分布偏斜 | 1:25 |
-| 9 | 誤報判讀與 assertion 修正 | 1:35 |
-| 10 | 結論與下一步 | 0:35 |
+| 頁 | ID | 內容 | 狀態 | 時間 |
+| --- | --- | --- | --- | --- |
+| 1 | cover | 置中封面 | 1 | 0:10 |
+| 2 | testing-before | 傳統 DL framework 測試導入 | 1 | 0:45 |
+| 3 | api-level | API-level 流程與限制 | 1 | 0:40 |
+| 4 | model-level | 模型層串接與三個關鍵詞 | 1 | 0:40 |
+| 5 | method | TitanFuzz 方法與搜尋公式 | 10 | 3:00 |
+| 6 | question | 探索更廣，測試一定會更好？ | 1 | 0:30 |
+| 7 | deeprel | API-level 比較基準 | 1 | 0:45 |
+| 8 | experiment | Experiments | 1 | 0:50 |
+| 9 | metrics | Metrics | 1 | 1:00 |
+| 10 | results | 結果圖 | 1 | 1:00 |
+| 11 | closing | Thanks for listening | 1 | 0:10 |
 
-合計 9:30，預留 30 秒緩衝。逐步講稿與問答見 [SPEAKER_NOTES.md](./SPEAKER_NOTES.md)。第 9 頁與結論不呈現新 bug 數量。
+合計約 9:30。以版本 8 的頁碼為準，原第 2 頁組合示例與第 5 頁歷史案例已移除；第二頁改為傳統測試導入。灰色旁註、統計與研究限制保留於 [SPEAKER_NOTES.md](./SPEAKER_NOTES.md)；證據檔不變。
 
-## 放映與視覺
+## 視覺與播放
 
-方向鍵或空白鍵推進步驟，Page Down / Page Up 整頁切換，O 開啟章節選單，F 全螢幕。
+- 保留黑底、柔白文字、TitanFuzz 藍 `#a6b4ff` 與 DeepREL 薄荷 `#9bdeca`。1600×900 畫布；中文使用思源黑體 TW，英文統一 Helvetica Neue（標題、正文、程式與數字），結尾保留 Allura 花體。
+- 研究問題保持白色置中標題與置中兩欄；背景、DeepREL、Experiments、Metrics 均一次顯示，沒有頁內動畫。
+- 方法保留十步與原生 SVG 連續鏡頭。在選 seed 與 mutation 回饋步驟替換右側說明為原生 MathML，分別呈現 FitnessFunction 與 Thompson Sampling，保留核心變數定義，其他說明移入講稿。Thompson Sampling 的兩條公式以共用 MathML 表格對齊關係符號；非聚焦元件與文字以淺灰色顯示。
+- 第 10 頁進場後 500／920／1340 ms 開始三組圖表，長條各展開 650 ms；數字與差值淡入。回到此頁會重播一次，無循環或手動揭露。
+- 換頁沿用 440 ms 轉場。靜態縮圖與減少動態效果模式直接呈現完成狀態，不播放動畫。
+- 本次 report 頁面不再顯示左下引用；原論文引用仍保留。
+- 方向鍵／空白鍵推進步驟，Page Down／Page Up 整頁切換，O 開啟章節選單，F 全螢幕。
+- 首頁九宮格使用新版頁面，封面保留正中央。章節與頁眉依頁面 ID 設定，避免順序變動造成錯配。
 
-換頁直接切換，避免文字交疊。頁內包含 320–360 ms 的漸入與場景替換、650 ms 的箭頭追蹤與長條展開，以及固定名額圖的短暫交錯填色。動畫有限次、由按鍵觸發，並遵守減少動態效果偏好與靜態預覽；沒有持續閃爍或自動換頁。
+`deck.tsx` 管理內容，`Method.tsx` 管理方法流程，`mathml.d.ts` 補足 React 的原生 MathML 型別，`styles.css` 限定此簡報，`motion.ts` 提供專屬轉場。未修改共用播放器。版本 9 保留可識別的既有頁面 ID，舊進度的步驟歸零。`architecture/titanfuzz.json` 保留原始拓撲參考。
 
-工具比較固定使用藍色 TitanFuzz、青綠色 DeepREL。架構圖以紫色呈現生成、琥珀色呈現搜尋、青綠色呈現有效候選、珊瑚色呈現差異警告，所有顏色均有文字標籤。程式遮蔽為紫底，候選修改為綠底。頁尾只在原方法頁保留論文 DOI，不把自己的實驗報告列成 reference。
+## 證據與來源
 
-第 4 頁為原生、可編輯 SVG 架構圖，保持全局可見並逐步強調：Codex → seed bank → 搜尋 → InCoder → 執行篩選 → 有效變體 → 差異驗證；另外分開畫出程式回存與 mutation 成效回饋。拓撲規格見 `architecture/titanfuzz.json`（Archify showcase 9/9、0 errors、0 warnings）。投影版使用較大文字與原生逐步動畫，另由瀏覽器檢查。Archify 的預設 standalone 字級不適合投影，因此交付的是簡報內原生 SVG，不保留該中間輸出。JSON 的檢查只驗證拓撲規格；簡報版面的驗收以實際放映檢查為準。
+- 結果數值與 CI 保持原樣：Python 22.75／3.44，差值 +19.31 [7.15, 40.31]；ATen 17.54／13.21，差值 +4.33 [0.35, 8.09]；有效產出 50.69%／68.42%，差值 −17.73 [−24.92, −10.48] 個百分點。
+- 三圖為每 API／run 平均，各 API 等權、獨立尺度。CI 是 TitanFuzz − DeepREL 的差值區間，使用 10,000 次分層配對階層 bootstrap；詳細統計與分布移入講稿。CI 與灰色解釋已從結果畫面移除；主要數值、差值及座標單位保留。
+- Python 原始碼行與 ATen 名稱都先去重、扣除共同 seed baseline。有效產出固定分母 50，不能混同候選成功率或 bug 數。
+- 60 秒只計主動搜尋；準備、載入、獨立重播及 metadata 可比性限制保留於講稿。Codex CLI 底層模型未記載，不能視為與原 Codex 相同。
+- [TitanFuzz §1–3、Fig. 1(a)、Algorithm 2、式 (3)](https://arxiv.org/html/2212.14834v4)。歷史案例已從放映移除，只留於備用講稿。
+- [DeepREL 原論文](https://www-cs.stanford.edu/~anjiang/papers/FSE22DeepREL.pdf)。畫面只介紹其為本次 API-level 比較基準，關係細節保留於講稿。
 
-第 6、7 頁以替換內容降低同時閱讀量；第 8 頁分開平均值與零覆蓋分布；第 9 頁分開誤報、漏報與總結。Mutation 示意與原始實驗輸出有明確區分。
+本地 [逐 API 彙整](./evidence/api_tradeoffs.csv)、[差值區間](./evidence/hierarchical_effects.csv)、[來源雜湊與摘要](./evidence/provenance.json) 保留，未重跑或變更研究數據。
 
-## 證據與解讀
+## 驗證
 
-- 三張結果圖使用獨立尺度。CI 為 TitanFuzz − DeepREL 的差值區間，單位隨各指標；有效產出的差值使用「個百分點」。
-- 原報告使用六類內 API 抽樣，再對重複種子配對抽樣的階層 bootstrap（10,000 次）。各 API 等權。
-- 有效產出以 50 為固定分母。候選不足也不縮小分母；它同時反映供給量與可執行性，不能等同候選成功率。
-- Coverage 是新增觸及的 **PyTorch Python 原始碼行**。ATen 指標是新增的運算子名稱，兩者均扣除共同 seed baseline，並非生成程式的長度或 bug 數量。
-- 逐 API 的高／相同／低是各 API 十次重複的平均值比較，順序皆為 TitanFuzz 相對 DeepREL；不是逐 API 顯著性檢定。
-- 新增覆蓋行數中位數為每工具 300 個 API/run 單位的中位數。兩者皆為 0，不能與先對各 API 取平均後再算中位數混用。
-- 50 次 mismatch 全部來自 TitanFuzz 抽樣重播的 `torch.topk`，合併為 37 個 AST，37 個皆經事後規格審查判為允許的同值索引或輸出順序。不能外推整個框架的誤報率。
-- Codex CLI 的底層模型版本未記載在所核對的報告中；簡報不將 CLI 與原論文 Codex 模型視為相同模型。種子先經規格驗證，主動搜尋的 60 秒不含準備、模型載入與獨立重播。
+`npm run typecheck`、36 個測試（既有 32 個及新增 4 個）與 `npx vite build` 均通過。新增測試涵蓋 20 狀態前後導覽、舊版本進度恢復、預覽 ID 與減少動態效果。瀏覽器核對 11 頁／20 狀態、方法十步、原生 MathML、文字邊界、三圖自動入場、章節選單、靜態九宮格與減少動態效果。新版截圖位於 `output/playwright/titanfuzz-v9/`。
 
-本地保留 [逐 API 彙整](./evidence/api_tradeoffs.csv)、[階層差值區間](./evidence/hierarchical_effects.csv) 和 [來源雜湊與判讀摘要](./evidence/provenance.json)，方便追溯；沒有重跑生成或變更原始實驗結果。
+## 附帶字型
 
-`deck.tsx` 管理內容與步驟；`styles.css` 完全限定於此簡報。版本升為 3，舊版 session progress 會保留所在頁並從該頁第一步開始。
-
-## 本輪檢查
-
-- 10 頁／34 狀態逐步檢查，沒有文字超出頁面或侵入頁尾的情形。
-- 實際檢視架構、實驗、指標、平均結果／分布、誤報／漏報、總結等畫面；修正搜尋預算換行與架構註解的頁尾間距。
-- 更詳細的放映量測與截圖在 `output/playwright/titanfuzz-*`。數據未改動，也沒有重跑原始研究。
+- 思源黑體 TW：Adobe 官方 [Source Han Sans](https://github.com/adobe-fonts/source-han-sans)，`release/Variable/WOFF2/OTF/Subset/SourceHanSansTW-VF.otf.woff2`，完整台灣字集。
+- [Allura](https://github.com/google/fonts/tree/main/ofl/allura)：Google Fonts 官方版本。
+- 字型與 SIL Open Font License 位於 `public/fonts/`，播放不依賴外部字型服務。
