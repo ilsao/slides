@@ -1,6 +1,6 @@
 # 網站驗證紀錄
 
-驗證日期：2026-10-08。範圍為根目錄的 React／Vite 網站、共用播放核心與 Backend Workshop adapter；歷史教材驗收保留於 `Backend Workhsop/docs/verification.md`。
+驗證日期：2026-10-08。範圍為根目錄的 React／Vite 網站、共用播放核心與 Backend Workshop adapter；歷史教材驗收保留於 `decks/backend-workshop/docs/verification.md`。
 
 ## 註解折行與 Python 內 SQL 高亮（2026-10-10）
 

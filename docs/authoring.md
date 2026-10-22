@@ -2,9 +2,7 @@
 
 新增 `decks/<slug>/deck.tsx` 與該簡報自己的 CSS，再在 `src/registry.ts` 登錄一個延遲載入入口。路由、播放控制與首頁會自動使用同一份簡報定義。
 
-可直接複製 [Template](../decks/template/README.md) 作為起點。它提供七種頁面範例、三種主題、逐步動畫與自訂跨頁轉場；設定、頁面元件和樣式各自獨立，可完全替換。
-
-也可從五頁的設計系列起步：[Editorial](../decks/editorial/README.md)、[Signal](../decks/signal/README.md)、[Prism](../decks/prism/README.md)、[Atlas](../decks/atlas/README.md)。它們只共用 `decks/shared/` 的動態效果判斷、小型揭露元件與字型定義，保留各自獨立的構圖與轉場。
+實際簡報位於 `decks/titanfuzz/` 與 `decks/backend-workshop/`。測試用範例位於 `tests/fixtures/example/`，只在測試模式註冊。
 
 ## 最小範例
 
@@ -95,4 +93,4 @@ transition: fadeTransition(.3),
 
 省略 `transition` 或設定 `false` 都會直接切換。自訂轉場提供 `name` 與 `animate({ incoming, outgoing }, direction)`，回傳 Web Animations API 的一個 `Animation` 或陣列。`direction` 為前進 `1` 或後退 `-1`。
 
-動畫必須在有限時間內完成。播放器會在完成後移除離場快照，快速操作會取消舊動畫，減少動態效果時直接切換。需要滑動範例時，參考 `decks/example/deck.tsx`。
+動畫必須在有限時間內完成。播放器會在完成後移除離場快照，快速操作會取消舊動畫，減少動態效果時直接切換。需要滑動範例時，參考 `tests/fixtures/example/deck.tsx`。

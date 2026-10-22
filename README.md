@@ -16,8 +16,8 @@ npm run dev
 ```
 
 - 首頁：http://localhost:5173/
+- TitanFuzz：http://localhost:5173/titanfuzz
 - Backend Workshop：http://localhost:5173/backend-workshop
-- Template：http://localhost:5173/template
 
 正式建置與本機預覽：
 
@@ -46,13 +46,9 @@ Backend Workshop 的休息頁首次進入會開始十分鐘倒數。倒數按時
 
 ## 新增簡報
 
-詳見 [新增簡報指南](docs/authoring.md) 與 [作者範例](decks/example/deck.tsx)。共用播放程式位於 `src/presentation/`，簡報登錄於 `src/registry.ts`。
+詳見 [新增簡報指南](docs/authoring.md) 與 [播放器測試範例](tests/fixtures/example/deck.tsx)。共用播放程式位於 `src/presentation/`，簡報登錄於 `src/registry.ts`。
 
-[Template](decks/template/README.md) 是首頁公開展示的可複製模板，包含七種頁面版型、主題與動畫示範，也能用來檢查首頁的多簡報捲動呈現。
-
-另外提供四套各五頁的獨立設計：[Editorial](decks/editorial/README.md)（雜誌排版）、[Signal](decks/signal/README.md)（技術介面）、[Prism](decks/prism/README.md)（幾何海報）、[Atlas](decks/atlas/README.md)（數據報告）。播放網址依序為 `/template-editorial`、`/template-signal`、`/template-prism`、`/template-atlas`。每套都有自己的版型、步驟動畫、轉場及複製指南。
-
-Backend Workshop 保留於 `Backend Workhsop/`，其中的 `sources/`、`scripts/`、`docs/` 與 `examples/` 維持教材來源與產生流程。`npm run content` 會更新該簡報的衍生教材及網站字型。
+Backend Workshop 位於 `decks/backend-workshop/`，其中的 `sources/`、`scripts/`、`docs/` 與 `examples/` 維持教材來源與產生流程。`npm run content` 會更新該簡報的衍生教材及網站字型。
 
 ## 驗證
 
@@ -109,3 +105,5 @@ location / {
 ```
 
 未知路徑與已移除的 `/presenter` 由前端處理。
+
+Debug 截圖與視覺檢查輸出位於 `output/playwright/` 或各簡報的 `docs/visual-checks/`，僅留在本機，不納入 Git。

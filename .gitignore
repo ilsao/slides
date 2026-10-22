@@ -33,12 +33,12 @@ venv/
 .ruff_cache/
 
 # Local databases created by the Python examples
-examples/*.db
-examples/*.db-*
-examples/*.sqlite
-examples/*.sqlite-*
-examples/*.sqlite3
-examples/*.sqlite3-*
+**/examples/*.db
+**/examples/*.db-*
+**/examples/*.sqlite
+**/examples/*.sqlite-*
+**/examples/*.sqlite3
+**/examples/*.sqlite3-*
 
 # Operating system files and editor temporary files
 .DS_Store
@@ -47,3 +47,7 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+# Generated debug screenshots and visual audit output
+/output/playwright/
+**/docs/visual-checks/

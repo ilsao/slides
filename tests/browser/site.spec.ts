@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { slides } from '../../decks/backend-workshop/src/deck';
 
 const viewer = '/backend-workshop';
 const stage = '.stage[data-present="true"]';
@@ -18,7 +19,7 @@ test('the collection shows nine real static previews without starting playback o
   await page.evaluate(() => document.fonts.ready);
   expect(await card.locator('.stage').evaluateAll(nodes => nodes.map(node => Number(node.getAttribute('data-slide'))))).toEqual([11,16,18,1,49,23001,30001,39,41]);
   await expect(card.getByRole('heading', { name: 'Backend Workshop' })).toBeVisible();
-  await expect(card.locator('.deck-meta')).toHaveText('90 頁');
+  await expect(card.locator('.deck-meta')).toHaveText(`${slides.length} 頁`);
   await expect(card.locator('.mosaic-grid')).toHaveCSS('transition-duration', '0s');
   expect(await card.locator('.mosaic-grid').evaluate(element => {
     const transform = new DOMMatrixReadOnly(getComputedStyle(element).transform);
@@ -54,17 +55,17 @@ test('two-column gallery reveals later rows with scroll and keeps them visible',
   expect(second!.y + second!.height).toBeLessThanOrEqual(900);
   await expect(cards.nth(0).locator('.deck-surface')).toHaveCSS('opacity', '1');
   await expect(cards.nth(1).locator('.deck-surface')).toHaveCSS('opacity', '1');
-  const card = page.locator('[data-gallery-deck="template-prism"]');
-  const sibling = page.locator('[data-gallery-deck="template-atlas"]');
+  // Start above the collection so the second row has not begun revealing.
+  await page.goto('/');
+  const card = page.locator('[data-gallery-deck="example"]');
   const surface = card.locator('.deck-surface');
   const top = await card.evaluate(element => element.getBoundingClientRect().top + scrollY);
   await expect(surface).toHaveCSS('opacity', '0');
   for (const progress of [.25, .5, 1]) {
     await page.evaluate(position => window.scrollTo(0, position), Math.ceil(top - 900 * (.95 - progress * .3)));
     await expect.poll(() => surface.evaluate(element => Number(getComputedStyle(element).opacity))).toBeCloseTo(progress, 2);
-    await expect.poll(() => sibling.locator('.deck-surface').evaluate(element => Number(getComputedStyle(element).opacity))).toBeCloseTo(progress, 2);
   }
-  await expect(card.locator('.slide-preview')).toHaveCount(9);
+  await expect(card.locator('.slide-preview')).toHaveCount(2);
   expect(await card.locator('.mosaic-grid').evaluate(element => {
     const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
     return Math.atan2(matrix.b, matrix.a) * 180 / Math.PI;
