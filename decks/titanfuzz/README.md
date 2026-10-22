@@ -25,8 +25,8 @@
 ## 視覺與播放
 
 - 保留黑底、柔白文字、TitanFuzz 藍 `#a6b4ff` 與 DeepREL 薄荷 `#9bdeca`。1600×900 畫布；中文使用思源黑體 TW，英文統一 Helvetica Neue（標題、正文、程式與數字），結尾保留 Allura 花體。
-- 研究問題保持白色置中標題與置中兩欄；背景、DeepREL、Experiments、Metrics 均一次顯示，沒有頁內動畫。
-- 方法共十二步，保留原生 SVG 連續鏡頭。選 seed 後以四個等高文字列呈現基本 mutation operator，延伸與組合僅保留於講稿，再以 Thompson Sampling 說明初始化、各 operator 抽樣、argmax 選擇及遮蔽生成。回饋步驟說明只更新選中 operator 的成功／失敗計數，成功須有效且不重複。FitnessFunction 與抽樣、更新公式使用原生 MathML。Thompson Sampling 的兩條公式以共用 MathML 表格對齊關係符號；非聚焦元件與文字以淺灰色顯示。
+- 第二頁僅保留 01–03 三欄測試步驟，不顯示中間箭頭或 API／Model-level 分類。研究問題頁僅保留白色疑問標題，水平與垂直置中；背景、DeepREL、Experiments、Metrics 均一次顯示，沒有頁內動畫。
+- 方法共十二步，保留原生 SVG 連續鏡頭。選 seed 後以自然高度、32px 組間距呈現四種基本 mutation operator，延伸與組合僅保留於講稿，再以 Thompson Sampling 說明初始化、各 operator 抽樣、argmax 選擇及遮蔽生成。回饋步驟說明只更新選中 operator 的成功／失敗計數，成功須有效且不重複。FitnessFunction 與抽樣、更新公式使用原生 MathML。Thompson Sampling 的兩條公式以共用 MathML 表格對齊關係符號；非聚焦元件與文字以淺灰色顯示。
 - 第 10 頁進場後 500／920／1340 ms 開始三組圖表，長條各展開 650 ms；數字與差值淡入。回到此頁會重播一次，無循環或手動揭露。
 - 換頁沿用 440 ms 轉場。靜態縮圖與減少動態效果模式直接呈現完成狀態，不播放動畫。
 - 本次 report 頁面不再顯示左下引用；原論文引用仍保留。
@@ -55,3 +55,9 @@
 - 思源黑體 TW：Adobe 官方 [Source Han Sans](https://github.com/adobe-fonts/source-han-sans)，`release/Variable/WOFF2/OTF/Subset/SourceHanSansTW-VF.otf.woff2`，完整台灣字集。
 - [Allura](https://github.com/google/fonts/tree/main/ofl/allura)：Google Fonts 官方版本。
 - 字型與 SIL Open Font License 位於 `public/fonts/`，播放不依賴外部字型服務。
+
+### 內文留白調整
+
+一般內容頁固定標題位置，內文區底部為 y=800，以實際內容高度垂直置中。第二頁移除固定列高，第三、四頁組間距為 48px；DeepREL 欄距為 80px，兩欄各自置中；Metrics 與結果頁欄距為 64px。方法頁保留左側鏡頭，右側以 590px 高度置中各步驟內容。密集的實驗表格保留列距。
+
+已在 1600×900 與 1280×720 檢查全部 11 頁、22 個放映狀態，截圖與邊界記錄位於 `output/playwright/titanfuzz-balanced/`。型別檢查、36 項既有測試與 Vite 建置通過。

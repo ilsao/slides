@@ -82,7 +82,7 @@ export function Method({ step, off }: { step:number; off:boolean }) {
   const variant=step>=6;
   const args=step===5?'<SPAN>':variant?'a, b[:, :1]':'a, b';
   return <div className="tf-method-story" data-phase={step}>
-    <div className="tf-method-heading"><h2>{frame.title}</h2></div>
+    <div className="tf-method-heading"><h2>TitanFuzz</h2></div>
     <div className="tf-method-layout">
       <motion.svg className="tf-method-map" initial={false} animate={{viewBox:frame.view}} transition={{duration:off?0:.68,ease:[.22,.68,.2,1]}} role="img" aria-label={`${frame.title}。Codex 產生 seed，演化搜尋遮蔽程式，InCoder 補齊，再執行篩選。有效程式回存，mutation 成效回饋搜尋，最後做差異驗證。`}>
         <defs>{['quiet','active'].map(s=><marker key={s} id={`${uid}-${s}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill={s==='active'?'#a6b4ff':'#777e8c'}/></marker>)}</defs>
@@ -96,7 +96,7 @@ export function Method({ step, off }: { step:number; off:boolean }) {
           <rect width={node.w} height="100" rx="8"/><text x={node.w/2} y="61" textAnchor="middle">{node.label}</text>
         </g>)}
       </motion.svg>
-      <div className="tf-method-example">
+      <div className="tf-method-example"><div className="tf-method-content">
         {step===3 ? <MutationOperators/> : [2,4,9].includes(step) ? <SearchFormula kind={step===2?'fitness':step===4?'selection':'feedback'}/> : <>
         <p className="tf-example-label">torch.mm</p>
         <pre className="tf-flow-code"><code><span className="tf-code-context">{'a = torch.randn(2, 3)\nb = torch.randn(3, 2)\n\n'}</span>{'y = torch.mm('}<span className="tf-flow-args" data-state={step===5?'masked':step===6?'candidate':step>=7?'valid':'seed'}>{args}</span>{')'}</code></pre>
@@ -107,7 +107,7 @@ export function Method({ step, off }: { step:number; off:boolean }) {
           {step===10 && <><div className="tf-device-pair"><span>CPU</span><span>GPU</span></div></>}
         </motion.div>
         </>}
-      </div>
+      </div></div>
     </div>
   </div>;
 }

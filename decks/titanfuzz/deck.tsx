@@ -25,13 +25,11 @@ const paper = <a href="https://doi.org/10.1145/3597926.3598067" target="_blank" 
 const deepPaper = <a href="https://doi.org/10.1145/3540250.3549085" target="_blank" rel="noreferrer">Deng et al., ESEC/FSE 2022</a>;
 
 function TestingBefore() {
-  return <>
-    <div className="tf-testing-cycle"><div><span>01</span><h2>產生測試</h2></div><b>→</b><div><span>02</span><h2>執行框架</h2><p>CPU / GPU</p></div><b>→</b><div><span>03</span><h2>檢查結果</h2><p>崩潰 / 結果差異</p></div></div>
-    <div className="tf-testing-levels">
-      <div><h2>API-level</h2><p>以 API 呼叫為單位</p><div className="tf-level-symbol"><span>輸入</span><b>→</b><strong>API</strong></div></div>
-      <div><h2>Model-level</h2><p>以完整模型為單位</p><div className="tf-level-symbol"><strong>Layer</strong><b>→</b><strong>Layer</strong><b>→</b><strong>Layer</strong></div></div>
-    </div>
-  </>;
+  return <div className="tf-testing-cycle">
+    <div><span>01</span><h2>產生測試</h2></div>
+    <div><span>02</span><h2>執行框架</h2><p>CPU / GPU</p></div>
+    <div><span>03</span><h2>檢查結果</h2><p>崩潰 / 結果差異</p></div>
+  </div>;
 }
 
 function ApiLevel() {
@@ -74,7 +72,7 @@ function Experiment() {
     ['運算資源', 'NVIDIA H200 × 1'],
     ['搜尋預算', '每次 60 秒主動搜尋上限'],
   ];
-  return <table className="tf-config-table"><caption>本次 PyTorch 重現研究</caption><tbody>{rows.map(([label,value])=><tr key={label}><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody></table>;
+  return <table className="tf-config-table" aria-label="實驗配置"><tbody>{rows.map(([label,value])=><tr key={label}><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody></table>;
 }
 function Metrics() {
   return <div className="tf-metrics-grid">
@@ -105,6 +103,7 @@ function Slide(r: SlideRenderProps) {
   const index = pages.findIndex(page => page[0] === r.slide.id);
   const id = r.slide.id;
   const title = (text:ReactNode) => <h1 className="tf-title">{text}</h1>;
+  const body = (content:ReactNode) => <div className="tf-body"><div className="tf-body-content">{content}</div></div>;
   const chapter = chapterById[String(id)];
   const paperSource = r.mode === 'preview' ? 'Deng et al., ISSTA 2023' : paper;
   const deepSource = r.mode === 'preview' ? 'Deng et al., ESEC/FSE 2022' : deepPaper;
@@ -113,15 +112,15 @@ function Slide(r: SlideRenderProps) {
     <header className="tf-header"><span>{id === 'cover' || id === 'closing' ? '' : chapter}</span></header>
     <main>
       {id === 'cover' && <div className="tf-cover-layout"><div><h1 className="tf-cover-title">TitanFuzz</h1><h2>以大型語言模型<br/>測試深度學習框架</h2><p className="tf-cover-sub">PyTorch 重現研究與 DeepREL 比較</p><p className="tf-cover-author">羅晨恩 <span>114550195</span></p></div></div>}
-      {id === 'question' && <><h1 className="tf-question-heading">探索更廣，測試一定會更好？</h1><p className="tf-question-lead">相同搜尋預算下，比較 TitanFuzz 與 DeepREL。</p><div className="tf-question-pair"><div><h2>探索範圍</h2><p>多觸及哪些框架程式碼<br/>與運算子？</p></div><div><h2>有效產出</h2><p>每個 API 固定 50 個名額，<br/>得到多少可執行的測試？</p></div></div></>}
-      {id === 'testing-before' && <>{title(<>TitanFuzz 之前，<br/>如何測試 DL framework？</>)}<TestingBefore/></>}
-      {id === 'api-level' && <>{title('API-level：單一呼叫之外呢？')}<ApiLevel/></>}
-      {id === 'model-level' && <>{title('Model-level：模型能有多自由？')}<ModelLevel/></>}
-      {id === 'deeprel' && <>{title('DeepREL')}<DeepRel/></>}
+      {id === 'question' && <h1 className="tf-question-heading">探索更廣，測試一定會更好？</h1>}
+      {id === 'testing-before' && <>{title(<>TitanFuzz 之前，<br/>如何測試 DL framework？</>)}{body(<TestingBefore/>)}</>}
+      {id === 'api-level' && <>{title('API-level：單一呼叫之外呢？')}{body(<ApiLevel/>)}</>}
+      {id === 'model-level' && <>{title('Model-level：模型能有多自由？')}{body(<ModelLevel/>)}</>}
+      {id === 'deeprel' && <>{title('DeepREL')}{body(<DeepRel/>)}</>}
       {id === 'method' && <Method step={r.step} off={r.still || r.reducedMotion}/>}
-      {id === 'experiment' && <>{title('Experiments')}<Experiment/></>}
-      {id === 'metrics' && <>{title('Metrics')}<Metrics/></>}
-      {id === 'results' && <>{title('探索增加，產出下降。')}<Results/></>}
+      {id === 'experiment' && <>{title('Experiments')}{body(<Experiment/>)}</>}
+      {id === 'metrics' && <>{title('Metrics')}{body(<Metrics/>)}</>}
+      {id === 'results' && <>{title('探索增加，產出下降。')}{body(<Results/>)}</>}
       {id === 'closing' && <div className="tf-thanks"><p className="tf-closing-topic">TitanFuzz</p><h1 lang="en">Thanks for listening</h1><div className="tf-closing-rule"/></div>}
     </main>
     <footer><span>{source}</span><span>{String(index+1).padStart(2,'0')} <i>/</i> {pages.length}</span></footer>
