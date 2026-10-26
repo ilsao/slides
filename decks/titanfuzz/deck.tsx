@@ -17,10 +17,6 @@ const pages = [
   ['results', '探索增加，產出下降', 1],
   ['closing', 'Thanks for listening', 1],
 ] as const;
-const chapterById: Record<string,string> = {
-  cover:'', 'testing-before':'研究背景', 'api-level':'研究背景', 'model-level':'研究背景',
-  method:'TitanFuzz 方法', question:'我的重現研究', deeprel:'比較工具', experiment:'我的重現研究', metrics:'我的重現研究', results:'我的重現研究', closing:'',
-};
 const paper = <a href="https://doi.org/10.1145/3597926.3598067" target="_blank" rel="noreferrer">Deng et al., ISSTA 2023</a>;
 const deepPaper = <a href="https://doi.org/10.1145/3540250.3549085" target="_blank" rel="noreferrer">Deng et al., ESEC/FSE 2022</a>;
 
@@ -69,7 +65,6 @@ function Experiment() {
     ['重複', '每個 API 重複 10 次實驗'],
     ['起始程式', '90 seeds · Codex CLI 協助撰寫，先依規格驗證'],
     ['比較工具', 'TitanFuzz（InCoder-1B）與 DeepREL'],
-    ['運算資源', 'NVIDIA H200 × 1'],
     ['搜尋預算', '每次 60 秒主動搜尋上限'],
   ];
   return <table className="tf-config-table" aria-label="實驗配置"><tbody>{rows.map(([label,value])=><tr key={label}><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody></table>;
@@ -104,12 +99,11 @@ function Slide(r: SlideRenderProps) {
   const id = r.slide.id;
   const title = (text:ReactNode) => <h1 className="tf-title">{text}</h1>;
   const body = (content:ReactNode) => <div className="tf-body"><div className="tf-body-content">{content}</div></div>;
-  const chapter = chapterById[String(id)];
   const paperSource = r.mode === 'preview' ? 'Deng et al., ISSTA 2023' : paper;
   const deepSource = r.mode === 'preview' ? 'Deng et al., ESEC/FSE 2022' : deepPaper;
   const source = ['testing-before','api-level','model-level','method'].includes(String(id)) ? paperSource : id === 'deeprel' ? deepSource : '';
   return <section className={`tf-slide tf-${id}`} data-still={r.still || r.reducedMotion} data-authored-slide={id} data-step={r.step} aria-label={r.slide.title}>
-    <header className="tf-header"><span>{id === 'cover' || id === 'closing' ? '' : chapter}</span></header>
+    <div className="tf-header" aria-hidden="true"/>
     <main>
       {id === 'cover' && <div className="tf-cover-layout"><div><h1 className="tf-cover-title">TitanFuzz</h1><h2>以大型語言模型<br/>測試深度學習框架</h2><p className="tf-cover-sub">PyTorch 重現研究與 DeepREL 比較</p><p className="tf-cover-author">羅晨恩 <span>114550195</span></p></div></div>}
       {id === 'question' && <h1 className="tf-question-heading">探索更廣，測試一定會更好？</h1>}
