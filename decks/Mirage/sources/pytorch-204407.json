@@ -1,0 +1,61 @@
+{
+  "retrievedOn": "2026-11-13",
+  "url": "https://github.com/pytorch/pytorch/issues/204407",
+  "title": "[Autograd] Incorrect first-order gradient for torch.linalg.slogdet with conj().imag input",
+  "issue_number": 204407,
+  "body": "### 🐛 Describe the bug\n\n## Summary\n\nWhen computing the backward gradient of `torch.linalg.slogdet` on the imaginary part of a conjugated complex tensor, PyTorch returns an incorrect first-order gradient.\n\nThe issue is reproducible on both **PyTorch 2.15.0 (latest stable release)** and the **latest nightly build**.\n\n## Steps to Reproduce\n\nThe issue can be reproduced with the following minimal example:\n\n```python\nimport torch\n\nz = torch.tensor(\n    [[-4j, -1j], [-2j, -3j]],\n    dtype=torch.complex128,\n    requires_grad=True,\n)\n\nloss = torch.linalg.slogdet(z.conj().imag).logabsdet\nloss.backward()\n\nprint(z.grad.imag)\n```\n\n## Actual Behavior\n\nPyTorch returns:\n\n```python\ntensor([[-0.3000,  0.1000],\n        [ 0.2000, -0.4000]], dtype=torch.float64)\n```\n\n## Expected Behavior\n\nThe mathematically correct gradient should be:\n\n```python\ntensor([[-0.3000,  0.2000],\n        [ 0.1000, -0.4000]], dtype=torch.float64)\n```\n\nThe off-diagonal elements are swapped, suggesting that the computed gradient is transposed relative to the mathematically expected result.\n\n## Mathematical Verification\n\nWe can verify the expected gradient analytically as follows.\n\nGiven\n\n$$\nZ = \\begin{bmatrix}\n-4i & -i \\\\\n-2i & -3i\n\\end{bmatrix}\n$$\n\nLet\n\n$$\nA = \\text{Im}(\\overline{Z})\n= \\begin{bmatrix}\n4 & 1 \\\\\n2 & 3\n\\end{bmatrix}\n$$\n\nThe loss is\n\n$$\nL = \\log|\\det(A)| = \\log 10\n$$\n\nSince $A$ is invertible, using the matrix derivative identity,\n\n$$\n\\frac{\\partial L}{\\partial A}\n= (A^{-1})^T\n= \\frac{1}{10}\n\\begin{bmatrix}\n3 & -2 \\\\\n-1 & 4\n\\end{bmatrix}\n$$\n\nLet $Z = X + iY$, where $X$ and $Y$ are real-valued matrices. Since $A = -Y$, applying the chain rule gives\n\n$$\n\\frac{\\partial L}{\\partial Y}\n= -\\frac{\\partial L}{\\partial A}\n= -(A^{-1})^T\n$$\n\nBecause $L$ is real-valued and independent of $X$, under PyTorch's complex autograd convention, the imaginary part of the gradient with respect to $Z$ should equal $\\frac{\\partial L}{\\partial Y}$.\n\nTherefore, the expected result is\n\n$$\n\\boxed{\n\\text{Im}(Z.\\mathrm{grad})\n= \\begin{bmatrix}\n-0.3 & 0.2 \\\\\n0.1 & -0.4\n\\end{bmatrix}\n}\n$$\n\nThis differs from the gradient returned by PyTorch, even though the forward computation produces the expected loss.\n\n## Willingness to Contribute\n\nI would be happy to investigate the root cause, add regression tests, and submit a PR to fix this issue.\n\nPlease let me know if there are any recommendations regarding the appropriate fix or additional tests that would be helpful.\n\n### Versions\n\nPyTorch version: 2.15.0\nIs debug build: False\nCUDA used to build PyTorch: None\nROCm SDK used to build PyTorch: N/A\nHIP used to build PyTorch: N/A\n\nOS: macOS 26.5.1 (arm64)\nGCC version: Could not collect\nClang version: 17.0.0 (clang-1700.4.4.1)\nCMake version: Could not collect\nLibc version: N/A\n\nPython version: 3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)] (64-bit runtime)\nPython platform: macOS-26.5.1-arm64-arm-64bit-Mach-O\nIs CUDA available: False\nCUDA runtime version: No CUDA\nCUDA_MODULE_LOADING set to: N/A\nGPU models and configuration: No CUDA\nNvidia driver version: No CUDA\ncuDNN version: No CUDA\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: False\nCaching allocator config: N/A\n\nCPU:\nApple M4\n\nVersions of relevant libraries:\n[pip3] numpy==2.5.4\n[pip3] torch==2.15.0\n[pip3] torchaudio==2.11.1\n[pip3] torchvision==0.29.2\n[conda] Could not collect\n\ncc @ezyang @albanD @gqchen @nikitaved @soulitzer @Varal7 @bobrenjc93 @anjali411 @dylanbespalko @mruberry @amjames @jianyuh @walterddr @Lezcano",
+  "state": "open",
+  "user": {
+    "login": "ilsao",
+    "name": "ilsao",
+    "email": null,
+    "avatar_url": "https://avatars.githubusercontent.com/u/55054243?v=4",
+    "id": 55054243
+  },
+  "assignees": null,
+  "labels": [
+    {
+      "name": "triage review",
+      "color": "cc317c",
+      "description": ""
+    },
+    {
+      "name": "module: autograd",
+      "color": "f7e101",
+      "description": "Related to torch.autograd, and the autograd engine in general"
+    },
+    {
+      "name": "module: complex",
+      "color": "f7e101",
+      "description": "Related to complex number support in PyTorch"
+    },
+    {
+      "name": "module: linear algebra",
+      "color": "f7e101",
+      "description": "Issues related to specialized linear algebra operations in PyTorch; includes matrix multiply matmul"
+    },
+    {
+      "name": "module: correctness (silent)",
+      "color": "f7e101",
+      "description": "issue that returns an incorrect result silently"
+    },
+    {
+      "name": "bot-triaged",
+      "color": "0b8793",
+      "description": "This is a label only to be used by the auto triage bot"
+    },
+    {
+      "name": "release triage",
+      "color": "425d7b",
+      "description": ""
+    }
+  ],
+  "milestone": null,
+  "state_reason": null,
+  "comments": 0,
+  "created_at": "2026-11-11T12:41:30Z",
+  "updated_at": "2026-11-11T12:43:27Z",
+  "closed_at": null,
+  "display_url": "https://github.com/pytorch/pytorch/issues/204407",
+  "display_title": "[Autograd] Incorrect first-order gradient for torch.linalg.slogdet with conj().imag input"
+}

@@ -1,0 +1,9 @@
+{
+  "source": "public/fonts/SourceHanSansTW-VF.otf.woff2",
+  "output": "MirageTextHan-Subset.woff2",
+  "weight": 400,
+  "characters": 265,
+  "bytes": 38136,
+  "familyRenamed": "Mirage Text Han",
+  "license": "SIL OFL 1.1"
+}

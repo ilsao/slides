@@ -1,0 +1,11 @@
+{
+ "page": null,
+ "url": "http://127.0.0.1:5174/mirage?start=1",
+ "root": null,
+ "kind": "software",
+ "category": "Training framework correctness proposal",
+ "primary": "閱讀提案",
+ "rounds": 3,
+ "start": "2026-11-12T17:31:49.419Z",
+ "by": "gate.mjs --start"
+}

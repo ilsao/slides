@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-13",
+  "timezone": "Asia/Taipei",
+  "presentation": {
+    "mainSlides": 7,
+    "appendixSlides": 0,
+    "targetDuration": "5–10 minutes",
+    "status": "proposal",
+    "states": 15,
+    "estimatedDuration": "5–8 minutes",
+    "subtitle": "探索深度學習框架的新測試空間"
+  },
+  "architecture": {
+    "source": "User prompt and attached text",
+    "localCopy": "architecture-original.md"
+  },
+  "pilot": {
+    "url": "https://github.com/pytorch/pytorch/issues/204407",
+    "localSnapshot": "pytorch-204407.json",
+    "discoveryAttribution": "Research workflow + Codex, per user instruction",
+    "automatedFrameworkDiscovery": false,
+    "state": "open",
+    "comments": 0,
+    "localPyTorchReproduction": false,
+    "rootCauseConfirmed": false,
+    "gpuBehaviorVerified": false,
+    "performanceEvaluationCompleted": false
+  },
+  "apiSemantics": [
+    "https://docs.pytorch.org/docs/2.15/generated/torch.conj.html",
+    "https://docs.pytorch.org/docs/2.15/generated/torch.clone.html",
+    "https://docs.pytorch.org/docs/2.15/generated/torch.linalg.slogdet.html"
+  ],
+  "visualReferences": {
+    "requested": [
+      "Fresha",
+      "Revolut",
+      "Mercury",
+      "Zara",
+      "Magnific"
+    ],
+    "mobbinScreenLibraryAccessible": false,
+    "fallback": "Public / archived brand website screenshots visually inspected for the redesign; these are not the supplied Mobbin collection. No reference artwork is embedded in the deck.",
+    "redesignRequestedByUser": true,
+    "inspectedScreenshots": {
+      "Zara": "https://nice-branding.com/wp-content/uploads/2022/06/Zara-Site.png",
+      "Fresha": "https://cdn2.avada.io/media/PRO/shopify/pos-for-hair-salon/pos-for-hair-salon-12.jpg",
+      "Revolut": "https://globalbankingmonitor.com/content/images/size/w1200/2026/04/pr-screenshot-5518-1776840925.png",
+      "Mercury": "https://globalbankingmonitor.com/content/images/size/w2000/2026/04/marcel-mercury.png",
+      "Magnific": "https://c2.vanceai.com/posts/17171293625216774-MagnificHSBig4.jpg"
+    }
+  },
+  "currentDesign": {
+    "specification": "premium-minimalist-brief.md",
+    "scope": "Mirage slides only, as clarified by user",
+    "primaryFoundation": [
+      "Mercury",
+      "Revolut"
+    ],
+    "typography": "Manrope + Source Han Sans subset; JetBrains Mono for code",
+    "presentation": "black text, white background, solid yellow emphasis, black selected architecture stage",
+    "responsive": "reflowed portrait reading below 960px, projection in landscape / desktop",
+    "decorativeGradients": false,
+    "decorativeAnimation": false,
+    "contentRevision": "Six pages; architecture uses focus / full-canvas detail / white overview per layer; discovery precedes evidence; evaluation page removed",
+    "interactionPolish": "Persistent card and title nodes morph over 560ms; details fade instead of unmounting; black shrinks to original card before white",
+    "cover": "Integrated white-ground optical field, no frame or radius; artwork bleeds beyond canvas; same white / black / yellow system",
+    "galleryPreviews": 9,
+    "coverReferences": [
+      "https://www.behance.net/gallery/113101693/Refraction",
+      "https://www.pentagram.com/work/isomorphic-labs"
+    ],
+    "coverArtwork": "assets/mirage-optical-white-v2.jpg; built-in imagegen; see cover-integrated-v2.md",
+    "galleryCenter": "cover (first slide), preview index 4",
+    "galleryDescription": "探索深度學習框架的新測試空間。"
+  }
+}

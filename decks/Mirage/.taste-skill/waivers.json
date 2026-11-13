@@ -1,0 +1,7 @@
+[
+  {
+    "check": "collide",
+    "target": "div.mg-special-content > div.mg-cover-composition > div.mg-cover-eyebrow > p \"State-aware testing for DL frameworks\"",
+    "reason": "The shared player scales one fixed 1600x900 canvas. The 390px and 320px crops show separated visible glyphs; the large serif font range box includes empty ascender space and the website collision heuristic counts it as text. The actual slide does not have overlapping text."
+  }
+]

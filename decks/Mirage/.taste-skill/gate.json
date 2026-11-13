@@ -1,0 +1,683 @@
+{
+ "start": "2026-11-12T17:31:49.419Z",
+ "round": 3,
+ "idle": 0,
+ "errors": 0,
+ "status": "open",
+ "history": [
+  {
+   "at": "2026-11-12T18:15:02.470Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 20,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-12T18:17:50.102Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 20,
+   "round": 1,
+   "reused": true,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-12T18:28:02.671Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 17,
+   "round": 2,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-12T18:29:47.151Z",
+   "mode": "manual",
+   "status": "open",
+   "fails": 16,
+   "round": 3,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": null,
+  "url": "http://127.0.0.1:5174/mirage?start=1",
+  "root": null,
+  "kind": "software",
+  "category": "Training framework correctness proposal",
+  "primary": "閱讀提案",
+  "rounds": 3,
+  "start": "2026-11-12T17:31:49.419Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "36ae6a5d65a6207e:a3b2f4f2",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "36ae6a5d65a6207e",
+ "page": "http://127.0.0.1:5174/mirage?start=1",
+ "found": {
+  "fails": [
+   {
+    "check": "text-only",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"Mirage.\"",
+    "msg": "the closing section is only text: no picture, icon, mock or effect in it",
+    "fix": "give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "text-only"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"Mirage.\""
+    ]
+   },
+   {
+    "check": "cta",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content",
+    "msg": "the hero has no button (the nav's does not count)",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "cta"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content"
+    ]
+   },
+   {
+    "check": "copy-headline",
+    "where": "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > h1.mg-masthead \"Mirage.\"",
+    "msg": "\"Mirage.\" does not name what is sold (training framework correctness proposal, training, framework, correctness, from flags); only the line under it does",
+    "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "copy-headline"
+    ],
+    "wheres": [
+     "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > h1.mg-masthead \"Mirage.\""
+    ]
+   },
+   {
+    "check": "moment-none",
+    "where": "(the page)",
+    "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+    "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "moment-none"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "hero-screen",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+    "msg": "the hero ends at 787px on a 900px screen, 113px above the fold: it ends at the fold, 1px either way (SR-1)",
+    "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hero-screen"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+    ]
+   },
+   {
+    "check": "hero-screen",
+    "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+    "msg": "113px of the next section shows on the first screen (from 787px on a 900px screen): nothing below the hero shows at load (SR-1)",
+    "fix": "end the hero at the fold so nothing of the next section shows at load (hero height: 100svh)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hero-screen"
+    ],
+    "wheres": [
+     "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+    "msg": "the section is 40px tall (0 screens), 860px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+    "msg": "the section starts at 117px, 117px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+    "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+    "msg": "the screen at scroll 0px (stride 0) shows 40px of section 2 beside section 1: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+    "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+    "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+    ]
+   },
+   {
+    "check": "one-heading",
+    "where": "div.mg-cover-composition > div.mg-cover-bottom > div:nth-of-type(1) > h2 \"Training frameworkcorrectness testing\"",
+    "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+    "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-heading"
+    ],
+    "wheres": [
+     "div.mg-cover-composition > div.mg-cover-bottom > div:nth-of-type(1) > h2 \"Training frameworkcorrectness testing\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div#root \"mirage.Final project proposalProposal / \"",
+    "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div#root \"mirage.Final project proposalProposal / \""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+    "msg": "the section needs exactly one in-flow child .wrap (it has 1 in-flow child, 0 .wrap) (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+    "msg": "the section needs exactly one in-flow child .wrap (it has 2 in-flow children, 0 .wrap) (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > div.mg-cover-bottom \"Training frameworkcorrectness testing探索 \"",
+    "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 911, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+    "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > div.mg-cover-bottom \"Training frameworkcorrectness testing探索 \""
+    ]
+   },
+   {
+    "check": "collide",
+    "where": "div.mg-special-content > div.mg-cover-composition > div.mg-cover-eyebrow > p \"State-aware testing for DL frameworks\"",
+    "msg": "the words \"State-aware testing for DL frame\" lie over \"Mirage.\": two lines in one place",
+    "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "collide"
+    ],
+    "wheres": [
+     "div.mg-special-content > div.mg-cover-composition > div.mg-cover-eyebrow > p \"State-aware testing for DL frameworks\""
+    ]
+   },
+   {
+    "check": "container",
+    "where": "page",
+    "msg": "no .wrap",
+    "fix": "put the content in one .wrap",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "container"
+    ],
+    "wheres": [
+     "page"
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "copy-headline",
+    "where": "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > h1.mg-masthead \"Mirage.\"",
+    "msg": "the h1 has 1 word (2 to 8 read at a glance)",
+    "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "skip-link",
+    "where": "div > div.presentation-player.projection-app > div.presentation-controls.projection-controls:nth-of-type(2) > a.icon-button \"返回首頁\"",
+    "msg": "the first Tab stop is \"返回首頁\", not a skip link: a keyboard user tabs through the whole nav on every visit",
+    "fix": "add the starter's skip link as the header's first child: <a class=\"skip-link\" href=\"#top\">Skip to content</a>",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "share-meta",
+    "where": "head",
+    "msg": "the head lacks og:title, og:description, og:image, twitter:card: a shared link shows no picture or title of its own",
+    "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div > div.presentation-player.projection-app > div.presentation-controls.projection-controls > a.icon-button",
+    "msg": "a 33x36px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div > div.presentation-player.projection-app > div.presentation-controls.projection-controls > button.icon-button:nth-of-type(1)",
+    "msg": "a 33x36px tap target (and 3 more like it on this screen): under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     320
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 45,
+   "layout": 12
+  }
+ },
+ "open": [
+  {
+   "check": "text-only",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"Mirage.\"",
+   "msg": "the closing section is only text: no picture, icon, mock or effect in it",
+   "fix": "give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "text-only"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"Mirage.\""
+   ]
+  },
+  {
+   "check": "cta",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content",
+   "msg": "the hero has no button (the nav's does not count)",
+   "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "cta"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content"
+   ]
+  },
+  {
+   "check": "copy-headline",
+   "where": "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > h1.mg-masthead \"Mirage.\"",
+   "msg": "\"Mirage.\" does not name what is sold (training framework correctness proposal, training, framework, correctness, from flags); only the line under it does",
+   "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "copy-headline"
+   ],
+   "wheres": [
+    "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > h1.mg-masthead \"Mirage.\""
+   ]
+  },
+  {
+   "check": "moment-none",
+   "where": "(the page)",
+   "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+   "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "moment-none"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "hero-screen",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+   "msg": "the hero ends at 787px on a 900px screen, 113px above the fold: it ends at the fold, 1px either way (SR-1)",
+   "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hero-screen"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+   ]
+  },
+  {
+   "check": "hero-screen",
+   "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+   "msg": "113px of the next section shows on the first screen (from 787px on a 900px screen): nothing below the hero shows at load (SR-1)",
+   "fix": "end the hero at the fold so nothing of the next section shows at load (hero height: 100svh)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hero-screen"
+   ],
+   "wheres": [
+    "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+   "msg": "the section is 40px tall (0 screens), 860px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+   "msg": "the section starts at 117px, 117px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+   "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+   "msg": "the screen at scroll 0px (stride 0) shows 40px of section 2 beside section 1: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+   "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+   "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+   ]
+  },
+  {
+   "check": "one-heading",
+   "where": "div.mg-cover-composition > div.mg-cover-bottom > div:nth-of-type(1) > h2 \"Training frameworkcorrectness testing\"",
+   "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+   "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-heading"
+   ],
+   "wheres": [
+    "div.mg-cover-composition > div.mg-cover-bottom > div:nth-of-type(1) > h2 \"Training frameworkcorrectness testing\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div#root \"mirage.Final project proposalProposal / \"",
+   "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div#root \"mirage.Final project proposalProposal / \""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\"",
+   "msg": "the section needs exactly one in-flow child .wrap (it has 1 in-flow child, 0 .wrap) (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div.stage-viewport > section.mg-slide.mg-cover > main.mg-special-main > div.mg-special-content \"State-aware testing for DL frameworksRep\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\"",
+   "msg": "the section needs exactly one in-flow child .wrap (it has 2 in-flow children, 0 .wrap) (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div.page-incoming > div.stage-viewport > section.mg-slide.mg-cover > footer.mg-slide-footer \"Mirage / Final project proposal01/13\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > div.mg-cover-bottom \"Training frameworkcorrectness testing探索 \"",
+   "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 911, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+   "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "main.mg-special-main > div.mg-special-content > div.mg-cover-composition > div.mg-cover-bottom \"Training frameworkcorrectness testing探索 \""
+   ]
+  },
+  {
+   "check": "container",
+   "where": "page",
+   "msg": "no .wrap",
+   "fix": "put the content in one .wrap",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "container"
+   ],
+   "wheres": [
+    "page"
+   ]
+  }
+ ],
+ "waived": [
+  {
+   "check": "collide",
+   "where": "div.mg-special-content > div.mg-cover-composition > div.mg-cover-eyebrow > p \"State-aware testing for DL frameworks\"",
+   "msg": "the words \"State-aware testing for DL frame\" lie over \"Mirage.\": two lines in one place",
+   "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+   "widths": [
+    390,
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "collide"
+   ],
+   "wheres": [
+    "div.mg-special-content > div.mg-cover-composition > div.mg-cover-eyebrow > p \"State-aware testing for DL frameworks\""
+   ],
+   "reason": "The shared player scales one fixed 1600x900 canvas. The 390px and 320px crops show separated visible glyphs; the large serif font range box includes empty ascender space and the website collision heuristic counts it as text. The actual slide does not have overlapping text."
+  }
+ ],
+ "warnCount": 5,
+ "at": "2026-11-12T18:29:47.152Z",
+ "openTold": true
+}

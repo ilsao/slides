@@ -1,0 +1,8 @@
+html,body{margin:0;background:#f8f8f7}
+.mirage-review-screen{height:100svh;width:100%;position:relative;overflow:hidden}
+.mirage-review-screen:has(.mg-slide[data-expanded="true"]){background:#171717}
+.mirage-review-screen:has(.mg-cover){background:#fff}
+.mirage-review-canvas{width:1600px;height:900px;position:absolute;top:50%;left:50%;transform-origin:center}
+.mirage-review-screen[data-reading="true"]{height:auto;min-height:100svh;overflow:visible;border-bottom:1px solid #e8e8e6}
+.mirage-review-screen[data-reading="true"]>.mirage-review-canvas{position:relative;top:auto;left:auto;width:100%;height:auto}
+@media print{.mirage-review-screen{height:900px;width:1600px;break-after:page}.mirage-review-canvas{transform:translate(-50%,-50%)!important}@page{size:1600px 900px;margin:0}}

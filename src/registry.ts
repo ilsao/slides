@@ -4,6 +4,10 @@ export type DeckEntry = { id: string; title: string; load: () => Promise<DeckDef
 
 export const deckEntries: DeckEntry[] = [
   {
+    id: 'mirage', title: 'Mirage',
+    load: () => import('../decks/Mirage/deck').then(module => module.mirageDeck),
+  },
+  {
     id: 'titanfuzz', title: 'TitanFuzz',
     load: () => import('../decks/titanfuzz/deck').then(module => module.titanFuzzDeck),
   },
