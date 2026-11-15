@@ -1,0 +1,17 @@
+.sia-slide .sia-figure { display:block; width:1408px; height:510px; overflow:visible; font-family:inherit; }
+.sia-slide .sia-figure text { font-family:inherit; }
+.sia-slide .sia-reveal { transition:opacity .65s ease,transform .8s cubic-bezier(.18,.8,.2,1); }
+.sia-slide .sia-morph { transition:transform 1s cubic-bezier(.22,.75,.12,1),opacity .5s ease,fill .55s ease; }
+.sia-slide .sia-wire { transition:stroke .6s ease,stroke-width .6s ease; }
+.sia-slide .sia-update-dot { animation:sia-state-update .8s ease both; }
+.sia-slide .sia-roof-path { stroke-dasharray:1250; animation:sia-roof-draw 1.7s cubic-bezier(.3,.3,.2,1) both; }
+.sia-slide .sia-silicon { position:absolute; pointer-events:none; width:1600px; height:900px; top:0; left:0; opacity:1; }
+.sia-slide .sia-silicon-cover { transform:translate(510px,-4px) scale(1.35); }
+.sia-slide .sia-silicon-chapter { transform:translate(550px,-50px) rotate(-14deg) scale(1.5); opacity:.65; }
+.sia-slide .sia-silicon-closing { transform:translate(0,280px) scale(1.4); opacity:.75; }
+.sia-slide .sia-field-plane { animation:sia-plane-enter 2.4s cubic-bezier(.12,.7,.2,1) both; transform-origin:800px 450px; }
+.sia-slide .sia-field-trace { stroke-dasharray:1800; animation:sia-conductor 3s ease both; }
+@keyframes sia-plane-enter { from {opacity:0;transform:translateY(90px) scale(.86)} to {opacity:1;transform:translateY(0) scale(1)} }
+@keyframes sia-conductor { from {stroke-dashoffset:1800;opacity:0} 20%{opacity:.8} to {stroke-dashoffset:0;opacity:.65} }
+@keyframes sia-roof-draw { from{stroke-dashoffset:1250} to{stroke-dashoffset:0} }
+@keyframes sia-state-update { 0%{transform:translateX(-40px);opacity:0} 100%{transform:translateX(0);opacity:1} }

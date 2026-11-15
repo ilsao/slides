@@ -1,0 +1,106 @@
+# System Is All You Need — 來源與技術說明
+
+內容以使用者提供的繁體中文講稿為基礎整理。下列第一手資料用於核實技術概念；核查日期：2026-11-16（Asia/Taipei）。簡報中的排程、記憶體及 Roofline 圖為教學示意，不是實測 benchmark。
+
+## 簡報上的四組延伸閱讀
+
+1. **NVIDIA — GPU architecture / CUDA / performance**
+   - [CUDA Programming Guide — Programming Model](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html)
+   - [GPU Performance Background User’s Guide](https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html)
+   - [Mastering LLM Techniques: Inference Optimization](https://developer.nvidia.com/blog/mastering-llm-techniques-inference-optimization/)
+2. **Orca — Iteration-level scheduling**
+   - Gyeong-In Yu et al., *Orca: A Distributed Serving System for Transformer-Based Generative Models*, OSDI 2022.
+   - [USENIX 論文與演講頁](https://www.usenix.org/conference/osdi22/presentation/yu)
+3. **FlashAttention — IO-aware exact attention**
+   - Tri Dao et al., *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness*, 2022.
+   - [arXiv:2205.14135](https://arxiv.org/abs/2205.14135)
+4. **PagedAttention — KV cache memory management**
+   - Woosuk Kwon et al., *Efficient Memory Management for Large Language Model Serving with PagedAttention*, SOSP 2023.
+   - [arXiv:2309.06180](https://arxiv.org/abs/2309.06180)
+   - [全文 HTML](https://arxiv.org/html/2309.06180v1)
+
+## 逐段對應
+
+| 頁面 | 概念 | 主要依據 |
+|---|---|---|
+| 06–09、30–31 | Prompt processing、prefill、decode、KV reuse、batching | NVIDIA Inference Optimization；PagedAttention §2 |
+| 10–12 | SM、thread/block/grid、warp、register/shared memory/L1/L2/HBM | CUDA Programming Model；GPU Performance Background |
+| 13–15 | Request batching、iteration-level scheduling、動態補入請求 | Orca；NVIDIA Inference Optimization |
+| 17–18 | Compute／memory limitations、arithmetic intensity、效能上限 | GPU Performance Background §4 |
+| 19–22 | N×N 中間矩陣、tiling、online softmax、exact attention、HBM I/O | FlashAttention |
+| 24–29 | KV cache、碎片、block table、按需配置、sharing／copy-on-write | PagedAttention §2–4 |
+| 32 | 三種技術的角色與互補關係 | 根據上述論文與文件的教學整理 |
+
+## KV cache 算例：2 GiB／request
+
+第 25 頁採**假設性 MHA 模型**，不是實際產品或特定模型的容量宣稱。公式為每個序列的 K/V 張量儲存量：
+
+```text
+M_KV = 2 × L × N × H_kv × d_h × b
+
+L     = 32 layers
+N     = 4,096 cached tokens
+H_kv  = 32 KV heads
+d_h   = 128 elements/head
+b     = 2 bytes/element (BF16)
+
+每 token：2 × 32 × 32 × 128 × 2 = 524,288 bytes = 512 KiB
+每 request：4,096 × 512 KiB = 2,147,483,648 bytes = 2 GiB
+16 requests：16 × 2 GiB = 32 GiB
+```
+
+- 第一個 `2` 代表 Key 與 Value；`b = 2` 是每個 BF16 元素的 bytes。
+- `N` 是目前快取的總 token 數，可包含 prompt 與已生成 tokens，不是只計輸出。
+- 假設 16 個 requests 都各有 4,096 cached tokens，且沒有 prefix sharing、KV 量化／壓縮或跨 GPU 分片。
+- 不含模型權重、activations、allocator／block table metadata、對齊與未填滿 block 等額外空間。
+- GQA／MQA 的 KV heads 較少，不能把此 MHA 例子的結果直接套用。採其他 dtype、sliding-window 或其他注意力設計時，也要重新計算。
+- GiB = 2³⁰ bytes，KiB = 2¹⁰ bytes；刻意不用十進位 GB／KB 混稱。
+
+## 原稿的精確性修訂與圖解範圍
+
+### GPU 與 Roofline
+
+- 「32 threads = 1 warp」採 NVIDIA CUDA 範圍；SM、CUDA Core、Tensor Core 也屬此硬體語境。
+- 每個 block 在一個 SM 上執行；SM 可能同時容納多個 blocks。Requests、threads 與實體運算單元沒有一對一對應。
+- Shared memory 與 L1 在多代 NVIDIA GPU 上共用可配置片上資源；層級圖表達 locality 與容量取捨，不是每筆資料的強制逐層流向。
+- 原稿的「memory-bound 時升級 GPU 通常不會顯著提升」改為「若只提高 FLOPS、沒有改善頻寬，幫助有限」。頻寬更高的裝置仍可加速 memory-bound 工作。
+- Compute-bound 的改善不只減少 FLOPs，也可能來自更高效的 kernel、Tensor Core 使用、精度選擇與利用率。
+- Roofline `P ≤ min(P_peak, B × I)` 描述簡化上限；實際效能也受 launch latency、occupancy、指令效率、通訊等影響。示意曲線與資料點不代表指定 GPU 的測量結果。
+
+### Tokenization 與生成
+
+- Token 不等於字或詞；示例切分、IDs 與 attention 連線不是實際 tokenizer／模型的量測輸出。
+- Prefill 處理 prompt，建立 KV cache，並產生第一個新 token 所需的 logits；標準 decode 產生後續 tokens。
+- 「每輪一個 token」是標準自回歸 decode 的教學前提；不涵蓋 speculative decoding 等可接受多個 tokens 的策略。
+- 停止條件除了 EOS，還包括長度限制、停止規則與取消。Streaming 可在生成期間逐步回傳。
+- Tokenization、admission、queue 與 scheduler 的具體先後邊界依 engine 而異，整合圖是概念流程。
+
+### Continuous batching
+
+- Orca 在 2022 年提出 iteration-level scheduling，並搭配 selective batching。簡報用 continuous batching 描述每輪可調整 requests 的主要概念，不把通用術語誤當成論文唯一技術名稱。
+- A／B／C 的 10／30／50 tokens 是教學工作量。圖中的一格是一個 iteration，不代表每輪相同 wall-clock 耗時，也不構成效能比值。
+- 新 request 的 prefill、KV 資源、token budget、延遲需求及公平性仍需排程；插入 lane 是概念動作。
+- 更高吞吐量不保證每個 request 的 latency 都下降。Static 圖的限制是無法補入新請求，不將「完成後一定無法立即回傳」泛化到所有實作。
+
+### FlashAttention
+
+- Dense attention 的漸近計算量仍為 `O(N²d)`；減少的是大型中間矩陣的 materialization 與 HBM I/O，不能說把 attention 計算複雜度變成線性。
+- Tiling、kernel fusion、online softmax 的組合允許逐塊累積結果。Q/K/V 及輸出依然需要讀寫，並非完全不使用 HBM。
+- Exact attention 指數學等價，並不保證浮點輸出與其他實作逐位元相同。
+- Prefill 在足夠大工作量下常偏 compute-bound；小 batch decode 常偏 memory-bound。這些是典型傾向，受硬體、模型、精度、batch 及序列長度影響。
+- 不採用未註明 GPU、shape、dtype 與比較基線的倍速宣稱。
+
+### PagedAttention
+
+- PagedAttention 是受 OS virtual memory／paging 啟發的 attention 與 KV 管理機制，不表示直接重用 OS page table 或缺頁處理流程。
+- 16 tokens／block 為示例大小，不是固定規格；最後一個 block 仍可能未填滿，因此不宣稱零碎片或零浪費。
+- 共用的是相同前綴對應的有效 KV blocks；需要引用管理與適當的 copy-on-write。文字任意片段相同不保證 KV 可共用。
+- Request 結束後，只有不再被其他序列引用的 blocks 才能回收。
+- Paging 改善可容納的 requests 數及記憶體使用效率；它與連續批次、attention kernel 的 I/O 優化處理不同層面的問題。
+
+## 敘事與視覺參考
+
+- 使用者提供的講稿：從 ChatGPT／Agent 引言，經單次 LLM request、GPU、continuous batching、FlashAttention、PagedAttention，回到 systems perspective 與 ML Systems 的價值。
+- 2022／2025 為引言的敘事時間錨點；2025 不被表述為 Agent 的發明年份或普及率統計。
+- 使用者指定的風格參考：[Cerulean — NCHC keynote](https://cerulean.works/slides/nchc-keynote/)。此連結是視覺方向來源，不是上述技術主張的依據。
+
