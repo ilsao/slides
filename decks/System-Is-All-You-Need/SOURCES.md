@@ -23,17 +23,17 @@
 
 | 頁面 | 概念 | 主要依據 |
 |---|---|---|
-| 06–09、30–31 | Prompt processing、prefill、decode、KV reuse、batching | NVIDIA Inference Optimization；PagedAttention §2 |
-| 10–12 | SM、thread/block/grid、warp、register/shared memory/L1/L2/HBM | CUDA Programming Model；GPU Performance Background |
-| 13–15 | Request batching、iteration-level scheduling、動態補入請求 | Orca；NVIDIA Inference Optimization |
-| 17–18 | Compute／memory limitations、arithmetic intensity、效能上限 | GPU Performance Background §4 |
-| 19–22 | N×N 中間矩陣、tiling、online softmax、exact attention、HBM I/O | FlashAttention |
-| 24–29 | KV cache、碎片、block table、按需配置、sharing／copy-on-write | PagedAttention §2–4 |
-| 32 | 三種技術的角色與互補關係 | 根據上述論文與文件的教學整理 |
+| 07–10、34–35 | Prompt processing、prefill、decode、KV reuse、batching | NVIDIA Inference Optimization；PagedAttention §2 |
+| 12–14 | SM、thread/block/grid、warp、register/shared memory/L1/L2/HBM | CUDA Programming Model；GPU Performance Background |
+| 16–18 | Request batching、iteration-level scheduling、動態補入請求 | Orca；NVIDIA Inference Optimization |
+| 20–21 | Compute／memory limitations、arithmetic intensity、效能上限 | GPU Performance Background §4 |
+| 22–25 | N×N 中間矩陣、tiling、online softmax、exact attention、HBM I/O | FlashAttention |
+| 27–32 | KV cache、碎片、block table、按需配置、sharing／copy-on-write | PagedAttention §2–4 |
+| 36 | 三種技術的角色與互補關係 | 根據上述論文與文件的教學整理 |
 
 ## KV cache 算例：2 GiB／request
 
-第 25 頁採**假設性 MHA 模型**，不是實際產品或特定模型的容量宣稱。公式為每個序列的 K/V 張量儲存量：
+第 28 頁採**假設性 MHA 模型**，不是實際產品或特定模型的容量宣稱。公式為每個序列的 K/V 張量儲存量：
 
 ```text
 M_KV = 2 × L × N × H_kv × d_h × b
@@ -129,11 +129,35 @@ b     = 2 bytes/element (BF16)
 - **本機檔案：** `assets/aurora-oskar.jpg`，4096 × 2732 px。
 - **使用規範：** [Unsplash License](https://unsplash.com/license)。免費使用與修改；保留作者署名。
 
-兩圖皆依版面裁切、縮放並疊加明暗遮罩。第 34 頁第二步提供兩張圖片的來源、署名、影像性質與兩站使用規範。
+全部影像皆依版面裁切、縮放並疊加明暗遮罩。第 38 頁第二步提供八張圖片的來源、署名、影像性質與兩站使用規範。
+
+## 六張宇宙章節影像（2026-11-16）
+
+使用者選擇每個技術章節各用一張滿版高清圖片，並指定極光或宇宙主題。六張均取自 NASA 的 Webb 官方影像頁，為紅外觀測的配色合成影像。保留技術頁的淺色底與可步進圖解；章節圖不表示硬體或演算法的科學對應關係。所有圖片本機打包、放映前解碼，原圖先裁成16:9，再縮到最多4096px寬，沒有放大或生成式補圖。
+
+| 章節頁 | NASA影像／來源頁 | 原始尺寸 | 本機尺寸 | 儀器 |
+|---|---|---|---|---|
+| 06 · 一次 LLM 請求 | [Southern Ring Nebula](https://science.nasa.gov/asset/webb/southern-ring-nebula-nircam-image/) | 4833 × 4501 | 4096 × 2304 | NIRCam |
+| 11 · GPU Architecture | [Webb’s First Deep Field](https://science.nasa.gov/asset/webb/webbs-first-deep-field-nircam-image/) | 4537 × 4630 | 4096 × 2304 | NIRCam |
+| 15 · Continuous Batching | [Cartwheel Galaxy](https://science.nasa.gov/asset/webb/cartwheel-galaxy-nircam-and-miri-composite-image/) | 4685 × 4312 | 4096 × 2304 | NIRCam + MIRI |
+| 19 · FlashAttention | [Pillars of Creation](https://science.nasa.gov/asset/webb/pillars-of-creation-nircam-image/) | 8423 × 14589 | 4096 × 2304 | NIRCam |
+| 26 · PagedAttention | [NGC 604](https://science.nasa.gov/asset/webb/ngc-604-miri-image/) | 3562 × 3024 | 3562 × 2003 | MIRI |
+| 33 · A Systems Perspective | [Stephan’s Quintet](https://science.nasa.gov/asset/webb/stephans-quintet-nircam-and-miri-composite-image/) | 12654 × 12132 | 4096 × 2304 | NIRCam + MIRI |
+
+署名：NASA, ESA, CSA, STScI；Cartwheel另含Webb ERO Production Team。Pillars of Creation影像處理：Joseph DePasquale、Anton Koekemoer、Alyssa Pagan（STScI）。每張章節頁可點擊署名回到官方來源，References第二步列出八張圖片。
+
+原始下載：
+
+- [Southern Ring Nebula 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/07/STScI-01G8GZQ3ZFJRD8YF8YZWMAXCE3.png)；本機 `assets/cosmos-southern-ring.jpg`。
+- [Webb’s First Deep Field 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/07/STScI-01G8H1K2BCNATEZSKVRN9Z69SR.png)；本機 `assets/cosmos-deep-field.jpg`。
+- [Cartwheel Galaxy 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/08/STScI-01G9G4J23CDPVNGCYDJRZTTJQN.png)；本機 `assets/cosmos-cartwheel.jpg`。
+- [Pillars of Creation 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/10/STScI-01GGF8H15VZ09MET9HFBRQX4S3.png)；本機 `assets/cosmos-pillars.jpg`。
+- [NGC 604 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2024/03/STScI-01HQP6MAB9N9NS69HBBA9RN5KK.png)；本機 `assets/cosmos-ngc604.jpg`。
+- [Stephan’s Quintet 原始PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/07/STScI-01G8H49RQ0E48YDM8WKW9PP5XS.png)；本機 `assets/cosmos-quintet.jpg`。
 
 ## Online softmax 的數字示例
 
-第 21 頁使用單列 scores `[1, 2, 3, 0, 2, 4]`，分成三個 tiles；對應純量 V 為 `[2, 4, 1, 3, 5, 2]`。這是解釋演算法的合成資料，不是模型輸出。
+第 24 頁使用單列 scores `[1, 2, 3, 0, 2, 4]`，分成三個 tiles；對應純量 V 為 `[2, 4, 1, 3, 5, 2]`。這是解釋演算法的合成資料，不是模型輸出。
 
 每次更新共同基準 m，保存 `ℓ = Σ exp(score − m)` 與 `o = Σ exp(score − m) × v`，最後 `O = o / ℓ`。三步顯示的 `(m, ℓ, o)` 分別約為 `(2, 1.368, 4.736)`、`(3, 1.553, 2.892)`、`(4, 1.707, 3.740)`，最終 O 約為 2.192。畫面顯示四捨五入值，計算採完整精度。
 

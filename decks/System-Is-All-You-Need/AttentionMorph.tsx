@@ -35,7 +35,7 @@ function ScoreCells({ flash, step }: { flash: boolean; step: number }) {
     const pendingY = [106, 106, 245, 245][group];
     const pose: Pose = !flash ? {
       left: 455 + col * 39, top: 117 + row * 39, width: 35, height: 35,
-      backgroundColor: step === 0 ? tint : row >= col ? cobalt : lightBlue,
+      opacity:step===0?.14:1, backgroundColor: row >= col ? cobalt : lightBlue,
       borderColor: 'transparent', borderRadius: 0,
     } : completed ? {
       left: 928, top: 225, width: 1, height: 1, opacity: 0,
@@ -47,7 +47,7 @@ function ScoreCells({ flash, step }: { flash: boolean; step: number }) {
       left: pendingX + localCol * 23, top: pendingY + localRow * 23, width: 19, height: 19,
       backgroundColor: paper, borderColor: line, borderRadius: 0,
     };
-    return <div key={`${row}-${col}`} data-morph={`attn-cell-${row}-${col}`} data-tile={group}
+    return <div key={`${row}-${col}`} data-morph={`attn-cell-${row}-${col}`} data-tile={group} data-morph-delay={!flash?row*24+col*9:group*24}
       className={`sia-attn-piece sia-attn-score ${active ? 'sia-attn-active-score' : ''} ${flash&&!active&&!completed?'sia-attn-pending-score':''}`}
       style={{ ...pose, '--cell': localRow * 4 + localCol } as CSSProperties}><i className="sia-attn-cell-cross"/></div>;
   })}</>;
@@ -62,18 +62,18 @@ export function StandardAttentionMorph({ step }: Props) {
     <Piece name="k" pose={{ left: 181, top: 168, width: 124, height: 120, backgroundColor: tint, borderColor: line, borderRadius: 0 }} className="sia-attn-input"><b>Kᵀ</b></Piece>
     <span className="sia-attn-multiply" style={{ left: 150, top: 212 }}>×</span>
     <Piece name="v" pose={{ left: 1049, top: 169, width: 93, height: 120, backgroundColor: tint, borderColor: line, borderRadius: 0 }} className="sia-attn-input"><b>V</b></Piece>
-    <Piece name="op-softmax" pose={{ left: 847, top: 191, width: 153, height: 75, backgroundColor: paper, borderColor: line, borderRadius: 0 }} className="sia-attn-op">Softmax</Piece>
-    <Piece name="output" pose={{ left: 1222, top: 163, width: 155, height: 130, backgroundColor: ink, borderColor: ink, borderRadius: 0 }} className="sia-attn-output"><b>O</b><small>Output</small></Piece>
+    <Piece name="op-softmax" pose={{ left: 847, top: 191, width: 153, height: 75, opacity:step>=2?1:.12, backgroundColor: paper, borderColor: line, borderRadius: 0 }} className="sia-attn-op">Softmax</Piece>
+    <Piece name="output" pose={{ left: 1222, top: 163, width: 155, height: 130, opacity:step>=2?1:.12, backgroundColor: ink, borderColor: ink, borderRadius: 0 }} className="sia-attn-output"><b>O</b><small>Output</small></Piece>
     <ScoreCells flash={false} step={step}/>
     <svg className="sia-attn-wires" viewBox="0 0 1408 510" aria-hidden="true">
-      <path d="M305 228H414M800 228H831M1005 228H1033M1147 228H1206"/>
+      <path d="M305 228H414"/><path data-build="standard-read" data-visible={step>=2} data-delay="220" d="M800 228H831M1005 228H1033M1147 228H1206"/>
       <path d="M408 224L414 228L408 232M825 224L831 228L825 232M1200 224L1206 228L1200 232"/>
       <path className="sia-attn-io" data-show={step >= 2} d="M615 443V459H926V278"/>
     </svg>
     <span className="sia-attn-multiply" style={{ left: 1014, top: 212 }}>×</span>
     <div className="sia-attn-caption" style={{ left: 16, top: 321 }}>QKᵀ / √dₖ</div>
     <div className="sia-attn-io-caption" data-show={step >= 2}>中間矩陣反覆讀寫</div>
-    <div className="sia-attn-standard-step" data-morph-enter>{['先計算每一對 tokens 的分數','N × N 的中間結果存入 HBM','讀回分數做 softmax，再與 V 相乘'][Math.min(step,2)]}</div>
+    <div className="sia-attn-standard-step" data-build="standard-caption" data-state={step}>{['Q 與 Kᵀ 相乘：為每一對 tokens 計算分數','N × N 的中間結果存入 HBM','讀回分數做 softmax，再與 V 相乘'][Math.min(step,2)]}</div>
     <div className="sia-attn-bottom"><span>分開執行的 attention kernels</span><strong>Intermediate memory · O(N²)</strong></div>
   </Scene>;
 }

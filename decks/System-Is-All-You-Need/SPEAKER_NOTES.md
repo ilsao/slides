@@ -1,6 +1,6 @@
 # System Is All You Need — 講者備註
 
-繁體中文 · 約 30 分鐘 · 34 頁（第 34 頁作延伸閱讀／Q&A，不計入主講時間）
+繁體中文 · 約 30 分鐘 · 38 頁（第 38 頁作延伸閱讀／Q&A，不計入主講時間）
 
 畫面只負責一個問題與一個視覺動作；背景、限制與因果由口述補足。以下時間是建議停留時間，包含逐步動畫，不是自動換頁時間。技術依據及精確性說明見 [SOURCES.md](./SOURCES.md)。
 
@@ -44,7 +44,13 @@
 
 **轉場：** 要理解系統的價值，先看清楚模型到底在做什麼。
 
-## 06 · request · 一次請求
+## 06 · request-title · 一次 LLM 請求
+
+**章節轉場**
+
+以 Southern Ring Nebula 滿版影像讓引言暫停一拍。只說「現在追蹤一次請求」，再進到下一頁的 What makes us human。停留時間併入下一頁原有預算。
+
+## 07 · request · 一次請求
 
 **2:00–2:35 · 35 秒**
 
@@ -52,7 +58,7 @@
 
 **轉場：** 在送進模型之前，文字先改變了形狀。
 
-## 07 · tokens · Tokenization
+## 08 · tokens · Tokenization
 
 **2:35–3:20 · 45 秒**
 
@@ -60,7 +66,7 @@ Tokenizer 將文字切成 tokens，再對應到 token IDs。Token 可能是字�
 
 **轉場：** 但理解一句話，不能只看每個 token 本身。
 
-## 08 · attention · Attention
+## 09 · attention · Attention
 
 **3:20–4:05 · 45 秒**
 
@@ -68,7 +74,7 @@ Transformer 用 attention 讓目前位置參考相關的上下文。指向視覺
 
 **轉場：** 讀過問題後，模型還不會一次吐出整篇答案。
 
-## 09 · generation · 逐 Token 生成
+## 10 · generation · 逐 Token 生成
 
 **4:05–5:00 · 55 秒**
 
@@ -78,7 +84,13 @@ Transformer 用 attention 讓目前位置參考相關的上下文。指向視覺
 
 **轉場：** 這個重複迴圈，會在什麼樣的硬體上發生？
 
-## 10 · gpu · GPU
+## 11 · gpu-title · GPU Architecture
+
+**章節轉場**
+
+以 Webb First Deep Field 作短暫的章節呼吸，接著切到 GPU 架構。影像只作宇宙視覺主題，不用它類比實體 GPU 結構。停留時間併入 GPU 段落。
+
+## 12 · gpu · GPU
 
 **5:00–5:35 · 35 秒**
 
@@ -86,7 +98,7 @@ Transformer 用 attention 讓目前位置參考相關的上下文。指向視覺
 
 **轉場：** 硬體要平行執行，程式也得把工作拆開。
 
-## 11 · warp · Thread / Warp / Block
+## 13 · warp · Thread / Warp / Block
 
 **5:35–6:10 · 35 秒**
 
@@ -94,7 +106,7 @@ CUDA 的 threads 組成 blocks，blocks 組成 grid。每個 block 在一個 SM 
 
 **轉場：** 平行工作之外，資料放在哪裡一樣重要。
 
-## 12 · hierarchy · Memory hierarchy
+## 14 · hierarchy · Memory hierarchy
 
 **6:10–7:00 · 50 秒**
 
@@ -104,7 +116,13 @@ CUDA 的 threads 組成 blocks，blocks 組成 grid。每個 block 在一個 SM 
 
 **轉場：** 第一個系統問題：如何讓 GPU 有足夠的工作可做？
 
-## 13 · batch · Batching
+## 15 · batch-title · Continuous Batching
+
+**章節轉場**
+
+Cartwheel Galaxy 作為章節開場。問題保持簡短：「如何讓硬體持續有工作？」接著進入權重重用與獨立 requests 的圖解。停留時間併入 batching 段落。
+
+## 16 · batch · Batching
 
 **7:00–8:05 · 65 秒**
 
@@ -114,37 +132,37 @@ CUDA 的 threads 組成 blocks，blocks 組成 grid。每個 block 在一個 SM 
 
 **轉場：** Batch 可以一起開始，卻不一定一起結束。
 
-## 14 · static · Static batching
+## 17 · static · Static batching
 
 **8:05–9:55 · 110 秒**
 
-以 A／B／C 分別需要 10／30／50 個輸出 tokens 為例，D／E 需要 40／20 個，先留在佇列。第一步從 t = 0 開始；第二步推進到 t = 10，A 完成，B 與 C 各完成 10 tokens。第三步仍停在 t = 10，強調 A 後方的空槽與 D 前面的阻擋：示意中的 static batch 要等到 C 在 t = 50 結束，才接納下一批。這一步只加強焦點，時間沒有繼續往前。
+以 A／B／C 分別需要 10／30／50 個輸出 tokens 為例，D／E 需要 40／20 個，先留在佇列。第一步 t = 0 同時開始，第二步 t = 5 看見三個 requests 每輪推進。第三步到 t = 10，A 完成，B、C 各完成10 tokens；第四步仍停在 t = 10，強調 A 後方的空槽與 D 前面的阻擋。這個 static batch 要等到 C 在 t = 50 結束，才接納下一批。
 
 數字是解釋排程的教學工作量，不是實測效能。不同 iteration 的實際耗時不必相等，這裡比較的是接納新請求的邊界。已完成的 request 是否能先回應，也依系統實作；此圖重點是不能將新工作補進同批空位。
 
 **轉場：** 模型本來就一輪一輪執行，為什麼一定要等整個 request？
 
-## 15 · continuous · Continuous batching
+## 18 · continuous · Continuous batching
 
 **9:55–12:00 · 125 秒**
 
-切頁時仍是剛才的 t = 10：D 從右側佇列直接移入 A 留下的空槽，沒有倒帶。A 的已完成區段留在時間軸上，B、C 的狀態與已生成內容保留；新的排程政策從這個 iteration 邊界接手。先讓跨頁變形完成，再指著同一條時間刻度解釋「排程單位由 request 改成 iteration」。
+切頁第一步仍是剛才的 t = 10，保留佇列與空槽，只交接政策。第二步才讓 D 從右側佇列移入 A 留下的空槽，沒有倒帶。A 的已完成區段留在時間軸上，B、C 的狀態與已生成內容保留；新的排程政策從這個 iteration 邊界接手。先讓跨頁變形完成，再指著同一條時間刻度解釋「排程單位由 request 改成 iteration」。
 
-下一步到 t = 20，D 已生成 10／40 tokens，B 與 C 繼續。再到 t = 30，B 完成，E 從佇列接上 B 的空槽；D 已完成的 20／40 tokens 不會歸零。最後到 t = 50，C、D、E 都完成，連同先前的 A、B，五個請求全部結束。沿著 D、E 的移動講述補位，讓觀眾看到每次接納新工作都保留其他請求的進度。
+第三步到 t = 30，B 完成，E 從佇列接上 B 的空槽；D 已完成的 20／40 tokens 不會歸零。最後到 t = 50，C、D、E 都完成，連同先前的 A、B，五個請求全部結束。沿著 D、E 的移動講述補位，讓觀眾看到每次接納新工作都保留其他請求的進度。
 
 Orca 在 OSDI 2022 提出 iteration-level scheduling，搭配 selective batching；後來常以 continuous／in-flight batching 描述這類動態組批方式。它減少空位等待，改善利用率與吞吐。實際系統仍需安排新請求的 prefill、KV 容量與延遲預算；圖中是核心機制的簡化示意。
 
 **轉場：** 填滿 GPU 之後，仍可能有另一種等待：等待資料。
 
-## 16 · flash-title · FlashAttention
+## 19 · flash-title · FlashAttention
 
 **12:00–12:20 · 20 秒**
 
-先不急著解釋演算法，只留下問題：同樣的 attention，為什麼換一種計算方式就能更快？答案要從計算與搬移的相對成本開始。
+Pillars of Creation 作為 FlashAttention 開場。先不急著解釋演算法，只留下問題：同樣的 attention，為什麼換一種計算方式就能更快？答案要從計算與搬移的相對成本開始。
 
 **轉場：** GPU 的效能，會被不同的天花板限制。
 
-## 17 · bottlenecks · Compute / Memory
+## 20 · bottlenecks · Compute / Memory
 
 **12:20–13:30 · 70 秒**
 
@@ -154,7 +172,7 @@ Compute-bound：運算單元忙著算，計算吞吐成為主要限制。Memory-
 
 **轉場：** Roofline 把這件事畫成一張圖。
 
-## 18 · roofline · Roofline
+## 21 · roofline · Roofline
 
 **13:30–15:00 · 90 秒**
 
@@ -164,7 +182,7 @@ Compute-bound：運算單元忙著算，計算吞吐成為主要限制。Memory-
 
 **轉場：** 接著把 attention 的資料搬移放進這個框架。
 
-## 19 · standard · Standard attention
+## 22 · standard · Standard attention
 
 **15:00–16:30 · 90 秒**
 
@@ -174,7 +192,7 @@ Attention(Q,K,V) = softmax(QKᵀ / √dₖ)V。QKᵀ 形成 N×N 分數矩陣，
 
 **轉場：** 能不能算出答案，卻從未把這張大表完整寫出去？
 
-## 20 · tiling · Tiling
+## 23 · tiling · Tiling
 
 **16:30–18:20 · 110 秒**
 
@@ -184,19 +202,19 @@ FlashAttention 把 Q、K、V 切成 tiles，將能放進快速片上 SRAM 的部
 
 **轉場：** 但 softmax 的分母需要整列資料，怎麼能只看一塊？
 
-## 21 · softmax · Online softmax
+## 24 · softmax · Online softmax
 
 **18:20–19:50 · 90 秒**
 
 Online softmax 不必先保存整列 scores，而是持續維護三種狀態：目前最大值、指數和，以及加權輸出累積值。下一塊出現更大最大值時，舊累積值要按新基準重新縮放，然後加入新塊貢獻；最後完成正規化。
 
-畫面用同一列六個 scores 的三塊純量例子，避免將三種狀態誤解成三個分開執行的步驟。每按一次，m、ℓ、o 都同步更新：scores 為 [1, 2]、[3, 0]、[2, 4]，對應 V 為 [2, 4]、[1, 3]、[5, 2]。第 1 塊 m=2、ℓ≈1.368、o≈4.736；第 2 塊 m=3、ℓ≈1.553、o≈2.891；第 3 塊 m=4、ℓ≈1.707、o≈3.740，最後 O=o/ℓ≈2.192。這裡 o 表示尚未除以分母的加權輸出累積，O 才是正規化後結果。實際 head 的 V/o/O 是向量，圖採單一維度以方便講解。
+五步先問「每塊各做 softmax，分母是否相同」，再合併三塊，最後正規化並與完整 softmax 對照。畫面採同一列六個 scores 的純量例子，三種摘要同時更新。每按一次，m、ℓ、o 都同步更新：scores 為 [1, 2]、[3, 0]、[2, 4]，對應 V 為 [2, 4]、[1, 3]、[5, 2]。第 1 塊 m=2、ℓ≈1.368、o≈4.736；第 2 塊 m=3、ℓ≈1.553、o≈2.892；第 3 塊 m=4、ℓ≈1.707、o≈3.740，最後 O=o/ℓ≈2.192。這裡 o 表示尚未除以分母的加權輸出累積，O 才是正規化後結果。實際 head 的 V/o/O 是向量，圖採單一維度以方便講解。
 
-不推導遞迴公式；數字不是要觀眾心算，而是讓「新 max 會使舊累積重新縮放」成為可觀察的變化。不要把 ℓ/o 在某一步變小誤解成丟掉先前資料。Exact 指數學上等價的 dense attention，不是近似或捨棄注意力連線；浮點運算順序不同仍可能造成微小數值差異。
+用畫面上的 α 展示兩次重新縮放；數字不是要觀眾心算，而是讓「新 max 會使舊累積重新縮放」成為可觀察的變化。不要把 ℓ/o 在某一步變小誤解成丟掉先前資料。Exact 指數學上等價的 dense attention，不是近似或捨棄注意力連線；浮點運算順序不同仍可能造成微小數值差異。
 
 **轉場：** 我們省下的究竟是什麼？
 
-## 22 · flash-result · FlashAttention 的取捨
+## 25 · flash-result · FlashAttention 的取捨
 
 **19:50–21:00 · 70 秒**
 
@@ -206,15 +224,15 @@ Online softmax 不必先保存整列 scores，而是持續維護三種狀態：�
 
 **轉場：** 算得更有效率之後，另一種記憶體還會一直長大。
 
-## 23 · paged-title · PagedAttention
+## 26 · paged-title · PagedAttention
 
 **21:00–21:15 · 15 秒**
 
-FlashAttention 關心計算過程的 I/O；PagedAttention 關心生成過程的 KV cache 如何存放與共用。接下來會看到一個熟悉的作業系統概念。
+以 NGC 604 的 Webb 影像開啟章節。FlashAttention 關心計算過程的 I/O；PagedAttention 關心生成過程的 KV cache 如何存放與共用。接下來會看到一個熟悉的作業系統概念。
 
 **轉場：** 先看模型為什麼需要「記住」先前的計算。
 
-## 24 · kv · KV cache
+## 27 · kv · KV cache
 
 **21:15–22:10 · 55 秒**
 
@@ -224,7 +242,7 @@ FlashAttention 關心計算過程的 I/O；PagedAttention 關心生成過程的 
 
 **轉場：** 一段看起來不長的對話，可能佔多少空間？
 
-## 25 · kv-scale · KV cache 的容量
+## 28 · kv-scale · KV cache 的容量
 
 **22:10–23:15 · 65 秒**
 
@@ -234,7 +252,7 @@ FlashAttention 關心計算過程的 I/O；PagedAttention 關心生成過程的 
 
 **轉場：** 容量已經很珍貴，連配置方式都不能浪費。
 
-## 26 · fragmentation · Fragmentation
+## 29 · fragmentation · Fragmentation
 
 **23:15–24:25 · 70 秒**
 
@@ -244,7 +262,7 @@ FlashAttention 關心計算過程的 I/O；PagedAttention 關心生成過程的 
 
 **轉場：** OS 已經教過我們，邏輯連續不等於實體連續。
 
-## 27 · paging · Paging
+## 30 · paging · Paging
 
 **24:25–25:45 · 80 秒**
 
@@ -254,17 +272,17 @@ PagedAttention 將 KV cache 切成固定 token 數的 blocks。每個 request �
 
 **轉場：** 有了 block table，新的 token 不再需要預留整條長序列。
 
-## 28 · growth · 按需配置
+## 31 · growth · 按需配置
 
 **25:45–26:50 · 65 秒**
 
-沿三個狀態追蹤同一個 request：14 tokens 時仍有兩格可用；16 tokens 剛好填滿；第 17 個 token 才配置下一個 physical block P2。P2 對應從 16 開始的 token indices（0-based），free pool 從 4 blocks 減少為 3 blocks。先填當前 block，滿了才配置另一個 physical block，並更新 mapping。圖中採 16 tokens／block 作示例；實際大小是系統設計與配置的選項。這樣避免替未知的最終長度一次預留巨大連續空間。
+沿四個狀態追蹤同一個 request A：14 tokens 時仍有兩格可用；16 tokens 剛好填滿；第三步在第17個 token 到來前，取出 physical block P2，更新 L1→P2；第四步才寫入第17個 token 的 KV。P2 對應從 16 開始的 token indices（0-based），free pool 從 4 blocks 減少為 3 blocks。先填當前 block，滿了才配置另一個 physical block，並更新 mapping。圖中採 16 tokens／block 作示例；實際大小是系統設計與配置的選項。這樣避免替未知的最終長度一次預留巨大連續空間。
 
 最後一個 block 仍可能未滿，所以不是零浪費。Request 完成或取消時，系統可回收不再被引用的 blocks，供新請求使用；若還有其他序列共用，須等引用解除後再釋放。
 
-**轉場：** 而且，不同 request 的映射可以指向同一份內容。
+**轉場：** 下一頁原位保留 P7 與 A 的 P2。現在讓另一個 request B 指向相同的完整前綴 P7。
 
-## 29 · sharing · Prefix sharing
+## 32 · sharing · Prefix sharing
 
 **26:50–28:00 · 70 秒**
 
@@ -274,17 +292,23 @@ PagedAttention 將 KV cache 切成固定 token 數的 blocks。每個 request �
 
 **轉場：** 現在重新按下那一次 Enter。
 
-## 30 · systems · 一次請求，系統的視角
+## 33 · systems-title · A Systems Perspective
+
+**章節轉場**
+
+Stephan’s Quintet 收束三個技術章節，回扣同一個 request。下一頁逐步走過 Tokenize、Schedule、Prefill、Decode、Complete。停留時間併入系統全貌段落。
+
+## 34 · systems · 一次請求，系統的視角
 
 **28:00–28:35 · 35 秒**
 
-快速追蹤開場同一個問題。第一步對應 tokenization／佇列與 continuous batching 排程；第二步接上 prefill、decode 與兩者共用的 KV cache，把 FlashAttention 的 attention I/O 改善和 PagedAttention 的 block 管理指回圖中位置。Decode 完成一輪會回到 scheduler，決定下一輪的 requests。第三步達到 EOS 或長度限制後解除引用，僅回收不再共用的 blocks，留在圖上的 blocks 表示其他仍在使用的資料。
+用五次推進追蹤開場的問題：第一步 tokenize 與 queue；第二步 scheduler 與 continuous batching；第三步 prefill、FlashAttention 與 PagedAttention 管理的 KV；第四步 decode 與 streaming，迴圈回到 scheduler；第五步 EOS / 長度上限，解除引用並回收不再共用的 blocks。畫面中的 request 沒有其他共用引用，因此最後全部回到 free pool。
 
 整個過程可持續 detokenize 與 streaming；完成不是第一個回傳文字的時點。具體系統中 tokenize 與 admission／排程的邊界可能不同。圖上示範 FlashAttention 對 prefill 的典型用途，不表示它只能用於 prefill。
 
 **轉場：** 同一請求的前半段與後半段，工作形狀也不同。
 
-## 31 · phases · Prefill / Decode
+## 35 · phases · Prefill / Decode
 
 **28:35–29:00 · 25 秒**
 
@@ -292,7 +316,7 @@ Prefill 處理已知 prompt 的大量 tokens，建立 KV 並提供第一個輸�
 
 **轉場：** 這些差異，正是系統設計發揮作用的地方。
 
-## 32 · takeaway · ML Systems
+## 36 · takeaway · ML Systems
 
 **29:00–29:40 · 40 秒**
 
@@ -304,16 +328,16 @@ Prefill 處理已知 prompt 的大量 tokens，建立 KV 並提供第一個輸�
 
 **轉場：** 讓最後一句落下，不再加新概念。
 
-## 33 · closing · System Is All You Need
+## 37 · closing · System Is All You Need
 
 **29:40–30:00 · 20 秒**
 
 以 Unsplash 的海岸極光回應開場 NASA Webb 的宇宙觀測影像，讓標題形成回環。「讓相同的模型，服務更多人」是這場演講的落點。口述收尾：「下一次看見一個 token 出現在螢幕上，希望你也看見它背後的整個系統。」停頓，致謝，進入提問。
 
-## 34 · sources · References
+## 38 · sources · References
 
 **Q&A／延伸閱讀，不計入 30 分鐘主講**
 
 四組入口：NVIDIA CUDA／GPU performance 文件、Orca、FlashAttention、PagedAttention。詳細連結、計算假設與本次對原稿做的精確性修訂整理在 [SOURCES.md](./SOURCES.md)。若有人問實測加速比，說明本簡報沒有進行效能 benchmark，請依論文工作負載與對照基線解讀數字。
 
-再推進一步顯示兩張圖片的來源與使用規範。封面是 NASA Webb Cosmic Cliffs，署名 NASA, ESA, CSA, STScI，屬 NIRCam 紅外觀測合成影像。結尾為 Oskar Kadaksoo / Unsplash 的海岸極光攝影。兩張素材均從原圖縮製為 4096px，只做裁切、縮放與明暗遮罩。
+再推進一步顯示八張圖片的來源與使用規範，包含六張宇宙章節影像。封面是 NASA Webb Cosmic Cliffs，署名 NASA, ESA, CSA, STScI，屬 NIRCam 紅外觀測合成影像。結尾為 Oskar Kadaksoo / Unsplash 的海岸極光攝影。兩張素材均從原圖縮製為 4096px，只做裁切、縮放與明暗遮罩。

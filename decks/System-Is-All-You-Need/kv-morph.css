@@ -31,3 +31,23 @@
 
 /* No CSS geometry races with the shared-object transition snapshot. */
 .sia-slide .sia-kv-morph [data-morph],.sia-slide .sia-kv-cell>span,.sia-slide .sia-kv-total>strong,.sia-slide .sia-kv-total>span,.sia-slide .sia-kv-attention>strong,.sia-slide .sia-kv-attention>span{transition:none}
+
+.sia-slide .sia-frag-row{position:absolute;border-top:1px solid var(--sia-line)}
+.sia-slide .sia-frag-reserved{position:absolute;background:repeating-linear-gradient(130deg,#e8eaee 0 8px,#dce0e6 8px 9px);display:flex;align-items:center;justify-content:space-between;font-size:20px;color:var(--sia-muted)}
+.sia-slide .sia-frag-reserved>div{background:var(--sia-blue);height:100%;display:grid;place-items:center;color:var(--sia-paper)}
+.sia-slide .sia-frag-reserved>span{padding-right:30px}
+.sia-slide .sia-frag-slots{position:absolute;left:405px;top:10px;display:flex;gap:8px;width:985px;height:63px}
+.sia-slide .sia-frag-slots>div{flex:1;background:#d4dce7;border:1px solid #c6d0df;display:grid;place-items:center;font-size:15px;color:var(--sia-muted)}
+.sia-slide .sia-frag-slots>div[data-free="true"]{background:transparent;border-style:dashed}
+.sia-slide .sia-frag-duplicate{position:absolute;display:flex;align-items:center;gap:12px;font-size:20px}
+.sia-slide .sia-frag-duplicate b{font-weight:400;width:35px}
+.sia-slide .sia-frag-duplicate span{background:#d7e2f0;flex:1;padding:12px 24px;color:var(--sia-blue)}
+.sia-slide .sia-frag-duplicate i{font-style:normal;background:#e8ebef;width:200px;padding:12px 24px}
+.sia-slide .sia-kv-map-wire{position:absolute;inset:0;width:1408px;height:510px;pointer-events:none;z-index:1}
+.sia-slide .sia-kv-map-wire path{fill:none;stroke:var(--sia-blue);stroke-width:1;opacity:.6}
+.sia-slide .sia-growth-table{position:absolute;border-top:2px solid var(--sia-ink);border-bottom:1px solid var(--sia-line);display:flex;align-items:center;gap:30px;font-size:22px;color:var(--sia-blue)}
+.sia-slide .sia-growth-pool{position:absolute;font-size:18px;color:var(--sia-muted)}
+.sia-slide .sia-growth-pool>div{display:flex;gap:12px;margin-top:16px}
+.sia-slide .sia-growth-pool i{font-style:normal;border:1px solid var(--sia-line);padding:10px 22px;font-size:19px}
+.sia-slide .sia-kv-sharing .sia-kv-microtokens{gap:4px}
+.sia-slide .sia-kv-microtokens i[data-build]{transition:background-color 620ms ease!important}

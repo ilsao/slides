@@ -187,19 +187,24 @@ describe('compositor object continuity', () => {
   });
 });
 
-describe('stable scene handoff', () => {
+describe('destination-only page motion', () => {
   it.each([
     ['standard', 'scene'], ['flash-title', 'chapter'], ['paged-title', 'chapter'],
     ['cover', 'bookend'], ['closing', 'bookend'], ['agents', 'epoch'],
-  ])('%s hands off a complete %s without replaying an entrance on remount', (id, mode) => {
+  ])('%s animates the destination %s without retaining or clipping the previous page', (id, mode) => {
     const title = node(), scene = node(), sculpture = node(), copy = node();
     const outgoing = layer(), incoming = layer({ id, title, scene, sculpture, copy });
     const result = systemTransition.animate({ incoming: incoming.element, outgoing: outgoing.element }, 1);
     expect(incoming.fake.dataset.morphMode).toBe(mode);
-    expect(result).toEqual([]);
+    expect(result).toHaveLength(2);
     expect(outgoing.fake.style.opacity).toBe('0');
-    for (const element of [incoming.fake, outgoing.fake, title, scene, sculpture, copy])
+    expect(title.animate).toHaveBeenCalledOnce();
+    expect(scene.animate).toHaveBeenCalledOnce();
+    for (const element of [incoming.fake, outgoing.fake, incoming.slide])
       expect(element.animate).not.toHaveBeenCalled();
+    expect(title.animate.mock.calls[0][0].every(frame=>!('opacity' in frame)&&!('clipPath' in frame))).toBe(true);
+    expect(scene.animate.mock.calls[0][0].at(-1)).toMatchObject({opacity:1});
+    expect(scene.animate.mock.calls[0][1].delay).toBeGreaterThan(title.animate.mock.calls[0][1].delay!);
   });
 
   it('keeps the title and new context visible from the first frame while shared objects move', () => {
@@ -209,7 +214,8 @@ describe('stable scene handoff', () => {
     const incoming = layer({ id: 'tiling', title, entering: [context], objects: [after] });
     systemTransition.animate({ outgoing: layer({ objects: [before] }).element, incoming: incoming.element }, 1);
     expect(after.animate).toHaveBeenCalledOnce();
-    expect(title.animate).not.toHaveBeenCalled();
+    expect(title.animate).toHaveBeenCalledOnce();
+    expect(title.animate.mock.calls[0][0].every(frame=>!('opacity' in frame))).toBe(true);
     expect(context.animate).not.toHaveBeenCalled();
     expect(incoming.fake.animate).not.toHaveBeenCalled();
   });

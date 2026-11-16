@@ -42,13 +42,13 @@ export function GpuArchitecture({ step }: SceneProps) {
       <rect x="217" y="369" width="85" height="25" fill="#e6e9ed" />
       <text x="259" y="387" textAnchor="middle" className="sia-gb-micro" fill={muted}>L2 CACHE</text>
     </g>
-    <g className="sia-gb-reveal" style={{ opacity: step >= 1 ? 1 : 0 }}>
-      <path d="M 254 188 L 636 48 M 254 234 L 636 428" fill="none" stroke="#bcc8d7" />
+    <g className="sia-gb-sm-shell" style={{ opacity: step >= 1 ? 1 : 0, transform: step>=1?'translate(0px,0px) scale(1)':'translate(-309px,-27px) scale(.08)' }}>
+      <path d="M 224 188 L 636 48 M 224 234 L 636 428" fill="none" stroke="#bcc8d7" />
       <rect x="636" y="48" width="744" height="380" fill={paper} stroke="#aab6c5" />
       <path d="M 636 112 H 1380" stroke={line} />
       <text x="664" y="95" className="sia-gb-label" fill={ink}>Streaming Multiprocessor</text>
       <text x="1352" y="94" textAnchor="end" className="sia-gb-micro" fill={blue}>ONE SM</text>
-      <g className="sia-gb-reveal" style={{ opacity: step >= 2 ? 1 : .14 }}>
+      <g data-build="sm-interior" data-visible={step>=2} data-delay="100">
         <rect x="664" y="132" width="688" height="34" fill={soft} stroke={line} />
         {[836, 1008, 1180].map(x => <path key={x} d={`M ${x} 132 V 166`} stroke={line} />)}
         <rect x="908" y="135" width="200" height="28" fill={soft} />
@@ -113,32 +113,29 @@ export function WarpHierarchy({ step }: SceneProps) {
 }
 
 export function MemoryHierarchy({ step }: SceneProps) {
-  const levels = [
-    { name: 'Registers', scope: 'Thread', detail: '每個 thread 的中間結果', width: 480 },
-    { name: 'Shared memory / L1', scope: 'SM', detail: 'Shared：block 內協作　L1：自動快取', width: 700 },
-    { name: 'L2 cache', scope: 'GPU', detail: '多個 SM 共享，減少存取外部記憶體', width: 920 },
-    { name: 'Global memory', scope: 'HBM / GDDR', detail: '大容量，資料搬移可能成為瓶頸', width: 1140 },
+  const levels=[
+    ['Registers','Thread','每個 thread 的中間結果'],
+    ['Shared / L1','SM','Block 協作 / 自動快取'],
+    ['L2 cache','GPU','多個 SM 共享'],
+    ['Global memory','HBM / GDDR','Weights · Activations · KV cache'],
   ];
+  const cx=674, top=8, band=101, half=(y:number)=>(y-top)*1.15;
   return <Scene name="memory" step={step}>
-    <text x="77" y="39" textAnchor="middle" className="sia-gb-small" fill={muted}>低延遲</text>
-    <path d="M 77 381 V 82 m -5 7 l 5 -7 l 5 7" stroke="#a7adb6" fill="none" />
-    <text x="77" y="423" textAnchor="middle" className="sia-gb-small" fill={muted}>大容量</text>
-    {levels.map((level, index) => {
-      const visible = index === 0 || step >= 1 && index < 3 || step >= 2;
-      const y = 41 + index * 96;
-      return <g key={level.name} className="sia-gb-reveal" style={{ opacity: visible ? 1 : .12, transform: `translateY(${visible ? 0 : 8}px)` }}>
-        <text x="177" y={y + 40} textAnchor="end" className="sia-gb-micro" fill={muted}>0{index + 1}</text>
-        <rect x="220" y={y} width={level.width} height="64" fill={index === 3 ? '#e8edf3' : '#f0f1f2'} stroke={index === 3 ? '#b7c5d6' : '#d4d8de'} />
-        <path d={`M 220 ${y} v 64`} stroke={blue} strokeWidth="2" />
-        <text x="244" y={y + 28} className="sia-gb-label" fill={ink}>{level.name}</text>
-        <text x="244" y={y + 51} className="sia-gb-micro" fill={muted}>{level.detail}</text>
-        <text x={220 + level.width - 20} y={y + 40} textAnchor="end" className="sia-gb-small" fill={muted}>{level.scope}</text>
+    <text x="72" y="49" className="sia-gb-small" fill={muted}>低延遲</text><text x="72" y="83" className="sia-gb-micro" fill={muted}>小容量</text>
+    <path d="M 118 368 V 123 m -6 9 6-9 6 9" stroke={muted} fill="none"/>
+    <text x="72" y="415" className="sia-gb-small" fill={muted}>大容量</text><text x="72" y="449" className="sia-gb-micro" fill={muted}>較高延遲</text>
+    {levels.map(([name,scope,detail],i)=>{
+      const y1=top+i*band,y2=y1+band-5,visible=i===0||step>=1&&i<3||step>=2;
+      const left=cx-half(y1),right=cx+half(y1),bottomLeft=cx-half(y2),bottomRight=cx+half(y2);
+      return <g key={name} data-build={`memory-level-${i}`} data-visible={visible} data-delay={i*85}>
+        <path d={`M${left} ${y1}H${right}L${bottomRight} ${y2}H${bottomLeft}Z`} fill={i===3?'#dfe7f1':i===0?'#d5e0ee':'#e9edf2'} stroke={i===0?blue:'#bdc9d8'}/>
+        <text x={cx} y={y1+(i===0?70:55)} textAnchor="middle" className="sia-gb-label" fill={ink}>{name}</text>
+        {i>0&&<text x={cx} y={y1+82} textAnchor="middle" className="sia-gb-micro" fill={muted}>{scope}</text>}
+        <path d={`M${cx+half(y1+61)+13} ${y1+61}H1188`} stroke={line}/><text x="1210" y={y1+56} className="sia-gb-small" fill={ink}>{i===0?scope:scope==='HBM / GDDR'?'Off-chip':scope}</text>
+        <text x="1210" y={y1+83} className="sia-gb-micro" fill={muted}>{i===3?'模型與 KV 的主要存放處':i===1?'Shared：block / L1：SM':detail}</text>
       </g>;
     })}
-    <g className="sia-gb-reveal" style={{ opacity: step >= 2 ? 1 : 0 }}>
-      <path d="M 220 425 V 440 H 1360 V 425" fill="none" stroke={line} />
-      {['Weights', 'Activations', 'KV cache'].map((label, i) => <text key={label} x={220 + i * 570} y="481" textAnchor={i === 0 ? 'start' : i === 2 ? 'end' : 'middle'} className="sia-gb-small" fill={ink}>{label}</text>)}
-    </g>
+    <g data-build="memory-hbm-note" data-visible={step>=2} data-delay="330"><path d="M212 436H1137" stroke={line}/><text x="674" y="478" textAnchor="middle" className="sia-gb-small" fill={blue}>越靠近運算單元，越要善用有限空間中的資料重用</text></g>
   </Scene>;
 }
 

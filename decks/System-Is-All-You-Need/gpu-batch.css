@@ -17,3 +17,5 @@
 @media (prefers-reduced-motion: reduce) {
   .sia-slide .sia-gb-scene * { transition: none !important; animation: none !important; }
 }
+
+.sia-slide .sia-gb-sm-shell{transform-box:view-box;transform-origin:1008px 238px;transition:transform 960ms cubic-bezier(.22,.72,.18,1),opacity 500ms ease 90ms}

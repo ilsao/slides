@@ -1,3 +1,36 @@
+# 宇宙章節與分層進場 · 2026-11-16
+
+最新版本為38頁、96個手動狀態。四個新章節頁加在request、GPU、batching、systems之前；FlashAttention與PagedAttention既有章節頁更新為滿版宇宙影像。
+
+- 16項Chrome回歸通過：包含74個正反換頁、每個7個固定時間取樣，共518個中間幀；slide根節點始終opacity=1、clip-path=none、transform=none，outgoing opacity=0，沒有前頁clone。圖解本身可局部揭示，沒有整頁淡入淡出。
+- 分層時序：標題0ms、圖解110ms、細節250ms起每項相差22ms（有上限），使用連續緩出。共享圖解的幾何與SRAM框保留，文字細節獨立進場。章節圖片只作輕微縮放，保持不透明。
+- 六張不同的NASA Webb宇宙影像均成功decode；五張本機寬4096px，一張3562px。來源為4833×4501、4537×4630、4685×4312、8423×14589、3562×3024、12654×12132的官方原始PNG，先裁16:9再縮製，未放大。
+- 已目視六張章節頁、八圖署名頁與0/100/220/400/700/1200ms進場截圖。瀏覽器執行錯誤為0。
+- TypeScript、63項單元測試、Vite正式建置、`git diff --check`通過。新圖片已包含於正式建置，講者備註與來源頁碼已同步。
+
+完整巡覽：96狀態正向＋96狀態倒向、8個章節跳轉、64次快速交錯操作、1024×768與390×844各96個reduced-motion狀態、觸控操作與縮小舞台的核心變形，共421個檢查點通過。console errors/warnings、page errors、HTTP failures、殘留outgoing/surface均為0，沒有slow settle紀錄。
+
+本機檢查紀錄與截圖：`output/playwright/sia-cosmos/`（已忽略）。下方為前幾輪驗證歷史，不代表目前的頁碼或進場時序。
+
+---
+
+# 前一輪：前頁暫留修復 · 2026-11-16
+
+本輪依使用者的14項回饋調整為34頁、92個手動狀態，並依後續「前頁暫留」回報移除來源底圖與全頁遮罩。下方舊紀錄保留供追溯；目前實作以此節與 README 的新動效規則為準。
+
+- TypeScript 型別檢查、63項單元測試、正式 Vite build、`git diff --check` 通過。
+- Chrome 動態回歸14項通過，包含33個正向與33個反向換頁都有空間動畫、快速反向時的物件姿勢、取消清理、減少動態效果、每輪機率改變、token flight、28→29的 P7/P2 位置保持，30頁五階段揭示，以及快速推進時保留未完成揭示的畫面姿勢。
+- 逐狀態檢查本輪14個重點頁：沒有瀏覽器執行錯誤或文字超出1600×900舞台。目視修正08 maps重疊與12金字塔標籤的引線。
+- 前頁暫留已重現：原轉場在0ms仍有完整前頁clone，目的頁被100%遮罩；180ms仍有28.8%未揭開。現在移除整頁序列化、clone與遮罩，新頁背景及內容從0ms完整顯示，動畫只移動目的頁的標題、圖解與章節標籤。
+- 66個正反換頁各檢查0/40/120/280/520/800/1200ms，共462個中間幀：前頁clone數為0，incoming僅有一張slide，opacity=1、clip-path=none、根節點transform=none，outgoing opacity=0。共享物件與章節透視動效保留。
+- 清除09 token flight與回饋線已完成後的CSS fill effects，避免完成動畫長期留在 animation list。靜態預覽及 reduced-motion 直接顯示各狀態。
+
+上一輪完整巡覽：92狀態正向＋92狀態倒向、8個章節跳轉、64次快速交錯按鍵、1024×768與390×844各92個reduced-motion狀態及觸控操作，共405個檢查點通過。console errors/warnings、page errors與HTTP failures均為0；完成後沒有殘留 outgoing layer 或 morph surface。
+
+本次修復前後的固定時間紀錄與截圖位於已忽略的 `output/playwright/sia-no-retention/`；上一輪巡覽位於 `output/playwright/sia-motion-revision/`。Chrome 為本輪驗證瀏覽器；沒有跨瀏覽器效能基準。
+
+---
+
 # Validation
 
 驗證日期：2026-11-16（Asia/Taipei）。此紀錄對應本輪完整審查後的 34 頁、84 個狀態。

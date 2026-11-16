@@ -16,7 +16,7 @@
 .sia-slide .sia-bm-idle{position:absolute;overflow:hidden;background:repeating-linear-gradient(132deg,transparent 0 9px,#d7dce3 9px 10px)}
 .sia-slide .sia-bm-idle span{position:absolute;right:19px;top:19px;font-size:19px;line-height:26px;color:#7b838f;background:#f0f1f2;padding:0 8px}
 .sia-slide .sia-bm-request{position:absolute;overflow:hidden;border-width:1px;border-style:solid}
-.sia-slide .sia-bm-request-progress{position:absolute;inset:0;background:#b9cce5;transform-origin:left center;transition:transform .56s cubic-bezier(.22,.72,.18,1)}
+.sia-slide .sia-bm-request-progress{position:absolute;inset:0;background:#b9cce5;transform-origin:left center;transition:transform .76s cubic-bezier(.22,.72,.18,1)}
 .sia-slide .sia-bm-request-progress::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--request-color)}
 .sia-slide .sia-bm-request-id{position:absolute;left:18px;top:17px;color:var(--sia-ink,#17191c);font-size:24px;line-height:28px;font-weight:500}
 .sia-slide .sia-bm-request-duration{position:absolute;right:18px;top:19px;color:#465467;font-size:21px;line-height:25px;font-variant-numeric:tabular-nums;font-weight:400}

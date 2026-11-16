@@ -53,31 +53,49 @@ export function Tokenization({ step }: Props) {
 
 export function ContextAttention({ step }: Props) {
   const words = ['What', 'makes', 'us', 'human', '?'];
-  return <Figure label="human 位置的 query 比對自己與之前位置的 keys，依權重整合 values。因果遮罩禁止讀取未來位置，連線與權重僅為示意。">
-    <T x={0} y={35} size={23} fill={muted}>目前位置：human</T>
-    {words.map((word, i) => <g key={word}><T x={70 + i * 160} y={281} anchor="middle" size={30} fill={i === 3 ? blue : ink}>{word}</T><circle cx={70 + i * 160} cy="235" r="4" fill={i === 3 ? blue : line} /><path d={`M${18 + i * 160} 309h104`} stroke={i === 3 ? blue : line} /></g>)}
-    <g className="sia-reveal" style={show(step >= 1)}>{[0, 1, 2].map(i => <path key={i} d={`M550 225C550 ${52 + i * 48} ${70 + i * 160} ${52 + i * 48} ${70 + i * 160} 225`} fill="none" stroke={blue} strokeWidth={i === 2 ? 2.5 : 1.2} opacity={i === 2 ? 1 : .35} />)}<path d="M550 225c-58-90 58-90 0 0" fill="none" stroke={blue} opacity=".5" /><T x={0} y={368} size={25}>Q 比對 K，依相關程度整合 V</T></g>
-    <path d="M850 8V420" stroke={line} /><T x={1126} y={35} size={23} fill={muted} anchor="middle">Causal mask</T>
-    <T x={1126} y={72} size={19} fill={muted} anchor="middle">Key positions</T>
-    {words.map((word, i) => <g key={word}><T x={975 + i * 66} y={100} size={17} anchor="middle" fill={muted}>{word}</T><T x={933} y={145 + i * 58} size={17} anchor="end" fill={i === 3 ? blue : muted}>{word}</T></g>)}
-    {Array.from({ length: 25 }, (_, i) => { const row = Math.floor(i / 5), col = i % 5; return <rect key={i} x={950 + col * 66} y={116 + row * 58} width="50" height="45" fill={col <= row ? blue : 'none'} stroke={col <= row ? 'none' : line} opacity={col <= row ? step >= 1 && row === 3 ? .85 : .17 : .65} className="sia-tone" />; })}
-    <T x={0} y={491} size={21} fill={muted}>連線與權重為概念示意</T><T x={1408} y={491} size={23} fill={muted} anchor="end">只能讀取自己與過去的位置</T>
+  const headWeights = [[.08,.12,.45,.35,0],[.14,.48,.11,.27,0],[.05,.18,.24,.53,0]];
+  const size=24, gap=3, mapX=925, mapY=135;
+  return <Figure label="三個 attention heads 各有不同的因果注意力分布。放大 human 這一列，Q 比對所有可見位置的 K，再按不同權重加總 V。亮度表示權重，未來位置被遮罩。">
+    <T x={0} y={28} size={23} fill={muted}>同一個 token，不同 heads 看不同關係</T>
+    {words.map((word,i)=><g key={word}><T x={76+i*158} y={222} size={29} anchor="middle" fill={i===3?blue:ink}>{word}</T><circle cx={76+i*158} cy="184" r="4" fill={i===3?blue:line}/><path d={`M${24+i*158} 241h104`} stroke={i===3?blue:line}/></g>)}
+    <g data-build="context-links" data-visible={step>=1} data-delay="80">
+      {headWeights.map((weights,head)=>weights.slice(0,4).map((weight,i)=><path key={`${head}-${i}`} d={i===3?`M550 174c${-42-head*14} ${-60-head*25} ${42+head*14} ${-60-head*25} 0 0`:`M550 174C550 ${35+head*28} ${76+i*158} ${35+head*28} ${76+i*158} 174`} fill="none" stroke={blue} strokeWidth={1+weight*5} opacity={.22+weight*.65}/>))}
+    </g>
+    <T x={0} y={292} size={20} fill={muted}>human 的 attention weights</T>
+    {headWeights.map((weights,head)=><g key={head} data-build={`head-row-${head}`} data-visible={step>=1} data-delay={120+head*100}>
+      <T x={0} y={337+head*51} size={20} fill={muted}>H{head+1}</T>
+      {weights.map((w,i)=><g key={i}><rect x={49+i*158} y={308+head*51} width="132" height="38" fill={w?blue:surface} opacity={w?.15+w*1.45:1}/><T x={115+i*158} y={334+head*51} size={21} anchor="middle" fill={w?ink:muted}>{w?w.toFixed(2):'masked'}</T></g>)}
+    </g>)}
+    <path d="M850 0V446" stroke={line}/><T x={925} y={28} size={23}>Multi-head attention maps</T><T x={925} y={65} size={18} fill={muted}>Key positions →　亮度 = 權重</T>
+    {[0,1,2].map(head=><g key={head} transform={`translate(${head*160} 0)`}>
+      <T x={mapX+66} y={mapY-26} size={20} fill={muted} anchor="middle">Head {head+1}</T>
+      {Array.from({length:25},(_,i)=>{const row=Math.floor(i/5),col=i%5;const raw=Array.from({length:row+1},(_,k)=>1+((row*7+k*3+head*5)%8));const weight=col>row?0:row===3?headWeights[head][col]:raw[col]/raw.reduce((a,b)=>a+b,0);return <rect key={i} x={mapX+col*(size+gap)} y={mapY+row*(size+gap)} width={size} height={size} fill={col>row?'none':blue} stroke={row===3?blue:line} strokeWidth={row===3?1.5:.5} opacity={col>row?.5:.13+weight*.87}/>;})}
+      <path d={`M${mapX-9} ${mapY+3*(size+gap)+size/2}h-11`} stroke={blue}/><T x={mapX+66} y={mapY+165} size={17} fill={muted} anchor="middle">human 這一列</T>
+    </g>)}
+    <T x={925} y={383} size={20} fill={muted}>每一列對應一個 query 位置</T><T x={925} y={420} size={20} fill={muted}>右上三角遮罩：禁止讀取未來</T>
+    <T x={0} y={497} size={22} fill={step>=1?blue:muted}>{step>=1?'每個 head 各自加權 V，再合併成新的 token 表示':'Q 比對 K → causal mask → softmax → 加權 V'}</T><T x={1408} y={497} size={17} fill={muted} anchor="end">權重為示意 · 非模型實測</T>
   </Figure>;
 }
 
 export function Generation({ step }: Props) {
-  const tokens = ['Our', 'shared', 'connections', '.'];
-  const candidates = [['Our', 'The', 'It'], ['shared', 'own', 'human'], ['connections', 'stories', 'experiences'], ['.', 'and', ','], ['EOS', 'We', 'That']][Math.min(step, 4)];
-  return <Figure label="每步由上下文計算下一個 token 的機率分布，取樣後把新 token 接回上下文，同時逐步回傳文字；EOS 結束生成。">
-    <T x={0} y={27} size={21} fill={muted}>Context</T><T x={0} y={77} size={29}>What makes us human?</T><T x={0} y={121} size={25} fill={blue}>{tokens.slice(0, step).join(' ').replace(' .', '.')}</T><path d="M0 155H440" stroke={line} />
-    <Arrow x1={464} y1={91} x2={570} y2={91} active /><rect x="592" y="20" width="255" height="171" fill="#1b232e" /><Pins x={592} y={20} w={255} h={171} /><Matrix x={618} y={45} cols={16} rows={5} cell={9} gap={4} /><T x={720} y={161} anchor="middle" size={27} fill="#fff">Transformer</T><Arrow x1={873} y1={91} x2={950} y2={91} active />
+  const tokens=['Our','shared','connections','.'];
+  const candidates=[['Our','The','It'],['shared','own','human'],['connections','stories','experiences'],['.','and',','],['EOS','We','That']][step];
+  const probabilities=[[.54,.28,.18],[.43,.35,.22],[.68,.19,.13],[.79,.14,.07],[.91,.06,.03]][step];
+  const tokenX=[0,139,363,712];
+  return <Figure label={`第 ${step+1} 輪，新的上下文重新計算機率分布：${candidates.map((word,i)=>`${word} ${probabilities[i]}`).join('、')}。取樣後逐 token 回傳。`}>
+    <T x={0} y={27} size={21} fill={muted}>Context · round {step+1}</T><T x={0} y={77} size={29}>What makes us human?</T><T x={0} y={121} size={25} fill={blue}>{tokens.slice(0,step).join(' ').replace(' .','.')}</T><path d="M0 155H440" stroke={line}/>
+    <Arrow x1={464} y1={91} x2={570} y2={91} active/><rect x="592" y="20" width="255" height="171" fill="#1b232e"/><Pins x={592} y={20} w={255} h={171}/><Matrix x={618} y={45} cols={16} rows={5} cell={9} gap={4}/><T x={720} y={161} anchor="middle" size={27} fill="#fff">Transformer</T><Arrow x1={873} y1={91} x2={950} y2={91} active/>
     <T x={977} y={27} size={21} fill={muted}>Next-token distribution</T>
-    {candidates.map((word, i) => <g key={`${i}-${word}`}><T x={977} y={77 + i * 47} size={23} fill={i ? muted : blue}>{word}</T><rect x="1180" y={62 + i * 47} width={153 - i * 48} height="5" fill={i ? line : blue} /><T x={1395} y={77 + i * 47} size={20} fill={muted} anchor="end">{[.54, .28, .18][i].toFixed(2)}</T></g>)}
-    <path d="M1130 198V257H220V179" fill="none" stroke={step < 4 ? blue : line} strokeDasharray={step < 4 ? undefined : '4 5'} /><path d="m214 187 6-8 6 8" fill="none" stroke={step < 4 ? blue : line} /><rect x="456" y="241" width="422" height="32" fill="var(--sia-paper)" /><T x={667} y={265} anchor="middle" size={22} fill={muted}>{step < 4 ? '取樣一個 token，加入下一輪上下文' : 'EOS：停止生成，回收請求資源'}</T>
+    {candidates.map((word,i)=><g key={i}>
+      <g data-build={`distribution-${i}`} data-state={step} data-delay={i*65}><T x={977} y={77+i*47} size={23} fill={i?muted:blue}>{word}</T><T x={1395} y={77+i*47} size={20} fill={muted} anchor="end">{probabilities[i].toFixed(2)}</T></g>
+      <g transform={`translate(1180 ${62+i*47})`}><rect width="150" height="6" fill={surface}/><rect className="sia-probability" width="150" height="6" fill={i?muted:blue} style={{transform:`scaleX(${probabilities[i]})`}}/></g>
+    </g>)}
+    <path className="sia-generation-loop" key={`path-${step}`} d="M1130 198V257H220V179" fill="none" stroke={step<4?blue:line}/><path d="m214 187 6-8 6 8" fill="none" stroke={step<4?blue:line}/><rect x="410" y="241" width="512" height="32" fill="var(--sia-paper)"/><T x={667} y={265} anchor="middle" size={22} fill={muted}>{step<4?'取樣 → 回傳 → 加回上下文 → 重算分布':'EOS：停止生成，回收請求資源'}</T>
     <T x={0} y={340} size={21} fill={muted}>Streaming output</T>
-    <T x={0} y={423} size={68}>{tokens.map((token, i) => <tspan key={token} className="sia-tone" fill={i === step ? blue : ink} opacity={step >= i ? 1 : 0}>{i > 0 && i < 3 ? ` ${token}` : token}</tspan>)}</T>
-    <g className="sia-reveal" style={show(step >= 4)}><rect x="1160" y="371" width="210" height="65" fill="none" stroke={line} /><T x={1265} y={413} size={30} fill={muted} anchor="middle">EOS</T></g>
-    <T x={0} y={491} size={21} fill={muted}>{step === 0 ? 'Prefill 提供第一個新 token 的分布' : step < 4 ? 'Decode：每輪延續同一份上下文' : '特殊 token 不會顯示為回答文字'}</T><T x={1408} y={491} size={19} fill={muted} anchor="end">分布與取樣結果為示意</T>
+    {tokens.map((token,i)=><g key={token} data-build={`generated-${i}`} data-visible={step>=i} data-delay="420"><T x={tokenX[i]} y={423} size={64} fill={i===step?blue:ink}>{token}</T></g>)}
+    <g key={`sample-${step}`} className="sia-sampled-token" style={{'--token-x':`${(tokenX[step]??1160)-977}px`,'--token-y':step===4?'324px':'334px'} as CSSProperties}><T x={977} y={77} size={23} fill={blue}>{candidates[0]}</T></g>
+    <g data-build="generation-eos" data-visible={step>=4} data-delay="420"><rect x="1160" y="371" width="210" height="65" fill="none" stroke={line}/><T x={1265} y={413} size={30} fill={muted} anchor="middle">EOS</T></g>
+    <T x={0} y={491} size={21} fill={muted}>{step===0?'Prefill 提供第一個新 token 的分布':step<4?'Decode：加入新 token，下一輪的分布也跟著改變':'特殊 token 不會顯示為回答文字'}</T><T x={1408} y={491} size={19} fill={muted} anchor="end">分布與取樣結果為示意</T>
   </Figure>;
 }
 
@@ -94,7 +112,8 @@ export function Bottlenecks({ step }: Props) {
 }
 
 export function Roofline({ step }: Props) {
-  const points = [[218, 282], [470, 135], [795, 104]];
+  const xs = [218,470,795];
+  const points = xs.map(x=>[x,x<=520?362-(x-65)*(362-83)/(520-65):83]);
   return <Figure label="Roofline 概念上限：P 不超過 min(P peak, B 乘 I)。算術強度 I 是 FLOPs per byte；分界點是峰值算力除以頻寬。減少資料搬移可提高 I，但仍受算力上限限制。">
     <g transform="translate(20 0)">
       {[0, 1, 2, 3, 4].map(i => <path key={i} d={`M65 ${70 + i * 73}H925`} stroke={line} strokeWidth=".75" />)}{[0, 1, 2, 3, 4, 5].map(i => <path key={i} d={`M${65 + i * 172} 70V362`} stroke={line} strokeWidth=".75" />)}
@@ -108,25 +127,37 @@ export function Roofline({ step }: Props) {
 }
 
 export function OnlineSoftmax({ step }: Props) {
-  const scoreTiles = [[1, 2], [3, 0], [2, 4]], values = [[2, 4], [1, 3], [5, 2]];
-  const scores = scoreTiles.slice(0, step + 1).flat(), seenValues = values.slice(0, step + 1).flat();
-  const m = Math.max(...scores), l = scores.reduce((sum, score) => sum + Math.exp(score - m), 0), o = scores.reduce((sum, score, i) => sum + Math.exp(score - m) * seenValues[i], 0);
-  return <Figure label={`Online softmax 單列純量教學算例。第 ${step + 1} 塊，同時更新最大值 m=${m}、指數和 ${l.toFixed(3)} 與輸出累積 ${o.toFixed(3)}。最後 O=o除以l=${(o / l).toFixed(3)}。`}>
-    {scoreTiles.map((tile, i) => <g key={i} opacity={i <= step ? 1 : .28} className="sia-tone">
-      <T x={i * 390} y={27} size={23} fill={i === step ? blue : muted}>Tile {i + 1}</T>
-      {tile.map((score, j) => <g key={j}><rect x={i * 390 + j * 104} y="51" width="88" height="61" fill={i === step ? blue : surface} /><T x={i * 390 + j * 104 + 44} y={91} size={32} anchor="middle" fill={i === step ? '#fff' : ink}>{score}</T><T x={i * 390 + j * 104 + 44} y={147} size={21} anchor="middle" fill={muted}>v = {values[i][j]}</T></g>)}
-      {i < 2 && <Arrow x1={i * 390 + 250} y1={81} x2={i * 390 + 342} y2={81} active={i < step} />}
+  const tiles=[[1,2],[3,0],[2,4]], values=[[2,4],[1,3],[5,2]];
+  const tile=Math.max(0,Math.min(step-1,2));
+  const summary=(count:number)=>{const s=tiles.slice(0,count).flat(),v=values.slice(0,count).flat(),m=Math.max(...s);return {m,l:s.reduce((a,x)=>a+Math.exp(x-m),0),o:s.reduce((a,x,i)=>a+Math.exp(x-m)*v[i],0)};};
+  const now=summary(tile+1),old=tile?summary(tile):null,alpha=old?Math.exp(old.m-now.m):0;
+  const tileL=tiles[tile].reduce((a,x)=>a+Math.exp(x-now.m),0),tileO=tiles[tile].reduce((a,x,i)=>a+Math.exp(x-now.m)*values[tile][i],0);
+  return <Figure label="Online softmax 讓 attention 每次只看一塊，仍得到完整 softmax 相同結果。先保存最大值 m、指數和 ℓ、加權值和 o；新最大值出現，舊 ℓ 與 o 先乘 exp(m舊減m新)，再加入新塊。最後 O=o除以ℓ。">
+    <T x={0} y={24} size={26}>不保留整列 scores，如何得到相同的 attention 輸出？</T>
+    {tiles.map((scores,i)=><g key={i} className="sia-tone" opacity={step===0||i<=tile?1:.23}>
+      <T x={i*365} y={70} size={21} fill={step>0&&i===tile?blue:muted}>Tile {i+1}</T>
+      {scores.map((score,j)=><g key={j}><rect x={i*365+j*91} y="86" width="78" height="46" fill={step>0&&i===tile?blue:surface}/><T x={i*365+j*91+39} y={118} size={28} anchor="middle" fill={step>0&&i===tile?'#fff':ink}>{score}</T><T x={i*365+j*91+39} y={160} size={18} fill={muted} anchor="middle">v={values[i][j]}</T></g>)}
+      {i<2&&<Arrow x1={i*365+204} y1={108} x2={i*365+310} y2={108} active={step>i+1}/>}
     </g>)}
-    <T x={1408} y={76} size={21} anchor="end" fill={muted}>一列 scores</T><T x={1408} y={112} size={21} anchor="end" fill={muted}>純量 V 示意</T><path d="M0 182H1408" stroke={line} />
-    {[
-      ['m', String(m), 'Running max', '目前看過的最大 score'],
-      ['ℓ', l.toFixed(3), 'Exponential sum', '以目前 m 為基準的指數和'],
-      ['o', o.toFixed(3), 'Output accumulator', '以同一基準累積加權 V'],
-    ].map(([symbol, value, title, detail], i) => <g key={symbol}>
-      <T x={i * 480} y={239} size={24} fill={muted}>{title}</T><T x={i * 480} y={326} size={59} fill={blue}>{symbol} = {value}</T><T x={i * 480} y={375} size={22} fill={muted}>{detail}</T>{i < 2 && <path d={`M${i * 480 + 430} 214V390`} stroke={line} />}
-    </g>)}
-    <path d="M0 425H1408" stroke={line} /><T x={0} y={480} size={24}>{step === 0 ? '保存三個摘要狀態，不必保留整列 scores' : '新 max 出現時，先重新縮放舊的 ℓ 與 o，再累加'}</T>
-    <T x={1408} y={480} anchor="end" size={step === 2 ? 30 : 22} fill={step === 2 ? blue : muted}>{step === 2 ? `O = o / ℓ ≈ ${(o / l).toFixed(3)}` : '三種狀態，每塊一起更新'}</T>
+    <T x={1408} y={102} size={22} anchor="end" fill={muted}>scores：QKᵀ / √dₖ</T><T x={1408} y={143} size={19} anchor="end" fill={muted}>單列 · 純量 V 算例</T>
+    <path d="M0 184H1408" stroke={line}/>
+    <g data-build="softmax-question" data-visible={step===0}>
+      <T x={0} y={246} size={30}>每塊各算 softmax 再相加，會用錯分母。</T><T x={0} y={302} size={25} fill={muted}>分母需要所有 scores；但 SRAM 一次只能放一塊。</T>
+      <T x={0} y={385} size={35} fill={blue}>只帶著 m、ℓ、o，逐塊合併。</T><T x={0} y={435} size={22} fill={muted}>m 保持數值穩定　ℓ 累積共同分母　o 累積加權 V</T>
+    </g>
+    <g data-build="softmax-merge" data-visible={step>=1&&step<4} data-state={step}>
+      <T x={0} y={231} size={24} fill={blue}>{tile===0?'第一塊：建立三個摘要':`新 max：${old!.m} → ${now.m}，先把舊摘要換成同一個基準`}</T>
+      <T x={0} y={282} size={24}>m′ = max(m, tile max) = {now.m}</T>
+      <T x={0} y={328} size={24} fill={muted}>{tile===0?'初始 ℓ = 0，o = 0':`α = exp(${old!.m} − ${now.m}) = ${alpha.toFixed(3)}`}</T>
+      <T x={0} y={380} size={25}>ℓ′ = {old?`${old.l.toFixed(3)} × ${alpha.toFixed(3)}`:'0'} + {tileL.toFixed(3)} = {now.l.toFixed(3)}</T>
+      <T x={0} y={429} size={25}>o′ = {old?`${old.o.toFixed(3)} × ${alpha.toFixed(3)}`:'0'} + {tileO.toFixed(3)} = {now.o.toFixed(3)}</T>
+      <path d="M879 214V437" stroke={line}/><T x={934} y={256} size={22} fill={muted}>只保存三個數值</T><T x={934} y={313} size={36} fill={blue}>m = {now.m}</T><T x={934} y={370} size={36} fill={blue}>ℓ = {now.l.toFixed(3)}</T><T x={934} y={427} size={36} fill={blue}>o = {now.o.toFixed(3)}</T>
+    </g>
+    <g data-build="softmax-result" data-visible={step>=4}>
+      <T x={0} y={254} size={25} fill={muted}>所有 tiles 都完成，現在才做最後正規化</T><T x={0} y={340} size={53} fill={blue}>O = o / ℓ = {now.o.toFixed(3)} / {now.l.toFixed(3)} ≈ {(now.o/now.l).toFixed(3)}</T>
+      <T x={0} y={409} size={26}>= softmax([1, 2, 3, 0, 2, 4]) · [2, 4, 1, 3, 5, 2]</T>
+    </g>
+    <path d="M0 459H1408" stroke={line}/><T x={0} y={499} size={23} fill={step>=4?blue:muted}>{['目的：每次只放一塊，也能計算完整 attention','ℓ 與 o 使用相同的 m 作基準','重縮放舊 ℓ 與 o，再累加新 tile','重複合併；不必把完整分數矩陣存回 HBM','分塊改變資料存取方式，保留 exact attention'][step]}</T>
   </Figure>;
 }
 
@@ -147,26 +178,28 @@ export function FlashResult({ step }: Props) {
 }
 
 export function SystemsView({ step }: Props) {
-  const labels = ['Tokenize', 'Schedule', 'Prefill', 'Decode', 'Complete'];
-  const details = ['文字變成 IDs，進入佇列', '每輪選出可執行的請求', '建立 prompt 的 KV', '讀舊 KV，追加新 KV', 'EOS 或達到長度限制'];
-  return <Figure label="同一次請求的系統全貌：tokenization與佇列、continuous batching 排程、FlashAttention 處理 attention、PagedAttention 管理 prefill 與 decode 的 KV，完成後解除引用並讓新請求進入。">
+  const labels=['Tokenize','Schedule','Prefill','Decode','Complete'];
+  const details=['文字 → IDs → queue','選出本輪 requests','建立 prompt 的 KV','讀舊 KV，追加新 KV','EOS / 長度上限'];
+  return <Figure label={`同一次請求，逐步走過 tokenization、排程、prefill、decode、streaming 與完成後回收；目前步驟 ${step+1}。`}>
     <T x={0} y={25} size={22} fill={muted}>What makes us human?</T><T x={1408} y={25} size={21} fill={muted} anchor="end">同一個 request，重新走一次</T>
-    {labels.map((label, i) => <g key={label}>
-      <path d={`M${i * 282} 58h235`} stroke={i < (step === 0 ? 2 : step === 1 ? 4 : 5) ? blue : line} strokeWidth="2" /><T x={i * 282} y={108} size={31} fill={i === (step === 0 ? 1 : step === 1 ? 3 : 4) ? blue : ink}>{label}</T><T x={i * 282} y={148} size={20} fill={muted}>{details[i]}</T>
-      {i < 4 && <Arrow x1={i * 282 + 238} y1={96} x2={i * 282 + 267} y2={96} active />}
+    {labels.map((label,i)=><g key={label} data-build={`system-stage-${i}`} data-visible={step>=i} data-delay="100">
+      <path d={`M${i*282} 58h235`} stroke={step===i?blue:line} strokeWidth="2"/><T x={i*282} y={108} size={31} fill={step===i?blue:ink}>{label}</T><T x={i*282} y={148} size={20} fill={muted}>{details[i]}</T>
+      {i<4&&<Arrow x1={i*282+238} y1={96} x2={i*282+267} y2={96} active/>}
     </g>)}
-    <T x={282} y={201} size={24} fill={blue}>Continuous batching</T>
-    <g className="sia-reveal" style={show(step >= 1)}>
-      <T x={564} y={201} size={24} fill={blue}>FlashAttention</T><T x={846} y={201} size={23} fill={muted}>逐 token 生成</T>
-      <path d="M964 226V263H396V226" fill="none" stroke={blue} /><path d="m390 234 6-8 6 8" fill="none" stroke={blue} /><T x={677} y={299} size={20} anchor="middle" fill={muted}>每輪結束，再排程</T>
-      <Arrow x1={680} y1={315} x2={680} y2={344} /><Arrow x1={964} y1={344} x2={964} y2={315} />
-      <T x={0} y={382} size={26} fill={blue}>PagedAttention</T><T x={0} y={421} size={21} fill={muted}>Block table 管理 KV cache</T>
-      <rect x="564" y="352" width="564" height="81" fill="none" stroke={line} />
-      {Array.from({ length: 12 }, (_, i) => <g key={i}><rect x={582 + i * 44} y="369" width="34" height="45" fill={i < (step >= 2 ? 4 : 10) ? blue : surface} opacity={i < (step >= 2 ? 4 : 10) ? .65 : 1} className="sia-tone" /><T x={599 + i * 44} y={399} size={16} fill={i < (step >= 2 ? 4 : 10) ? '#fff' : muted} anchor="middle">{i}</T></g>)}
-      <rect x="564" y="440" width="13" height="13" fill={blue} opacity=".65" /><T x={586} y={453} size={18} fill={muted}>{step >= 2 ? '仍被引用' : '本 request 的 KV'}</T><rect x="800" y="440" width="13" height="13" fill={surface} stroke={line} /><T x={822} y={453} size={18} fill={muted}>可配置</T>
+    <g data-build="system-scheduler" data-visible={step>=1} data-delay="260"><T x={282} y={205} size={24} fill={blue}>Continuous batching</T></g>
+    <g data-build="system-prefill" data-visible={step>=2} data-delay="260">
+      <T x={564} y={205} size={24} fill={blue}>FlashAttention</T>
+      <T x={0} y={378} size={26} fill={blue}>PagedAttention</T><T x={0} y={418} size={21} fill={muted}>Block table 管理 KV cache</T>
+      <Arrow x1={680} y1={247} x2={680} y2={339}/><rect x="564" y="352" width="564" height="81" fill="none" stroke={line}/>
+      {Array.from({length:12},(_,i)=><g key={i}><rect x={582+i*44} y="369" width="34" height="45" fill={i<(step===2?5:step===3?10:0)?blue:surface} opacity={.7} className="sia-tone"/><T x={599+i*44} y={399} size={16} fill={i<(step===2?5:step===3?10:0)?'#fff':muted} anchor="middle">{i}</T></g>)}
+      <T x={564} y={454} size={18} fill={muted}>{step===2?'5 prompt tokens → KV blocks':step===3?'每輪追加 KV，生成一個 token':'引用歸零的 blocks 回到 free pool'}</T>
     </g>
-    <g className="sia-reveal" style={show(step >= 2)}><path d="M1255 174V392H1150" fill="none" stroke={blue} /><path d="m1158 386-8 6 8 6" fill="none" stroke={blue} /><T x={1266} y={287} size={21} fill={muted}>解除引用</T><T x={1266} y={321} size={21} fill={muted}>回收空間</T></g>
-    <path d="M0 465H1408" stroke={line} /><T x={0} y={501} size={23}>{step < 2 ? '生成期間即可 detokenize，逐步傳回文字' : '完成的請求騰出資源，等待中的請求接續進入'}</T><T x={1408} y={501} size={24} fill={blue} anchor="end">Our shared connections.</T>
+    <g data-build="system-decode" data-visible={step>=3} data-delay="250">
+      <T x={846} y={205} size={23} fill={blue}>逐 token 生成</T><path d="M964 226V266H396V226m-6 8 6-8 6 8" fill="none" stroke={blue}/><T x={677} y={305} size={20} anchor="middle" fill={muted}>每輪結束，再排程</T><Arrow x1={964} y1={344} x2={964} y2={315}/>
+    </g>
+    <g data-build="system-complete" data-visible={step>=4} data-delay="250"><path d="M1255 174V392H1150m8-6-8 6 8 6" fill="none" stroke={blue}/><T x={1266} y={287} size={21} fill={muted}>解除引用</T><T x={1266} y={321} size={21} fill={muted}>回收空間</T></g>
+    <path d="M0 471H1408" stroke={line}/><T x={0} y={507} size={23}>{['文字先轉為 IDs，排進等待佇列','本輪選誰執行？Continuous batching 負責補位','Prefill 平行處理 prompt；FlashAttention 減少 attention I/O','Decode 重複排程，逐 token streaming','完成後釋放 KV 與 batch slot，下一個請求接續進入'][step]}</T>
+    <g data-build="system-stream" data-visible={step>=3} data-delay="450"><T x={1408} y={507} size={24} fill={blue} anchor="end">Our shared connections.</T></g>
   </Figure>;
 }
 

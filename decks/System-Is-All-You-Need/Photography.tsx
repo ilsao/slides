@@ -1,16 +1,17 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import cosmicArt from './assets/cosmic-cliffs-webb.jpg';
 import auroraArt from './assets/aurora-oskar.jpg';
+import { chapterPhotoCredits } from './ChapterPhotography';
 
 export { cosmicArt, auroraArt };
 
 // Keep the decoded images alive through navigation. Gallery previews do not mount
-// this provider; only the player waits for its two photographic bookends.
+// this provider; only the player prepares chapter imagery and the two photographic bookends.
 let preparation: Promise<void> | undefined;
 let prepared = false;
 const photographs: HTMLImageElement[] = [];
 function preparePhotography() {
-  return preparation ??= Promise.all([cosmicArt, auroraArt].map(src => {
+  return preparation ??= Promise.all([cosmicArt, auroraArt, ...chapterPhotoCredits.map(photo=>photo.src)].map(src => {
     const photo = new Image();
     photographs.push(photo);
     photo.src = src;

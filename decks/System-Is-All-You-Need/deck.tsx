@@ -1,4 +1,4 @@
-import type { CSSProperties, ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { defineDeck, type SlideRenderProps } from '../../src/presentation';
 import { GpuArchitecture, WarpHierarchy, MemoryHierarchy, WhyBatch } from './GpuBatch';
 import { StaticBatchMorph, ContinuousBatchMorph } from './BatchMorph';
@@ -7,6 +7,7 @@ import { KvMorph } from './KvMorph';
 import { systemTransition } from './morph';
 import { RequestJourney, Tokenization, ContextAttention, Generation, Bottlenecks, Roofline, OnlineSoftmax, FlashResult, SystemsView, Phases } from './Scenes';
 import { PhotographyReady, cosmicArt, auroraArt } from './Photography';
+import { PhotoChapter, chapterPhotoCredits, type PhotoChapterId } from './ChapterPhotography';
 import './styles.css';
 import notesUrl from './SPEAKER_NOTES.md?url';
 import sourcesUrl from './SOURCES.md?url';
@@ -31,31 +32,35 @@ export const systemPages: Page[] = [
   {id:'agents',title:'2025 · AI Agents',steps:1,chapter:'引言',kind:'epoch'},
   {id:'question',title:'模型之外',steps:1,chapter:'引言',kind:'question'},
   {id:'stage',title:'Model + System',steps:2,chapter:'引言',kind:'stage'},
+  {id:'request-title',title:'一次 LLM 請求',steps:1,chapter:'一次 LLM 請求',kind:'chapter'},
   {id:'request',title:'一次請求',steps:3,chapter:'一次 LLM 請求',scene:RequestJourney},
   {id:'tokens',title:'Tokenization',steps:3,chapter:'一次 LLM 請求',scene:Tokenization},
   {id:'attention',title:'Attention',steps:2,chapter:'一次 LLM 請求',scene:ContextAttention},
   {id:'generation',title:'逐 Token 生成',steps:5,chapter:'一次 LLM 請求',scene:Generation},
+  {id:'gpu-title',title:'GPU Architecture',steps:1,chapter:'GPU Architecture',kind:'chapter'},
   {id:'gpu',title:'GPU',steps:3,chapter:'GPU Architecture',scene:GpuArchitecture,source:'cuda'},
   {id:'warp',title:'Thread / Warp / Block',steps:3,chapter:'GPU Architecture',scene:WarpHierarchy,source:'cuda'},
   {id:'hierarchy',title:'Memory hierarchy',steps:3,chapter:'GPU Architecture',scene:MemoryHierarchy,source:'cuda'},
+  {id:'batch-title',title:'Continuous Batching',steps:1,chapter:'Continuous Batching',kind:'chapter'},
   {id:'batch',title:'Batching',steps:2,chapter:'Continuous Batching',scene:WhyBatch},
-  {id:'static',title:'Static batching',steps:3,chapter:'Continuous Batching',scene:StaticBatchMorph,source:'orca'},
+  {id:'static',title:'Static batching',steps:4,chapter:'Continuous Batching',scene:StaticBatchMorph,source:'orca'},
   {id:'continuous',title:'Continuous batching',steps:4,chapter:'Continuous Batching',scene:ContinuousBatchMorph,source:'orca'},
   {id:'flash-title',title:'FlashAttention',steps:1,chapter:'FlashAttention',kind:'chapter'},
   {id:'bottlenecks',title:'Compute / Memory',steps:2,chapter:'FlashAttention',scene:Bottlenecks,source:'roof'},
   {id:'roofline',title:'Roofline',steps:3,chapter:'FlashAttention',scene:Roofline,source:'roof'},
   {id:'standard',title:'Standard attention',steps:3,chapter:'FlashAttention',scene:StandardAttentionMorph,source:'flash'},
   {id:'tiling',title:'Tiling',steps:4,chapter:'FlashAttention',scene:FlashAttentionMorph,source:'flash'},
-  {id:'softmax',title:'Online softmax',steps:3,chapter:'FlashAttention',scene:OnlineSoftmax,source:'flash'},
+  {id:'softmax',title:'Online softmax',steps:5,chapter:'FlashAttention',scene:OnlineSoftmax,source:'flash'},
   {id:'flash-result',title:'FlashAttention 的取捨',steps:2,chapter:'FlashAttention',scene:FlashResult,source:'flash'},
   {id:'paged-title',title:'PagedAttention',steps:1,chapter:'PagedAttention',kind:'chapter'},
   {id:'kv',title:'KV cache',steps:3,chapter:'PagedAttention',scene:CacheScene,source:'paged'},
   {id:'kv-scale',title:'KV cache 的容量',steps:2,chapter:'PagedAttention',scene:ScaleScene,source:'paged'},
   {id:'fragmentation',title:'Fragmentation',steps:3,chapter:'PagedAttention',scene:FragmentationScene,source:'paged'},
-  {id:'paging',title:'Paging',steps:3,chapter:'PagedAttention',scene:PagingScene,source:'paged'},
-  {id:'growth',title:'按需配置',steps:3,chapter:'PagedAttention',scene:GrowthScene,source:'paged'},
+  {id:'paging',title:'Paging',steps:5,chapter:'PagedAttention',scene:PagingScene,source:'paged'},
+  {id:'growth',title:'按需配置',steps:4,chapter:'PagedAttention',scene:GrowthScene,source:'paged'},
   {id:'sharing',title:'Prefix sharing',steps:3,chapter:'PagedAttention',scene:SharingScene,source:'paged'},
-  {id:'systems',title:'一次請求，系統的視角',steps:3,chapter:'A Systems Perspective',scene:SystemsView},
+  {id:'systems-title',title:'A Systems Perspective',steps:1,chapter:'A Systems Perspective',kind:'chapter'},
+  {id:'systems',title:'一次請求，系統的視角',steps:5,chapter:'A Systems Perspective',scene:SystemsView},
   {id:'phases',title:'Prefill / Decode',steps:3,chapter:'A Systems Perspective',scene:Phases},
   {id:'takeaway',title:'ML Systems',steps:2,chapter:'ML Systems',kind:'takeaway'},
   {id:'closing',title:'System Is All You Need',steps:1,chapter:'ML Systems',kind:'closing'},
@@ -78,16 +83,6 @@ function StageReveal({step}:{step:number}) {
   </div>;
 }
 
-function Chapter({paged}:{paged:boolean}) {
-  return <div className={`sia-chapter-layout ${paged?'sia-chapter-paged':'sia-chapter-flash'}`}>
-    <div className="sia-chapter-topic">{paged?'Memory management':'Memory access'}</div>
-    <h1>{paged?'Paged':'Flash'}<br/>Attention</h1>
-    <div className={`sia-chapter-object ${paged?'sia-page-sculpture':'sia-matrix-sculpture'}`} aria-hidden="true">
-      {paged?Array.from({length:6},(_,i)=><div key={i} className="sia-sculpture-page" style={{'--i':i} as CSSProperties}><span>{String(i).padStart(2,'0')}</span>{Array.from({length:8},(_,j)=><i key={j}/>)}</div>):Array.from({length:144},(_,i)=><i key={i} style={{'--i':i} as CSSProperties} data-active={Math.floor(i/12)>=4&&Math.floor(i/12)<8&&i%12>=4&&i%12<8}/>)}
-    </div>
-  </div>;
-}
-
 function Takeaway({step}:{step:number}) {
   return <div className="sia-takeaway-layout"><h1>ML Systems</h1><p className="sia-takeaway-thesis">讓相同的模型，服務更多人</p><div className="sia-takeaway-grid">{[
     ['誰先算？','Continuous batching','每輪重新排程，讓新請求補位','作業系統'],
@@ -97,10 +92,14 @@ function Takeaway({step}:{step:number}) {
 }
 
 function References({step}:{step:number}) {
-  if(step===1)return <div className="sia-references sia-art-references"><h1>Photography</h1><div className="sia-credit-grid">{[
-    [cosmicArt,'Cosmic Cliffs','NASA, ESA, CSA, STScI','Webb · NIRCam 紅外觀測合成影像','https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/'],
-    [auroraArt,'Aurora over the Coast','Oskar Kadaksoo / Unsplash','海岸、夜空與極光','https://unsplash.com/photos/aurora-borealis-glows-brightly-in-the-night-sky-m5oOEXIRWdU'],
-  ].map(([src,title,credit,description,url])=><a href={url} key={title} target="_blank" rel="noreferrer"><img src={src} alt={title}/><h2>{title}</h2><p>{credit}<br/>{description}</p></a>)}</div><div className="sia-credit-policy"><span>原圖縮製為 4096px · 依版面裁切與明暗遮罩</span><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noreferrer">NASA Media Guidelines ↗</a><a href="https://unsplash.com/license" target="_blank" rel="noreferrer">Unsplash License ↗</a></div></div>;
+  if(step===1) {
+    const photographs=[
+      {src:cosmicArt,title:'Cosmic Cliffs',credit:'NASA, ESA, CSA, STScI',instrument:'Webb · NIRCam',url:'https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/'},
+      {src:auroraArt,title:'Aurora over the Coast',credit:'Oskar Kadaksoo / Unsplash',instrument:'海岸極光攝影',url:'https://unsplash.com/photos/aurora-borealis-glows-brightly-in-the-night-sky-m5oOEXIRWdU'},
+      ...chapterPhotoCredits,
+    ];
+    return <div className="sia-references sia-art-references"><h1>Photography</h1><div className="sia-credit-grid">{photographs.map(photo=><a href={photo.url} key={photo.title} target="_blank" rel="noreferrer"><img src={photo.src} alt={photo.title}/><div><h2>{photo.title}</h2><p>{photo.credit}<br/>{photo.instrument}</p></div></a>)}</div><div className="sia-credit-policy"><span>原始高清影像 · 裁切與縮製 · 未放大</span><a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noreferrer">NASA Media Guidelines ↗</a><a href="https://unsplash.com/license" target="_blank" rel="noreferrer">Unsplash License ↗</a></div></div>;
+  }
 
   return <div className="sia-references"><h1>References</h1><div className="sia-reference-list">{[
     ['GPU','CUDA Programming Guide','NVIDIA',sources.cuda.url],
@@ -112,16 +111,16 @@ function References({step}:{step:number}) {
 
 function Slide(r:SlideRenderProps) {
   const index=systemPages.findIndex(p=>p.id===r.slide.id),page=systemPages[index],Scene=page.scene;
-  const dark=['cover','flash-title','agents','stage','closing'].includes(page.id);
+  const dark=page.kind==='chapter'||['cover','agents','stage','closing'].includes(page.id);
   const source=page.source?sources[page.source]:null;
-  return <section className={`sia-slide sia-${page.id} ${dark?'sia-dark':''}`} data-still={r.still||r.reducedMotion} data-step={r.step} data-slide-id={page.id} aria-label={page.title}>
+  return <section className={`sia-slide sia-${page.id} ${dark?'sia-dark':''}`} data-still={r.still||r.reducedMotion} data-step={r.step} data-slide-id={page.id} data-kind={page.kind} aria-label={page.title}>
     <div className="sia-topline"><span>{page.chapter}</span></div>
-    {Scene&&<><header className="sia-heading"><h1>{page.title}</h1></header><main className="sia-scene"><Scene step={r.step}/></main></>}
+    {Scene&&<><header className="sia-heading" data-entry="title"><h1>{page.title}</h1></header><main className="sia-scene" data-entry="diagram"><Scene step={r.step}/></main></>}
     {page.kind==='cover'&&<><img className="sia-photo-art sia-cover-photo" src={cosmicArt} alt="" fetchPriority="high" decoding="sync"/><div className="sia-cover-shade"/><div className="sia-cover-layout"><h1>System is<br/>all you need.</h1><p>LLM inference, from a systems perspective</p></div></>}
     {page.kind==='epoch'&&<Epoch agents={page.id==='agents'}/>}
     {page.kind==='question'&&<div className="sia-question-layout"><h1>我們學的系統<br/>還有價值嗎<span>？</span></h1><div className="sia-question-subjects"><span>計算機組織</span><span>作業系統</span><span>平行程式</span></div></div>}
     {page.kind==='stage'&&<StageReveal step={r.step}/>}
-    {page.kind==='chapter'&&<Chapter paged={page.id==='paged-title'}/>}
+    {page.kind==='chapter'&&<PhotoChapter id={page.id as PhotoChapterId} active={r.active}/>}
     {page.kind==='takeaway'&&<Takeaway step={r.step}/>}
     {page.kind==='closing'&&<><img className="sia-closing-photo" src={auroraArt} alt="" decoding="sync"/><div className="sia-closing-shade"/><div className="sia-closing-layout"><h1>System is<br/>all you need.</h1><p>讓相同的模型，服務更多人。</p><span>Thank you.</span></div></>}
     {page.kind==='sources'&&<References step={r.step}/>}
@@ -130,11 +129,11 @@ function Slide(r:SlideRenderProps) {
 }
 
 export const systemIsAllYouNeed=defineDeck({
-  id:'system-is-all-you-need',title:'System Is All You Need',version:3,
+  id:'system-is-all-you-need',title:'System Is All You Need',version:5,
   description:'一次 LLM 請求背後的系統工程。GPU、Continuous Batching、FlashAttention 與 PagedAttention。',
   size:{width:1600,height:900},slides:systemPages.map(({id,title,steps})=>({id,title,steps})),RenderSlide:Slide,
   transition:systemTransition,freezeEntranceOnNavigation:false,Provider:PhotographyReady,
   handout:{title:'講者備註（Markdown）',href:notesUrl},
   previews:[{slideId:'cover'},{slideId:'continuous'},{slideId:'flash-title'},{slideId:'paging'},{slideId:'roofline'},{slideId:'takeaway'}],
-  chapters:[{id:'intro',title:'引言',slideId:'cover'},{id:'request',title:'一次請求',slideId:'request'},{id:'gpu',title:'GPU',slideId:'gpu'},{id:'batching',title:'Continuous Batching',slideId:'batch'},{id:'flash',title:'FlashAttention',slideId:'flash-title'},{id:'paged',title:'PagedAttention',slideId:'paged-title'},{id:'systems',title:'一次請求，系統的視角',slideId:'systems'},{id:'refs',title:'References',slideId:'sources'}],
+  chapters:[{id:'intro',title:'引言',slideId:'cover'},{id:'request',title:'一次請求',slideId:'request-title'},{id:'gpu',title:'GPU',slideId:'gpu-title'},{id:'batching',title:'Continuous Batching',slideId:'batch-title'},{id:'flash',title:'FlashAttention',slideId:'flash-title'},{id:'paged',title:'PagedAttention',slideId:'paged-title'},{id:'systems',title:'一次請求，系統的視角',slideId:'systems-title'},{id:'refs',title:'References',slideId:'sources'}],
 });
