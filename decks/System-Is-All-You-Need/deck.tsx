@@ -132,7 +132,7 @@ function Slide(r:SlideRenderProps) {
 }
 
 export const systemIsAllYouNeed=defineDeck({
-  id:'system-is-all-you-need',title:'System Is All You Need',version:11,
+  id:'system-is-all-you-need',title:'System Is All You Need',version:13,
   description:'一次 LLM 請求背後的系統工程。GPU、Continuous Batching、FlashAttention 與 PagedAttention。',
   size:{width:1600,height:900},slides:systemPages.map(({id,title,steps})=>({id,title,steps})),RenderSlide:Slide,
   transition:systemTransition,freezeEntranceOnNavigation:false,Provider:PhotographyReady,

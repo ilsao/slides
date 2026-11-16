@@ -4,20 +4,44 @@ async function ready(page:Page){await page.goto(viewer);await expect(page.locato
 async function settle(page:Page){await expect.poll(()=>page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).length)).toBe(0)}
 async function jump(page:Page,id:string){await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();await settle(page)}
 async function hold(page:Page){await page.evaluate(()=>{const original=Element.prototype.animate;Element.prototype.animate=function(frames,options){const a=original.call(this,frames,options);a.pause();a.currentTime=0;return a}})}
-async function frame(page:Page,time:number){return page.locator(live).evaluate((root,time)=>{root.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=time});const slide=root.querySelector('.sia-slide')!,s=getComputedStyle(slide),old=document.querySelector('.page-outgoing');return{opacity:s.opacity,transform:s.transform,clip:s.clipPath,oldOpacity:old?getComputedStyle(old).opacity:'0',oldVisibility:old?getComputedStyle(old).visibility:'hidden',slides:root.querySelectorAll('.sia-slide').length,clones:document.querySelectorAll('.sia-transition-snapshot').length,sceneOpacity:root.querySelector('.sia-scene')?getComputedStyle(root.querySelector('.sia-scene')!).opacity:'1'}},time)}
-async function finish(page:Page){for(let i=0;i<3;i++){await page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).forEach(a=>a.finish()));await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.locator('.page-outgoing,[data-morph-surface]').count())break}await expect(page.locator('.page-outgoing,[data-morph-surface]')).toHaveCount(0)}
+async function frame(page:Page,time:number){return page.locator(live).evaluate((root,time)=>{root.parentElement!.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=time});const slide=root.querySelector('.sia-slide')!,s=getComputedStyle(slide),old=document.querySelector('.page-outgoing');return{opacity:s.opacity,transform:s.transform,clip:s.clipPath,oldOpacity:old?getComputedStyle(old).opacity:'0',oldVisibility:old?getComputedStyle(old).visibility:'hidden',slides:root.querySelectorAll('.sia-slide').length,clones:document.querySelectorAll('.sia-transition-snapshot').length,sceneOpacity:root.querySelector('.sia-scene')?getComputedStyle(root.querySelector('.sia-scene')!).opacity:'1'}},time)}
+async function finish(page:Page){for(let i=0;i<3;i++){await page.locator(live).evaluate(root=>root.parentElement!.getAnimations({subtree:true}).forEach(a=>a.finish()));await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.locator('.page-outgoing,[data-morph-surface]').count())break}await expect(page.locator('.page-outgoing,[data-morph-surface]')).toHaveCount(0)}
 
-test('every page boundary paints only the destination in both directions',async({page})=>{
+test('every boundary hides the source except the six strictly timed section endings',async({page})=>{
  await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);
  await page.keyboard.press('o');const count=await page.locator('.slide-list [data-target]').count();await page.keyboard.press('Escape');
+ let sectionExits=0;
  for(const direction of ['PageDown','PageUp'])for(let i=1;i<count;i++){
   await page.keyboard.press(direction);
   expect(await page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).some(a=>a.effect instanceof KeyframeEffect&&a.effect.getKeyframes().some(f=>f.transform)))).toBe(true);
-  const scene=page.locator(`${live} .sia-scene`);if(await scene.count())expect(await scene.evaluate(e=>e.getAnimations().length),`${direction} ${i}: diagram entrance`).toBeGreaterThan(0);
+  const scene=page.locator(`${live} .sia-scene`);if(await scene.count()){
+   expect(await scene.evaluate(e=>e.getAnimations({subtree:true}).length),`${direction} ${i}: artwork animation`).toBeGreaterThan(0);
+   expect(await scene.evaluate(e=>getComputedStyle(e).transform),`${direction} ${i}: anchored diagram`).toBe('none');
+   expect(await scene.evaluate(e=>e.getAnimations().length),`${direction} ${i}: no parent float`).toBe(0);
+  }
   const heading=page.locator(`${live} .sia-heading`);if(await heading.count())expect(await heading.locator('[data-reveal="heading"]').evaluateAll(es=>es.length>0&&es.every(e=>e.getAnimations().length>0)),`${direction} ${i}: title reveal`).toBe(true);
-  for(const time of [0,40,120,280,520,800,1400])expect(await frame(page,time),`${direction} ${i} ${time}ms`).toEqual({opacity:'1',transform:'none',clip:'none',oldOpacity:'0',oldVisibility:'hidden',slides:1,clones:0,sceneOpacity:'1'});
+  const exiting=await page.locator('.page-outgoing[data-section-exit="true"]').count();sectionExits+=exiting;
+  let previousOpacity=1;
+  for(const time of [0,40,120,280,520,800,1400]){
+   const observed=await frame(page,time),opacity=Number(observed.oldOpacity);
+   if(exiting&&time<240){expect(opacity).toBeGreaterThan(0);expect(opacity).toBeLessThanOrEqual(previousOpacity);if(time)expect(opacity).toBeLessThan(previousOpacity);previousOpacity=opacity;await expect(page.locator(`${live} [data-reveal="chapter-title"]`)).toHaveCSS('opacity','0')}
+   else expect(opacity).toBe(0);
+   expect({...observed,oldOpacity:'0',oldVisibility:'hidden'},`${direction} ${i} ${time}ms`).toEqual({opacity:'1',transform:'none',clip:'none',oldOpacity:'0',oldVisibility:'hidden',slides:1,clones:0,sceneOpacity:'1'});
+   expect(observed.oldVisibility).toBe(exiting&&time<240?'visible':'hidden');
+  }
   await finish(page);
  }
+ expect(sectionExits).toBe(6);
+});
+
+test('Draw On constructs anchored contours before the fill and labels',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);await page.keyboard.press('o');await page.locator('[data-target="hierarchy"]').click();
+ const scene=page.locator(`${live} .sia-scene`);await expect(scene).toHaveAttribute('data-artwork-motion','draw-on');
+ const ink=await scene.evaluate(e=>e.getAnimations({subtree:true}).flatMap(a=>{const effect=a.effect as KeyframeEffect;return effect.getKeyframes().map(f=>({stroke:f.strokeDashoffset,fill:f.fillOpacity,opacity:f.opacity,transform:f.transform,delay:effect.getTiming().delay}))}));
+ expect(ink.some(f=>Number(f.stroke)>0)).toBe(true);expect(ink.some(f=>f.fill!==undefined&&Number(f.fill)===0)).toBe(true);expect(ink.every(f=>!f.transform)).toBe(true);
+ expect(Math.min(...ink.filter(f=>f.stroke!==undefined).map(f=>f.delay))).toBeLessThan(Math.min(...ink.filter(f=>f.fill!==undefined).map(f=>f.delay)));
+ const positions=[];for(const time of [0,100,250,550]){await frame(page,time);positions.push(await scene.evaluate(e=>{const r=e.querySelector('svg')!.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}}))}for(const position of positions)samePose(position,positions[0]);
+ await finish(page);
 });
 
 test('page title leads the primary diagram without fading the slide root',async({page})=>{
@@ -62,12 +86,68 @@ test('KV growth retains fixed capacity and sharing reveals B only on its own bea
  await jump(page,'sharing');await expect(page.locator(`${live} [data-build="sharing-branch-b"]`)).toHaveCSS('opacity','0');await page.keyboard.press('ArrowRight');await expect(page.locator(`${live} [data-build="sharing-branch-b"]`)).toHaveAttribute('data-visible','true');await expect(page.locator(`${live} .sia-focus-block`)).toHaveCount(1);
 });
 
+test('newly allocated KV block draws in place without flying or scaling',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'growth');await page.keyboard.press('ArrowRight');await settle(page);await hold(page);await page.keyboard.press('ArrowRight');
+ const centers=[];
+ for(const time of [0,120,320,840]){
+  await frame(page,time);
+  centers.push(await page.locator(`${live} .sia-focus-block:not(.sia-block-inset) [data-motion-surface]`).evaluate(e=>{const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2,width:r.width}}));
+ }
+ expect(centers[0].width).toBeCloseTo(centers.at(-1)!.width,3);
+ for(const p of centers){expect(Math.abs(p.x-centers.at(-1)!.x)).toBeLessThan(.1);expect(Math.abs(p.y-centers.at(-1)!.y)).toBeLessThan(.1)}
+ await finish(page);
+});
+
+test('section fade freezes an interrupted glyph and cannot survive rapid navigation',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'generation');await hold(page);await page.keyboard.press('ArrowRight');await frame(page,420);
+ const source=await page.locator(`${live} [data-motion-id="output-1"]`).evaluate(e=>getComputedStyle(e).transform);
+ await page.keyboard.press('PageDown');await frame(page,0);
+ await expect(page.locator('.page-outgoing')).toHaveAttribute('data-section-exit','true');
+ expect(await page.locator('.page-outgoing [data-motion-id="output-1"]').evaluate(e=>getComputedStyle(e).transform)).toBe(source);
+ await frame(page,120);const opacity=await page.locator('.page-outgoing').evaluate(e=>Number(getComputedStyle(e).opacity));expect(opacity).toBeGreaterThan(0);expect(opacity).toBeLessThan(1);
+ await page.keyboard.press('PageDown');await frame(page,0);await expect(page.locator('.page-outgoing[data-section-exit]')).toHaveCount(0);await expect(page.locator('.page-outgoing')).toHaveCSS('visibility','hidden');
+ await finish(page);
+});
+
+test('section fade preserves the current CSS batching progress instead of snapping to completion',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'continuous');
+ for(let i=0;i<2;i++){await page.keyboard.press('ArrowRight');await settle(page)}
+ await hold(page);await page.keyboard.press('ArrowRight');await frame(page,120);
+ const selector='[data-morph="batch-span-E"] .sia-bm-request-progress';
+ const source=await page.locator(`${live} ${selector}`).evaluate(e=>{const transform=getComputedStyle(e).transform;return{transform,scale:new DOMMatrix(transform).a}});
+ expect(source.scale).toBeLessThan(1);
+ await page.keyboard.press('PageDown');await frame(page,0);
+ expect(await page.locator(`.page-outgoing ${selector}`).evaluate(e=>getComputedStyle(e).transform)).toBe(source.transform);
+ await frame(page,280);await expect(page.locator('.page-outgoing')).toHaveCSS('visibility','hidden');await finish(page);
+});
+
 test('prefill and decode occupy separate pages and decode has one evolving cache',async({page})=>{
  await ready(page);await jump(page,'phases');await expect(page.locator(`${live} h1`)).toHaveText('Prefill');await page.keyboard.press('PageDown');await expect(page.locator(`${live} h1`)).toHaveText('Decode');for(let i=0;i<3;i++){if(i)await page.keyboard.press('ArrowRight');await expect(page.locator(`${live} [data-hero="decode-cache"]`)).toHaveCount(1);await expect(page.locator(`${live} [data-build="decode-output-${i}"]`)).toHaveCount(1)}
 });
 
 test('six chapter photographs remain distinct and decoded at high resolution',async({page})=>{
  await ready(page);const sources=[];for(const id of ['request-title','gpu-title','batch-title','flash-title','paged-title','systems-title']){await jump(page,id);const info=await page.locator(`${live} .sia-chapter-photo`).evaluate(async e=>{const i=e as HTMLImageElement;await i.decode();return{src:i.src,width:i.naturalWidth,height:i.naturalHeight}});expect(info.width).toBeGreaterThanOrEqual(3500);expect(info.width/info.height).toBeCloseTo(16/9,2);sources.push(info.src);await expect(page.locator(`${live} .sia-chapter-subtitle,.sia-chapter-topic`)).toHaveCount(0)}expect(new Set(sources).size).toBe(6);
+});
+
+test('chapter arrival expands the photo plane and reveals one coherent title',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);
+ for(const id of ['request-title','gpu-title','batch-title','flash-title','paged-title','systems-title']){
+  await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();
+  const motion=await page.locator(live).evaluate(root=>{
+   const title=root.querySelector('[data-reveal="chapter-title"]')!,art=root.querySelector('.sia-chapter-art')!,photo=root.querySelector('.sia-chapter-photo')!;
+   const effects=(e:Element)=>e.getAnimations().map(a=>({duration:a.effect!.getTiming().duration,delay:a.effect!.getTiming().delay,frames:(a.effect as KeyframeEffect).getKeyframes()}));
+   return{title:effects(title),words:title.querySelectorAll('[data-reveal]').length,lines:[...title.children].map(e=>e.getAnimations().length),art:effects(art),photo:effects(photo)};
+  });
+  expect(motion.words).toBe(0);expect(motion.lines).toEqual([0,0]);expect(motion.title).toHaveLength(1);expect(motion.title[0].delay).toBe(120);expect(motion.title[0].duration).toBe(560);
+  expect(motion.art).toHaveLength(1);expect(motion.art[0].duration).toBe(720);expect(motion.art[0].frames[0].transform).toBe('scale(0.955)');expect(motion.art[0].frames.at(-1)!.transform).toBe('scale(1)');
+  expect(motion.photo).toHaveLength(1);expect(motion.photo[0].duration).toBe(1150);expect(motion.photo[0].frames[0].transform).toBe('scale(1.055)');expect(motion.photo[0].frames.at(-1)!.transform).toBe('scale(1)');
+  for(const time of [0,120,240,420,720,1200]){
+   await frame(page,time);
+   const visible=await page.locator(`${live} .sia-chapter-heading h1`).evaluate(e=>({opacity:Number(getComputedStyle(e).opacity),x:new DOMMatrix(getComputedStyle(e).transform).e}));
+   expect(visible.x).toBe(0);if(time>=300)expect(visible.opacity).toBe(1);
+  }
+  await finish(page);
+ }
 });
 
 test('reduced motion leaves exactly one usable layer and no active animations',async({page})=>{

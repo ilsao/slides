@@ -1,3 +1,34 @@
+# Draw On、章節淡出與中斷連續性 · 2026-11-16 · version 13
+
+42頁、101狀態。圖解改參考WWDC25 SF Symbols 7的Draw On／Whole Symbol（2:19）。scene無父層位移或縮放，以輪廓→填色→標籤構成；新配置P2同樣原位描繪。依新要求，只有六個章節尾頁向前進入星空時，來源連續淡出240ms，之後完全隱藏，新章節標題才開始。其餘邊界與反向仍立即隱藏來源。
+
+- TypeScript、66項單元測試、正式及測試Vite建置、git diff --check通過。開發版19項Chrome回歸通過；補齊CSS batching progress凍結後，最終建置版20項全部通過。
+- 全82個正反邊界／574個取樣幀：六組允許的來源淡出在0／40／120ms嚴格遞減、240ms結束，280ms後opacity=0且visibility=hidden；其他來源全程隱藏。新章節標題在來源淡出期間opacity=0。目的slide與scene始終opacity=1，根節點transform=none、clip-path=none，前頁clone數0。
+- 每個技術scene自身transform=none，沒有父層animation；圖解子樹實際有動畫。Draw On檢查實際strokeDashoffset由正數至0、fill晚於stroke、標籤沒有transform，0／100／250／550ms的SVG外框完全對齊。P2在0／120／320／840ms中心與尺寸固定。
+- 中途token飛行切入章節時，來源glyph首幀transform與切換前一致；快速再切頁會取消來源淡出，不會殘留可見舊層。CSS batching進度條在120ms切章節時，同樣保持當下transform，不先跳到100%。
+- 101靜態狀態、505動畫取樣重新擷取，執行錯誤、SVG文字碰撞與來源繪製規則違反均為0。另擷取六個章節淡出及六個圖解進場，共60張0／120／240／400／650ms過程圖並目視。
+- 全101狀態正向與反向、8章節、64次快速操作、重新載入恢復、1024×768與390×844的reduced motion／觸控／正常動畫核心配對，共441個檢查點通過。app console錯誤／警告、HTTP失敗、殘留outgoing／surface與過慢收尾均為0。
+- 16段1600×900實時錄影，每段90–92個RAF取樣，中位約16.7ms、p95及最大間隔最高16.8ms，無大於25ms的間隔。這是本機Chrome觀測。
+
+原始紀錄與錄影：已忽略的output/playwright/sia-draw/，包括audit.json、motion-all.json、storyboard.json、runtime.json、ux-playback.json與ux-playback.mp4。以下保留前版歷史。
+
+---
+
+# 章節銜接與取消側向進場 · 2026-11-16 · version 12
+
+42頁、101狀態。具體Apple來源與採用方式見APPLE_MOTION_REFERENCES.md。六張章節目的影像平面以720ms展開，內層照片推鏡仍為1.055×→1×／1150ms／mass 2.1；章節標題兩行整組進場，移除分詞遮罩。通用主圖改24px垂直收束，新配置P2以圖心原位展開。
+
+- TypeScript、66項單元測試、Vite正式與測試建置及git diff --check通過。開發版16項動畫回歸通過；最後修正P2後，建置版最終17項Chrome回歸全部通過。
+- 全部82個正反換頁／574個取樣幀：來源opacity=0、visibility=hidden，目的slide根節點與scene保持opacity=1，根節點transform=none、clip-path=none，前頁clone數為0。每個技術scene自身的所有進場keyframes水平位移為0；每個技術標題詞組都有動畫。
+- 六章節逐一檢查：標題只有一個動畫，兩行沒有各自的動畫；照片內層的起終尺度與1150ms維持原值。24張章節0／160／320／720ms畫面已目視，標題均在舞台範圍內，沒有裁字。
+- 42頁／101靜態狀態、505動畫中間幀重新擷取。最後P2修正後重新擷取完整505幀；執行錯誤、SVG文字碰撞與來源殘留檢查失敗均為0。P2另以0／120／320／840ms檢查表面中心，全程偏移小於.1px。
+- 完整101狀態正向與反向、8章節跳轉、64次快速操作、重新載入恢復，以及1024×768／390×844的reduced motion、觸控和正常動效核心切換，共441個檢查點通過。app console錯誤／警告、HTTP失敗、殘留outgoing／surface、過慢收尾均為0。
+- 六章節的進入與離開，加一個一般換頁，共13段1600×900實時錄影。每段90–92個RAF取樣，中位約16.7ms、p95最高16.8ms，無大於25ms的間隔。這是本機Chrome觀測。
+
+原始紀錄與錄影位於已忽略的output/playwright/sia-depth/：audit.json、motion-all.json、section-review.json、runtime.json、ux-playback.json、ux-playback.mp4。下方保留前版歷史。
+
+---
+
 # 全頁換頁覆蓋修復 · 2026-11-16 · version 11
 
 修正上一輪漏套用的路徑：shared-objects分支原先跳過通用pageLayers；一般技術標題也未採用文字揭示。現在所有頁面共用同一換頁入口，技術頁／References／takeaway的標題詞組都執行420ms揭示，間隔55ms；封面／結語逐行揭示。開場專屬分鏡與Section圖片動畫保留。

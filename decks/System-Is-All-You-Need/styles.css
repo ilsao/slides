@@ -1,8 +1,8 @@
 @font-face{font-family:'SIA CJK Fallback';src:url('/fonts/SourceHanSansTW-VF.otf.woff2') format('woff2');font-weight:250 900;font-display:swap}
 [data-deck="system-is-all-you-need"]{--sia-ink:#17191c;--sia-blue:#376bba;--sia-cyan:#90a9bc;--sia-muted:#68717e;--sia-line:#ccd2db;--sia-paper:#f6f6f4;--sia-surface:#e7ebef;--sia-dark:#080b10}
 [data-deck="system-is-all-you-need"] .presentation-player{background:#080b10}
-/* The previous layer is never paintable, even before layout effects or cancellation. */
-[data-deck="system-is-all-you-need"] .page-outgoing{visibility:hidden!important;opacity:0!important;pointer-events:none}
+/* Ordinary sources are excluded before paint; six timed chapter exits opt in. */
+[data-deck="system-is-all-you-need"] .page-outgoing:not([data-section-exit="true"]){visibility:hidden!important;opacity:0!important;pointer-events:none}
 .sia-slide{position:relative;isolation:isolate;width:1600px;height:900px;overflow:hidden;background:var(--sia-paper);color:var(--sia-ink);font-family:'Helvetica Neue','Helvetica','Arial','PingFang TC','SIA CJK Fallback',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .sia-slide *{box-sizing:border-box}
 .sia-slide :is(h1,h2,h3,p){margin:0}
@@ -67,11 +67,13 @@
 /* Full-bleed cosmic chapters share quiet typography and retain image detail. */
 .sia-slide[data-kind="chapter"] .sia-topline{display:none}
 .sia-slide .sia-chapter-layout{position:absolute;inset:0}
+.sia-slide .sia-chapter-art{position:absolute;inset:0;overflow:hidden;transform-origin:50% 50%}
 .sia-slide .sia-chapter-photo{position:absolute;inset:0;width:1600px;height:900px;object-fit:cover;pointer-events:none}
 .sia-slide .sia-chapter-photo-shade{position:absolute;inset:0;background:linear-gradient(90deg,#05080eee 0%,#05080eb0 28%,#05080e35 65%,#05080e10 100%),linear-gradient(0deg,#05080eaa,transparent 24%)}
 .sia-slide .sia-chapter-topic{position:absolute;left:100px;top:185px;font-size:24px;color:#b9c4d3}
 .sia-slide .sia-chapter-heading{position:absolute;left:96px;top:268px}
 .sia-slide .sia-chapter-heading h1{font-size:132px;line-height:1.03;font-weight:400;letter-spacing:-5.5px;color:#f6f7fa}
+.sia-slide .sia-chapter-heading h1>span{display:block}
 .sia-slide .sia-chapter-subtitle{position:absolute;left:100px;top:608px;font-size:28px;line-height:1.5;color:#d0d8e3}
 .sia-slide .sia-chapter-photo-credit{position:absolute;left:100px;bottom:42px;max-width:1230px;color:#c0c8d3;font-size:14px;line-height:1.3}
 .sia-slide .sia-chapter-photo-credit a{color:inherit;text-decoration:none}
@@ -133,7 +135,6 @@
 /* Apple-reference opening: one typographic idea per beat, quick masked reveals. */
 .sia-slide .sia-reveal-clip{display:block;overflow:hidden;padding-bottom:.12em;margin-bottom:-.12em}
 .sia-slide .sia-reveal-clip>[data-reveal]{display:block;will-change:auto}
-.sia-slide [data-reveal="chapter-word"]{display:inline-block}
 .sia-slide .sia-epoch-layout{inset:110px 100px 100px}
 .sia-slide .sia-year{font-size:76px;letter-spacing:-4px;line-height:1;color:var(--sia-muted)}
 .sia-slide .sia-epoch-copy{left:0;top:138px}

@@ -196,15 +196,13 @@ describe('destination-only page motion', () => {
     const outgoing = layer(), incoming = layer({ id, title, scene, sculpture, copy });
     const result = systemTransition.animate({ incoming: incoming.element, outgoing: outgoing.element }, 1);
     expect(incoming.fake.dataset.morphMode).toBe(mode);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(1);
     expect(outgoing.fake.style.opacity).toBe('0');
     expect(title.animate).toHaveBeenCalledOnce();
-    expect(scene.animate).toHaveBeenCalledOnce();
+    expect(scene.animate).not.toHaveBeenCalled();
     for (const element of [incoming.fake, outgoing.fake, incoming.slide])
       expect(element.animate).not.toHaveBeenCalled();
     expect(title.animate.mock.calls[0][0].every(frame=>!('opacity' in frame)&&!('clipPath' in frame))).toBe(true);
-    expect(scene.animate.mock.calls[0][0].every(frame=>!('opacity' in frame))).toBe(true);
-    expect(scene.animate.mock.calls[0][1].delay).toBeGreaterThan(title.animate.mock.calls[0][1].delay!);
   });
 
   it('keeps the title and new context visible from the first frame while shared objects move', () => {

@@ -1,4 +1,5 @@
 import type { TransitionDefinition } from '../../src/presentation';
+import { drawArtwork } from './diagramDraw';
 
 type Box = Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>;
 type Label = { key: string; element: HTMLElement; box: Box };
@@ -6,7 +7,12 @@ type MorphSource = { box: Box; opacity: string; labels: { key: string; box: Box 
 type BuildPose = { opacity: string; transform: string; state: string };
 type MotionVelocity = { box:Box; matrix:number[] };
 type MotionPose = { key:string; transform:string; index:number; box?:Box; opacity?:number; velocity?:MotionVelocity };
-type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose>; motions?:Map<string,MotionPose>; slide?:string; step?:number; title?:string };
+type ExitPaint=Pick<CSSStyleDeclaration,'opacity'|'transform'|'stroke'|'strokeWidth'|'strokeOpacity'|'strokeDasharray'|'strokeDashoffset'|'fillOpacity'|'clipPath'>;
+type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose>; motions?:Map<string,MotionPose>; slide?:string; step?:number; title?:string; exitPaint?:ExitPaint[] };
+const sectionEnds:Record<string,string>={'request-title':'stage','gpu-title':'generation','batch-title':'hierarchy','flash-title':'continuous','paged-title':'flash-result','systems-title':'sharing'};
+// Only authored nodes: diagnostic attributes and temporary backing surfaces
+// are absent from React's frozen source render and cannot identify its nodes.
+const exitNodes='[data-motion],[data-build],[data-morph],[data-reveal],svg path,svg line,svg polyline,svg polygon,svg rect,svg circle,svg ellipse,svg text,h1,.sia-scene,.sia-heading,.sia-stack-layer,.sia-system-word,.sia-bm-request-progress';
 const easing = 'cubic-bezier(.22,0,.2,1)';
 const entranceEasing = easing;
 const pageTiming = { title: 0, diagram: 70, detail: 190, detailStagger: 45 };
@@ -90,6 +96,9 @@ function captureMorph(current: HTMLElement): MorphSnapshot {
   snapshot.slide = current.querySelector<HTMLElement>('.sia-slide')?.dataset.slideId;
   snapshot.step = Number(current.querySelector<HTMLElement>('.sia-slide')?.dataset.step ?? 0);
   snapshot.title=current.querySelector('.sia-heading h1')?.textContent??'';
+  if(Object.values(sectionEnds).includes(snapshot.slide??''))snapshot.exitPaint=Array.from(current.querySelectorAll<HTMLElement>(exitNodes)).map(element=>{
+    const p=getComputedStyle(element);return{opacity:p.opacity,transform:p.transform,stroke:p.stroke,strokeWidth:p.strokeWidth,strokeOpacity:p.strokeOpacity,strokeDasharray:p.strokeDasharray,strokeDashoffset:p.strokeDashoffset,fillOpacity:p.fillOpacity,clipPath:p.clipPath};
+  });
   const motionNodes=Array.from(current.querySelectorAll<HTMLElement>('[data-motion]')),velocities=motionVelocities(current,motionNodes);
   snapshot.motions = new Map(motionNodes.map(element => {
     let opacity=1;
@@ -237,9 +246,10 @@ function animateBuilds(current: HTMLElement, source: MorphSnapshot, entranceDela
     const replacing=Boolean(old&&old.state!==state&&Number(old.opacity)>.99);
     const fromOpacity = replacing?'1':old?.opacity ?? '0';
     animations.push(element.animate([
-      { opacity: fromOpacity, transform: replacing?'translateX(4px)':old?.transform !== 'none' && old?.transform ? old.transform : `translateY(${visible ? Number(element.dataset.enterY??8) : 0}px)` },
-      { opacity, transform: `translateY(${visible ? 0 : -10}px)` },
-    ], { duration: replacing?220:Number(element.dataset.duration ?? 300), delay: !replacing&&visible && old?.state !== state ? entranceDelay + Number(element.dataset.delay ?? 0) : 0, easing, fill: 'both' }));
+      { opacity: replacing?'.65':fromOpacity },
+      { opacity },
+    ], { duration: replacing?180:160, delay: !replacing&&visible && old?.state !== state ? entranceDelay + Number(element.dataset.delay ?? 0) : 0, easing, fill: 'both' }));
+    if(!old||Number(old.opacity)<.01)animations.push(...drawArtwork(element,entranceDelay+Number(element.dataset.delay??0)));
   }
   return animations;
 }
@@ -256,6 +266,7 @@ function mechanisms(current:HTMLElement,source:MorphSnapshot,delay=0):Animation[
   for(const element of current.querySelectorAll<HTMLElement>('[data-motion]')) {
     const kind=element.dataset.motion!,old=source.motions?.get(element.dataset.motionId??kind);
     if(kind!=='object'&&source.slide===slide?.dataset.slideId&&old?.key===element.dataset.motionKey||element.dataset.motionActive==='false')continue;
+    if(element.dataset.drawArrival==='true'&&!old){animations.push(...drawArtwork(element,delay));continue;}
     let frames:Keyframe[]=[];
     let duration=760,wait=delay,velocity=old?.velocity?.matrix;
     const objectFlight=()=>{
@@ -349,26 +360,30 @@ function mechanisms(current:HTMLElement,source:MorphSnapshot,delay=0):Animation[
  * painted and the outgoing page is never retained, cloned, or faded back in. */
 function pageDetails(incoming: HTMLElement): Animation[] {
   const details = Array.from(incoming.querySelectorAll<HTMLElement>('[data-entry-group],[data-entry="detail"],.sia-scene [data-morph-enter],.sia-bm-status,.sia-attn-bottom'))
-    .filter(element => !element.matches('.sia-attn-sram') && !element.closest('[data-build],[data-morph],[data-motion]') && !element.parentElement?.closest('[data-entry-group],[data-entry="detail"]'));
+    .filter(element => !element.closest('.sia-scene') && !element.matches('.sia-attn-sram') && !element.closest('[data-build],[data-morph],[data-motion]') && !element.parentElement?.closest('[data-entry-group],[data-entry="detail"]'));
   return details.flatMap((element,index) => {
     const paint = getComputedStyle(element);
     if (Number(paint.opacity) === 0) return [];
-    const base = paint.transform && paint.transform !== 'none' ? paint.transform : '';
     const animation = element.animate([
-      { transform: `translateX(6px) ${base}`.trim(), opacity: 0 },
-      { transform: `translateY(0px) ${base}`.trim(), opacity: paint.opacity },
+      { opacity: 0 },
+      { opacity: paint.opacity },
     ], {duration: 360, delay: pageTiming.detail + Math.min(index,3) * pageTiming.detailStagger, easing: entranceEasing, fill:'both'});
     return [animation];
   });
 }
 
-/** Reference: Apple WWDC23 snappy(0.4), Keynote ordered text builds. */
-function textReveals(root:HTMLElement):Animation[]{
+/** Apple WWDC23 snappy text builds. Chapter titles use one coherent vertical
+ * settle, rather than clipping and staggering individual words or lines. */
+function textReveals(root:HTMLElement,chapterDelay=0):Animation[]{
  const animations:Animation[]=[];
  const run=(element:Element,delay:number,duration:number,y:string,scale=1)=>animations.push(element.animate([{transform:`translateY(${y}) scale(${scale})`,opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration,delay,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'}));
  root.querySelectorAll('[data-reveal="heading"]').forEach((e,i)=>run(e,i*55,420,'105%'));
  root.querySelectorAll('[data-reveal="bookend"]').forEach((e,i)=>run(e,40+i*100,560,'105%'));
- root.querySelectorAll('[data-reveal="chapter-word"]').forEach((e,i)=>run(e,40+i*65,420,'105%'));
+ root.querySelectorAll('[data-reveal="chapter-title"]').forEach(e=>{
+   const duration=560;
+   const frames=entryFrames(0,18,duration,1,'',1.1).map((frame,i)=>({...frame,opacity:Math.min(1,i/60*duration/180)}));
+   animations.push(e.animate(frames,{duration,delay:120+chapterDelay,easing:'linear',fill:'both'}));
+ });
  root.querySelectorAll('[data-reveal="hero"]').forEach(e=>run(e,40,620,'105%',.97));
  root.querySelectorAll('[data-reveal="prompt"]').forEach((e,i)=>run(e,240+i*65,400,'105%'));
  root.querySelectorAll('[data-reveal="agent"]').forEach((e,i)=>run(e,200+i*110,460,'26px'));
@@ -378,20 +393,30 @@ function textReveals(root:HTMLElement):Animation[]{
  return animations;
 }
 
-function pageLayers(incoming: HTMLElement, direction: -1 | 1, build=true): Animation[] {
+function pageLayers(incoming: HTMLElement, direction: -1 | 1, source:MorphSnapshot, build=true,chapterDelay=0): Animation[] {
   const animations:Animation[]=[];
   const move=(selector:string,x:number,y:number,duration:number,delay:number,mass=1.8,depth=false)=>{
     const element=incoming.querySelector<HTMLElement>(selector);if(!element||element.querySelector?.('[data-reveal]'))return;
     const authored=getComputedStyle(element).transform,base=authored&&authored!=='none'?authored:'';
     animations.push(element.animate(entryFrames(x,y,duration,direction,base,mass,depth),{duration,delay,easing:'linear',fill:'both'}));
   };
-  move('[data-entry="title"],.sia-heading,.sia-cover-layout,.sia-closing-layout,.sia-chapter-layout h1,.sia-epoch-copy,.sia-question-layout h1,.sia-stage-reveal h1,.sia-takeaway-layout h1,.sia-references h1',32,0,500,0,.95);
+  move('[data-entry="title"],.sia-heading,.sia-cover-layout,.sia-closing-layout,.sia-chapter-layout h1,.sia-epoch-copy,.sia-question-layout h1,.sia-stage-reveal h1,.sia-takeaway-layout h1,.sia-references h1',0,14,500,0,.95);
 
-  move('[data-entry="diagram"],.sia-scene,.sia-chapter-object,.sia-epoch-detail,.sia-system-stack,.sia-takeaway-grid,.sia-reference-list,.sia-credit-grid',56,0,700,pageTiming.diagram,1.25,false);
-  move('.sia-topline',14,0,620,0,1.1);
+  const scene=incoming.querySelector<HTMLElement>('.sia-scene');
+  if(scene)animations.push(...drawArtwork(scene,pageTiming.diagram,{morphs:new Set(source.keys()),motions:new Set(Array.from(source.motions??[]).filter(([,p])=>(p.opacity??1)>.01).map(([id])=>id))}));
+  const supporting=incoming.querySelector<HTMLElement>('.sia-system-stack,.sia-focus-foundations,.sia-reference-list,.sia-credit-grid');
+  if(supporting)animations.push(...drawArtwork(supporting,pageTiming.diagram));
+  move('.sia-topline',0,6,500,0,1.1);
+  const art=incoming.querySelector<HTMLElement>('.sia-chapter-art');
+  // WWDC24 10145, 1:34: expand the destination plane instead of sliding it
+  // across the screen. No source snapshot, root fade, or whole-page mask.
+  if(art)animations.push(art.animate(Array.from({length:61},(_,i)=>{
+    const remaining=i===60?0:springValue(1,0,0,i/60*.72,1.25);
+    return{offset:i/60,transform:`scale(${1-.045*remaining})`,borderRadius:`${28*remaining}px`};
+  }),{duration:720,easing:'linear',fill:'both'}));
   const photo=incoming.querySelector<HTMLElement>('.sia-chapter-photo');
   if(photo)animations.push(photo.animate(Array.from({length:61},(_,i)=>({offset:i/60,transform:`scale(${i===60?1:1+.055*springValue(1,0,0,i/60*1.15,2.1)})`})),{duration:1150,easing:'linear',fill:'both'}));
-  return [...animations,...textReveals(incoming),...pageDetails(incoming),...(build?animateBuilds(incoming,new Map(),pageTiming.diagram+90):[])];
+  return [...animations,...textReveals(incoming,chapterDelay),...pageDetails(incoming),...(build?animateBuilds(incoming,new Map(),pageTiming.diagram+90):[])];
 }
 
 export const systemTransition: TransitionDefinition = {
@@ -402,7 +427,7 @@ export const systemTransition: TransitionDefinition = {
     const source=snapshot as MorphSnapshot;
     current.dataset.morphMode = 'step-objects';
     const title=current.querySelector<HTMLElement>('.sia-heading');
-    const heading=source.title&&title&&title.textContent!==source.title?[title.animate(entryFrames(24,0,480,Number(current.querySelector<HTMLElement>('.sia-slide')?.dataset.step)<Number(source.step)?-1:1,'',.95),{duration:480,easing:'linear',fill:'both'})]:[];
+    const heading=source.title&&title&&title.textContent!==source.title?[title.animate(entryFrames(0,12,480,1,'',.95),{duration:480,easing:'linear',fill:'both'})]:[];
     return [...animateObjects(current, source, objectDuration(slideId(current), true)), ...animateBuilds(current,source),...mechanisms(current,source),...heading];
   },
   animate({ incoming, outgoing, snapshot }, direction) {
@@ -411,11 +436,22 @@ export const systemTransition: TransitionDefinition = {
     const objects = Array.from(incoming.querySelectorAll<HTMLElement>('[data-morph]'));
     const shared = objects.some(element => source.has(element.dataset.morph!))||Array.from(incoming.querySelectorAll<HTMLElement>('[data-motion]')).some(element=>(source.motions?.get(element.dataset.motionId??element.dataset.motion!)?.opacity??0)>.01);
     outgoing.style.opacity = '0';
+    const exit:Animation[]=[];
+    // The sole source-paint exception: the six chapter-ending pages dissolve
+    // continuously for 240ms. They are invisible thereafter, including during
+    // the remaining destination animation. There is no static hold or clone.
+    if(direction===1&&source.slide===sectionEnds[id]){
+      outgoing.dataset.sectionExit='true';
+      const nodes=Array.from(outgoing.querySelectorAll<HTMLElement>(exitNodes));
+      source.exitPaint?.forEach((pose,i)=>{if(nodes[i])Object.assign(nodes[i].style,pose)});
+      exit.push(outgoing.animate([{opacity:1,visibility:'visible'},{opacity:0,visibility:'hidden'}],{duration:240,easing:'cubic-bezier(.4,0,1,1)',fill:'both'}));
+    }
     incoming.dataset.morphMode=shared?(['chatgpt','agents'].includes(id)?'epoch':'shared-objects'):['flash-title','paged-title'].includes(id)?'chapter':['cover','closing'].includes(id)?'bookend':['chatgpt','agents'].includes(id)?'epoch':'scene';
-    // Every page uses the same entrance, including pages with shared objects.
-    // Start the parent entrance before measuring destination geometry, so FLIP
-    // compensates its initial offset and still starts at the captured surface.
-    const entrance=pageLayers(incoming,direction,!shared);
+    // Technical artwork stays anchored. Shared objects use their actual pose;
+    // newly introduced geometry uses Draw On instead of a parent translation.
+    // Let the old title clear before the new chapter headline starts. The
+    // destination photograph can already emerge underneath the dissolve.
+    const entrance=[...exit,...pageLayers(incoming,direction,source,!shared,exit.length?120:0)];
     if(shared)return [...entrance,...animateObjects(incoming,source,objectDuration(id),0),...animateBuilds(incoming,source,pageTiming.diagram+70),...mechanisms(incoming,source,0)];
     return [...entrance,...mechanisms(incoming,source,pageTiming.diagram)];
   },
