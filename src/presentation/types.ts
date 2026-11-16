@@ -18,7 +18,13 @@ export type SlideRenderProps = {
 };
 export type TransitionDefinition = {
   name: string;
-  animate: (layers: { incoming: HTMLElement; outgoing: HTMLElement }, direction: -1 | 1) => Animation | Animation[];
+  /** Optional read-only snapshot of the live incoming layer before React changes
+   * its DOM or cancels its animations. Return geometry/styles, not live nodes. */
+  capture?: (current: HTMLElement) => unknown;
+  /** Opt in to the same before-mutation capture on an in-place step update.
+   * The current layer is already at its new authored layout when this runs. */
+  animateStep?: (update: { current: HTMLElement; snapshot: unknown }) => Animation | Animation[];
+  animate: (layers: { incoming: HTMLElement; outgoing: HTMLElement; snapshot?: unknown }, direction: -1 | 1) => Animation | Animation[];
 };
 export type PlaybackRuntime = {
   deck: DeckDefinition; state: PlaybackState; slide: SlideDefinition;

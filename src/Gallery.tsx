@@ -53,11 +53,18 @@ function DeckCard({ entry, immediate }: {
     return () => { alive = false; observer.disconnect(); };
   }, [entry]);
   const href = sitePath(`${entry.id}?start=1`);
+  const surrounding = deck && entry.coverMosaic
+    ? entry.coverMosaic.filter(id => id !== deck.slides[0].id && deck.slides.some(slide => slide.id === id)).slice(0, 8).map(slideId => ({ slideId }))
+    : [];
+  const centeredMosaic = surrounding.length === 8;
+  const previews = deck
+    ? centeredMosaic ? [...surrounding.slice(0, 4), { slideId: deck.slides[0].id, step: 0 }, ...surrounding.slice(4)] : deck.previews
+    : [];
   const artwork = <a className="deck-artwork" href={href} aria-label={`播放 ${entry.title}`}>
-      {deck ? <div className="mosaic-grid" style={{ gridTemplateColumns: `repeat(${Math.min(3, Math.max(1, deck.previews.length))}, minmax(0, 1fr))` }}>{deck.previews.map((preview, i) => <SlidePreview key={`${preview.slideId}-${i}`} deck={deck} {...preview}/>)}</div>
+      {deck ? <div className="mosaic-grid" style={{ gridTemplateColumns: `repeat(${Math.min(3, Math.max(1, previews.length))}, minmax(0, 1fr))` }}>{previews.map((preview, i) => <SlidePreview key={`${preview.slideId}-${i}`} deck={deck} {...preview}/>)}</div>
         : <div className="gallery-placeholder" role="status">{failed ? '預覽暫時無法載入' : '載入投影片預覽…'}</div>}
     </a>;
-  return <article className="deck-card" ref={root} data-gallery-deck={entry.id}
+  return <article className="deck-card" ref={root} data-gallery-deck={entry.id} data-gallery-layout={centeredMosaic?'centered-mosaic':undefined}
     onFocusCapture={() => { revealed.current = true; opacity.set(1); }}>
     <motion.div className="deck-surface" style={{ opacity, y }}>
       {artwork}

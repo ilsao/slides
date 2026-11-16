@@ -78,7 +78,8 @@ b     = 2 bytes/element (BF16)
 ### Continuous batching
 
 - Orca 在 2022 年提出 iteration-level scheduling，並搭配 selective batching。簡報用 continuous batching 描述每輪可調整 requests 的主要概念，不把通用術語誤當成論文唯一技術名稱。
-- A／B／C 的 10／30／50 tokens 是教學工作量。圖中的一格是一個 iteration，不代表每輪相同 wall-clock 耗時，也不構成效能比值。
+- A／B／C／D／E 的 10／30／50／40／20 tokens 是教學工作量。圖中的一格是一個 iteration，不代表每輪相同 wall-clock 耗時，也不構成效能比值。
+- Static 頁停在 t = 10，Continuous 頁從同一時刻接續：D 補入 A 留下的空槽；t = 30 時 E 補入 B 的空槽，D 的進度保留；t = 50 時全部完成。跨頁是同一工作量下排程政策的比較，不是重新開始計時。
 - 新 request 的 prefill、KV 資源、token budget、延遲需求及公平性仍需排程；插入 lane 是概念動作。
 - 更高吞吐量不保證每個 request 的 latency 都下降。Static 圖的限制是無法補入新請求，不將「完成後一定無法立即回傳」泛化到所有實作。
 
@@ -102,5 +103,38 @@ b     = 2 bytes/element (BF16)
 
 - 使用者提供的講稿：從 ChatGPT／Agent 引言，經單次 LLM request、GPU、continuous batching、FlashAttention、PagedAttention，回到 systems perspective 與 ML Systems 的價值。
 - 2022／2025 為引言的敘事時間錨點；2025 不被表述為 Agent 的發明年份或普及率統計。
-- 使用者指定的風格參考：[Cerulean — NCHC keynote](https://cerulean.works/slides/nchc-keynote/)。此連結是視覺方向來源，不是上述技術主張的依據。
+- 既有版本的視覺參考：[Cerulean — NCHC keynote](https://cerulean.works/slides/nchc-keynote/)。此連結保留為視覺方向來源，不是上述技術主張的依據。
 
+## 高解析影像與使用規範
+
+封面採 NASA Webb 觀測影像，結語採 Unsplash 海岸極光攝影。兩張素材均從原始解析度縮製為寬 4096 px，沒有放大、AI 補細節或生成式修改；本機打包，不依賴外部熱連結。播放器開始前預先解碼並保留圖片，避免換頁時才載入。技術頁維持可步進的機制圖解。
+
+### 封面：Cosmic Cliffs
+
+- **來源：** [Cosmic Cliffs in the Carina Nebula — NIRCam Image](https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/)
+- **署名：** NASA, ESA, CSA, STScI。
+- **觀測日期：** 2022-06-03；發布日期：2022-07-12。
+- **性質：** Webb NIRCam 多波段紅外觀測的官方配色合成影像，不是肉眼可見光照片。
+- **原始檔：** [NASA 原圖 PNG](https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2022/07/STScI-01GA6KKWG229B16K4Q38CH3BXS.png)，14575 × 8441 px。
+- **本機檔案：** `assets/cosmic-cliffs-webb.jpg`，4096 × 2372 px。
+- **使用規範：** [NASA Images and Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/)。教學／資訊用途；署名不代表 NASA 為本演講背書。
+
+### 結語：海岸極光
+
+- **來源：** [Aurora borealis glows brightly in the night sky](https://unsplash.com/photos/aurora-borealis-glows-brightly-in-the-night-sky-m5oOEXIRWdU)
+- **署名：** Oskar Kadaksoo / Unsplash。
+- **發布日期：** 2025-03-26；不將發布日當作拍攝日。
+- **場景：** 深色海岸、夜空中的極光與海面反光。
+- **原始檔：** [Unsplash 原始尺寸影像](https://images.unsplash.com/photo-1742993493624-ac0f22810eb6?fm=jpg&q=90)，7872 × 5251 px。
+- **本機檔案：** `assets/aurora-oskar.jpg`，4096 × 2732 px。
+- **使用規範：** [Unsplash License](https://unsplash.com/license)。免費使用與修改；保留作者署名。
+
+兩圖皆依版面裁切、縮放並疊加明暗遮罩。第 34 頁第二步提供兩張圖片的來源、署名、影像性質與兩站使用規範。
+
+## Online softmax 的數字示例
+
+第 21 頁使用單列 scores `[1, 2, 3, 0, 2, 4]`，分成三個 tiles；對應純量 V 為 `[2, 4, 1, 3, 5, 2]`。這是解釋演算法的合成資料，不是模型輸出。
+
+每次更新共同基準 m，保存 `ℓ = Σ exp(score − m)` 與 `o = Σ exp(score − m) × v`，最後 `O = o / ℓ`。三步顯示的 `(m, ℓ, o)` 分別約為 `(2, 1.368, 4.736)`、`(3, 1.553, 2.892)`、`(4, 1.707, 3.740)`，最終 O 約為 2.192。畫面顯示四捨五入值，計算採完整精度。
+
+實際 attention 的 V 與輸出是向量，教學算例只保留一個維度以看清「重新縮放舊摘要，再累加新 tile」；它不將完整 N × N scores 常駐 HBM。此處說明數學等價，並不宣稱浮點結果逐位元一致。

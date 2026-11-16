@@ -42,6 +42,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid #0071e3; outline-offs
 .deck-artwork { display: block; position: relative; isolation: isolate; overflow: hidden; container-type: inline-size; aspect-ratio: 2.08; background: #e8e8e3; border-radius: 20px; text-decoration: none; transition: box-shadow .2s; }
 @media (hover: hover) { .deck-artwork:hover { box-shadow: 0 8px 24px #1d1d1f12; } }
 .mosaic-grid { position: absolute; width: 117%; left: -8.5%; top: 50%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.9cqw; transform: translateY(-50%) rotate(12deg); }
+/* A complete center cover surrounded by eight real slides, with no empty corners. */
+[data-gallery-layout="centered-mosaic"] .mosaic-grid { width: 158%; left: 50%; gap: 1.2cqw; transform: translate(-50%, -50%) rotate(10deg); }
+[data-gallery-layout="centered-mosaic"] .slide-preview:nth-child(5) { z-index: 1; }
 .slide-preview { position: relative; width: 100%; overflow: hidden; background: #fff; box-shadow: 0 4px 8px #24261a0b, 0 14px 28px #24261a14; pointer-events: none; }
 .preview-canvas { position: absolute; inset: 0 auto auto 0; transform-origin: top left; overflow: hidden; }
 .gallery-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #6e6e73; font-size: 16px; }

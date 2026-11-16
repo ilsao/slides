@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePlayback } from './context';
 import { useReducedMotion } from './useReducedMotion';
+import { TransitionSnapshot, type CapturedTransition } from './TransitionSnapshot';
 import type { DeckDefinition, PresentationActions, SlideId } from './types';
 
 const inertActions: PresentationActions = {
@@ -26,6 +27,7 @@ export function PresentationStage() {
   const reduced = useReducedMotion();
   const frame = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
+  const captured = useRef<CapturedTransition | null>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   useLayoutEffect(() => {
     const element = frame.current!;
@@ -41,18 +43,32 @@ export function PresentationStage() {
     setView({ current: { id: state.slideId, step: state.step }, previous: view.current,
       serial: view.serial + 1, direction: runtime.index >= previousIndex ? 1 : -1 });
   } else if (view.current.step !== state.step) {
-    setView({ ...view, current: { id: state.slideId, step: state.step }, previous: null });
+    // Only decks that opt in to in-place FLIP need a before-mutation snapshot
+    // for steps. Other decks keep their existing component/CSS step behavior.
+    const captureStep = Boolean(deck.transition && deck.transition.animateStep);
+    setView({ ...view, serial: view.serial + (captureStep ? 1 : 0), current: { id: state.slideId, step: state.step }, previous: null });
   }
   useLayoutEffect(() => {
     const outgoing = root.current!.querySelector<HTMLElement>('.page-outgoing');
     const incoming = root.current!.querySelector<HTMLElement>('.page-incoming')!;
     let alive = true;
-    const result = view.previous && deck.transition && !reduced && outgoing
-      ? deck.transition.animate({ incoming, outgoing }, view.direction) : [];
+    const snapshot = captured.current?.serial === view.serial ? captured.current.value : undefined;
+    captured.current = null;
+    const result = deck.transition && !reduced
+      ? view.previous && outgoing
+        ? deck.transition.animate({ incoming, outgoing, snapshot }, view.direction)
+        : snapshot !== undefined && deck.transition.animateStep
+          ? deck.transition.animateStep({ current: incoming, snapshot })
+          : []
+      : [];
     const animations = Array.isArray(result) ? result : [result];
     const finish = () => {
       if (!alive) return;
       if (outgoing) outgoing.style.visibility = 'hidden';
+      // A step transition keeps this same DOM and does not trigger another
+      // render. Release fill:'both' effects here instead of retaining GPU layers
+      // until the presenter next navigates; the authored endpoint is identical.
+      animations.forEach(animation => animation.cancel());
       setView(current => current.serial === view.serial && current.previous ? { ...current, previous: null } : current);
     };
     if (animations.length) void Promise.all(animations.map(animation => animation.finished)).then(finish).catch(() => {});
@@ -70,6 +86,9 @@ export function PresentationStage() {
     transform: `translate(-50%, -50%) scale(${scaleFor(id)})`, visibility: size ? 'visible' : 'hidden',
   });
   return <div className="frame projection-frame" ref={frame}>
+    <TransitionSnapshot serial={view.serial} root={root}
+      capture={!reduced && deck.transition ? deck.transition.capture : undefined}
+      onCapture={snapshot => { captured.current = snapshot; }}>
     <div className="page-transition" ref={root} data-transition={view.previous && deck.transition && !reduced ? deck.transition.name : 'none'}>
       {view.previous && <div className="page-outgoing" key={'out-' + view.serial} aria-hidden inert>
         <div className="stage-viewport" style={viewportStyle(view.previous.id)}>
@@ -82,6 +101,7 @@ export function PresentationStage() {
         </div>
       </div>
     </div>
+    </TransitionSnapshot>
     {size && deck.Overlay && <deck.Overlay {...runtime} viewport={size} scale={scaleFor(state.slideId)}/>}
   </div>;
 }

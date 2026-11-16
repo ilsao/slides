@@ -1,11 +1,18 @@
 import type { DeckDefinition } from './presentation';
 
-export type DeckEntry = { id: string; title: string; load: () => Promise<DeckDefinition> };
+export type DeckEntry = {
+  id: string;
+  title: string;
+  load: () => Promise<DeckDefinition>;
+  /** Eight surrounding slides; the first slide is kept in the center. */
+  coverMosaic?: readonly string[];
+};
 
 export const deckEntries: DeckEntry[] = [
   {
     id: 'system-is-all-you-need', title: 'System Is All You Need',
     load: () => import('../decks/System-Is-All-You-Need/deck').then(module => module.systemIsAllYouNeed),
+    coverMosaic: ['continuous', 'gpu', 'flash-title', 'paging', 'roofline', 'standard', 'kv', 'takeaway'],
   },
   {
     id: 'mirage', title: 'Mirage',

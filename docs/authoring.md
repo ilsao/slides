@@ -94,3 +94,7 @@ transition: fadeTransition(.3),
 省略 `transition` 或設定 `false` 都會直接切換。自訂轉場提供 `name` 與 `animate({ incoming, outgoing }, direction)`，回傳 Web Animations API 的一個 `Animation` 或陣列。`direction` 為前進 `1` 或後退 `-1`。
 
 動畫必須在有限時間內完成。播放器會在完成後移除離場快照，快速操作會取消舊動畫，減少動態效果時直接切換。需要滑動範例時，參考 `tests/fixtures/example/deck.tsx`。
+
+若跨頁要接續仍在移動的物件，可選擇提供 `capture(current)`。播放器會在 React 更動 DOM、取消舊動畫之前呼叫它，將回傳值傳給 `animate({ incoming, outgoing, snapshot }, direction)`。使用這份 `snapshot` 作為起點，便能保留快速換頁時的實際位置，避免讀到重建的離場快照終態。
+
+`capture` 應只讀取 DOM，回傳幾何、樣式等獨立資料，不保留即將被移除的 DOM nodes。它不會在頁內步進或 reduced motion 時執行。若捕捉失敗，播放器會記錄警告並以未提供 `snapshot` 的方式繼續，轉場應能回退至 `outgoing`。沒有設定 `capture` 的簡報維持原有行為。

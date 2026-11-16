@@ -1,0 +1,52 @@
+.sia-slide .sia-attn-scene{position:relative;width:1408px;height:510px;color:var(--sia-ink);font-family:inherit;font-weight:400}
+.sia-slide .sia-attn-piece{position:absolute;box-sizing:border-box;border:1px solid transparent;transform-origin:0 0;transition:none}
+.sia-slide .sia-attn-memory{z-index:0;padding:20px 24px;border-top:2px solid var(--sia-ink)!important}
+.sia-slide .sia-attn-memory:after{content:'';position:absolute;top:78px;left:0;right:0;border-top:1px solid var(--sia-line)}
+.sia-slide .sia-attn-memory>span{font-size:23px;font-weight:450;line-height:1.2;letter-spacing:-.25px}
+.sia-slide .sia-attn-memory>small{position:absolute;right:24px;top:23px;font-size:18px;color:var(--sia-muted);line-height:1.2;letter-spacing:0}
+.sia-slide .sia-attn-input,.sia-slide .sia-attn-output,.sia-slide .sia-attn-op{z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sia-slide .sia-attn-input{background-image:linear-gradient(to right,color-mix(in srgb,var(--sia-blue) 15%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--sia-blue) 15%,transparent) 1px,transparent 1px);background-size:14px 14px}
+.sia-slide .sia-attn-input b{font-size:37px;font-weight:400;line-height:1;background:var(--sia-paper);padding:4px 10px;color:var(--sia-ink)}
+.sia-slide .sia-attn-output{color:var(--sia-paper)}
+.sia-slide .sia-attn-output:after{content:'';position:absolute;left:11px;right:11px;bottom:11px;height:8px;border-top:1px solid currentColor;border-bottom:1px solid currentColor;opacity:.2}
+.sia-slide .sia-attn-output b{font-size:43px;line-height:1;font-weight:400}
+.sia-slide .sia-attn-output small{font-size:18px;line-height:1.2;margin-top:12px;letter-spacing:.1px}
+.sia-slide .sia-attn-score{z-index:2;overflow:hidden}
+.sia-slide .sia-attn-pending-score{border-style:dashed}
+.sia-slide .sia-attn-cell-cross{position:absolute;inset:0;background-image:linear-gradient(to right,color-mix(in srgb,var(--sia-paper) 45%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--sia-paper) 45%,transparent) 1px,transparent 1px);background-size:50% 50%;pointer-events:none}
+.sia-slide .sia-attn-op{font-size:23px;font-weight:400;letter-spacing:-.3px}
+.sia-slide .sia-attn-multiply{position:absolute;font-size:27px;line-height:1;color:var(--sia-muted)}
+.sia-slide .sia-attn-wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1}
+.sia-slide .sia-attn-wires path{fill:none;stroke:var(--sia-muted);stroke-width:1.25;stroke-linejoin:miter}
+.sia-slide .sia-attn-wires .sia-attn-io{stroke:var(--sia-blue);stroke-width:1.4;stroke-dasharray:550;stroke-dashoffset:550;transition:stroke-dashoffset 650ms cubic-bezier(.22,.72,.18,1)}
+.sia-slide .sia-attn-wires .sia-attn-io[data-show=true]{stroke-dashoffset:0}
+.sia-slide .sia-attn-caption{position:absolute;font-size:24px;line-height:1.3;color:var(--sia-muted);letter-spacing:-.3px}
+.sia-slide .sia-attn-io-caption{position:absolute;left:952px;top:401px;font-size:19px;color:var(--sia-blue);opacity:0;transition:opacity .5s ease .35s}
+.sia-slide .sia-attn-io-caption[data-show=true]{opacity:1}
+.sia-slide .sia-attn-bottom{position:absolute;left:0;right:0;bottom:-3px;display:flex;align-items:baseline;justify-content:space-between;gap:20px;font-size:19px;line-height:1.3;color:var(--sia-muted)}
+.sia-slide .sia-attn-bottom strong{font-weight:400;font-size:23px;color:var(--sia-ink);letter-spacing:-.3px}
+.sia-slide .sia-attn-sram{position:absolute;left:405px;top:50px;width:651px;height:345px;background:color-mix(in srgb,var(--sia-line) 20%,var(--sia-paper));border:1px solid var(--sia-line);border-top:2px solid var(--sia-ink);border-radius:0;padding:22px 29px}
+.sia-slide .sia-attn-sram:after{content:'';position:absolute;left:0;right:0;top:54px;border-top:1px solid var(--sia-line)}
+.sia-slide .sia-attn-sram>span{display:block;font-size:23px;color:var(--sia-ink);line-height:1.2;font-weight:450;letter-spacing:-.2px}
+.sia-slide .sia-attn-sram>small{position:absolute;left:30px;bottom:20px;font-size:18px;color:var(--sia-muted)}
+.sia-slide .sia-attn-kernel{position:absolute;left:650px;width:181px;height:57px;display:flex;align-items:center;justify-content:center;background:var(--sia-paper);border:1px solid var(--sia-line);border-radius:0;color:var(--sia-ink);font-size:23px;z-index:3;letter-spacing:-.3px}
+.sia-slide .sia-attn-matmul{top:113px}.sia-slide .sia-attn-accumulate{top:269px}
+.sia-slide .sia-attn-flash .sia-attn-op{font-size:23px;color:var(--sia-ink)}
+.sia-slide .sia-attn-flash .sia-attn-output{color:var(--sia-ink)}
+.sia-slide .sia-attn-flash[data-attn-step="3"] .sia-attn-output{color:var(--sia-paper)}
+.sia-slide .sia-attn-wires .sia-attn-inner-wire{stroke:var(--sia-muted);stroke-width:1.1}
+.sia-slide .sia-attn-wires .sia-attn-writeback{stroke:var(--sia-blue);stroke-width:1.4;opacity:0;stroke-dasharray:120;stroke-dashoffset:120;transition:stroke-dashoffset 480ms ease 180ms,opacity .2s ease 120ms}
+.sia-slide .sia-attn-wires .sia-attn-writeback[data-show=true]{opacity:1;stroke-dashoffset:0}
+.sia-slide .sia-attn-tile-index{position:absolute;left:438px;top:114px;font-size:19px;color:var(--sia-blue);font-variant-numeric:tabular-nums}
+.sia-slide .sia-attn-tile-index span{color:var(--sia-muted)}
+.sia-slide .sia-attn-pending-label{position:absolute;left:1112px;top:53px;width:286px;font-size:22px;line-height:1.3;color:var(--sia-muted)}
+.sia-slide .sia-attn-kernel-note{position:absolute;left:650px;top:414px;width:405px;text-align:center;font-size:19px;line-height:1.3;color:var(--sia-muted)}
+.sia-slide .sia-attn-standard-step{position:absolute;left:16px;top:33px;font-size:18px;line-height:1.6;width:360px;color:var(--sia-muted)}
+.sia-slide .sia-attn-pending-note{position:absolute;left:1112px;top:368px;font-size:17px;line-height:1.6;color:var(--sia-muted)}
+.sia-slide .sia-attn-tile-label{position:absolute;left:441px;top:304px;font-size:17px;color:var(--sia-muted)}
+.sia-slide .sia-attn-load-label{position:absolute;left:310px;top:203px;font-size:17px;color:var(--sia-muted)}
+.sia-slide[data-still="true"] .sia-attn-scene *{transition:none!important;animation:none!important}
+@media(prefers-reduced-motion:reduce){.sia-slide .sia-attn-scene *{transition:none!important;animation:none!important}}
+
+/* Shared geometry and direct labels are animated by the presentation FLIP engine. */
+.sia-slide .sia-attn-scene [data-morph],.sia-slide .sia-attn-piece>span,.sia-slide .sia-attn-piece>b,.sia-slide .sia-attn-piece>small{transition:none}
