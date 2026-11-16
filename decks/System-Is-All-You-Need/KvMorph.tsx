@@ -28,10 +28,10 @@ export function kvCellLayout(phase:KvPhase,step:number,i:number):Cell {
   }
   if(phase==='paging') {
     if(step===0)return {x:40+i*111,y:185,w:98,h:104,tone:group===1?cyan:blue,text:''};
-    if(step===1)return {x:22+local*55,y:112+group*109,w:48,h:74,tone:group===1?cyan:blue,text:local===0?`L${group}`:''};
-    if(step<group+2)return {x:22+local*55,y:112+group*109,w:48,h:74,tone:group===1?cyan:blue,text:local===0?`L${group}`:''};
+    if(step===1)return {x:82+(local%2)*64,y:124+group*109+Math.floor(local/2)*23,w:56,h:17,tone:group===1?cyan:blue,text:''};
+    if(step<group+2)return {x:82+(local%2)*64,y:124+group*109+Math.floor(local/2)*23,w:56,h:17,tone:group===1?cyan:blue,text:''};
     const slot=[7,2,10][group],x=922+(slot%3)*162,y=72+Math.floor(slot/3)*94;
-    return {x:x+10+(local%2)*64,y:y+18+Math.floor(local/2)*26,w:56,h:22,tone:group===1?cyan:blue,text:''};
+    return {x:x+10+(local%2)*64,y:y+28+Math.floor(local/2)*23,w:56,h:17,tone:group===1?cyan:blue,text:''};
   }
   if(phase==='growth'||phase==='sharing') {
     // A complete physical P7 retains the same 16 token cells and position on 28→29.
@@ -42,9 +42,8 @@ export function kvCellLayout(phase:KvPhase,step:number,i:number):Cell {
   return {x:0,y:0,w:1,h:1,tone:pale,opacity:0};
 }
 
-const localDelay=(i:number)=>i%4*35;
 function MemoryCells({phase,step}:Props){
-  return <>{Array.from({length:12},(_,i)=>{const cell=kvCellLayout(phase,step,i);return <div key={i} data-morph={`${phase==='growth'||phase==='sharing'?'kv-page':'kv-cell'}-${i}`} data-morph-delay={phase==='paging'?localDelay(i):0} className={`sia-kv-cell ${phase==='growth'||phase==='sharing'?'sia-kv-cell-tokens':''}`} style={{...style(cell.x,cell.y,cell.w,cell.h),backgroundColor:cell.tone,opacity:cell.opacity??1,color:[blue,ink].includes(cell.tone)?paper:ink,borderColor:cell.tone==='transparent'?line:cell.tone,'--cell-order':i} as CSSProperties}>
+  return <>{Array.from({length:12},(_,i)=>{const cell=kvCellLayout(phase,step,i);return <div key={i} data-morph={`${phase==='growth'||phase==='sharing'?'kv-page':'kv-cell'}-${i}`} data-morph-delay="0" className={`sia-kv-cell ${phase==='growth'||phase==='sharing'?'sia-kv-cell-tokens':''}`} style={{...style(cell.x,cell.y,cell.w,cell.h),backgroundColor:cell.tone,opacity:cell.opacity??1,color:[blue,ink].includes(cell.tone)?paper:ink,borderColor:cell.tone==='transparent'?line:cell.tone,'--cell-order':i} as CSSProperties}>
       {cell.filled!==undefined?<div className="sia-kv-microtokens">{[0,1,2,3].map(t=><i key={t} data-filled={t<cell.filled!} data-build={`kv-token-${i}-${t}`} data-state={t<cell.filled!} data-delay={phase==='growth'&&i===3?100+t*75:180}><span>{String((i%4)*4+t+(i>=4?16:0)).padStart(2,'0')}</span></i>)}</div>:<><span>{cell.text}</span><div className="sia-kv-grain" aria-hidden="true"><i/><i/><i/></div></>}
     </div>;})}</>;
 }
@@ -54,7 +53,7 @@ function CacheScene({step}:{step:number}){
     <Label x={70} y={7}>已快取的 context</Label><Label x={785} y={7} muted>追加 K / V</Label>
     {['The','future','of','AI','is','systems'].map((t,i)=><div key={t} className="sia-kv-token" style={{...style(70+i*143,60,119,50),opacity:i===5&&step===0?.15:1}}>{t}</div>)}
     <Label x={0} y={163} large>K</Label><Label x={0} y={273} large>V</Label>
-    <div data-morph="kv-attention" className="sia-kv-attention" style={{...style(1080,173,288,143),opacity:15}}><strong>Attention</strong><span>Reuse K / V</span></div>
+    <div data-build="cache-read" data-visible={step>=2}><div data-morph="kv-attention" className="sia-kv-attention" style={style(1080,173,288,143)}><strong>Attention</strong><span>Reuse K / V</span></div></div>
     <div className="sia-kv-current-query" style={{opacity:step>=2?1:.12}}>目前 token 的 Q</div>
     <svg className="sia-kv-query-wire" viewBox="0 0 1408 510" aria-hidden="true" style={{opacity:step>=2?1:.12}}><path d="M1224 122V157m-5-7 5 7 5-7"/></svg>
     <Arrow x={940} y={244} w={114} show={step>=2}/>
@@ -96,43 +95,51 @@ function PagingScene({step}:{step:number}){
     </div>
     <div data-build="paging-map" data-visible={step>=1}>
       <Label x={22} y={24} large>Logical blocks</Label>
-      {[0,1,2].map(i=><div key={i} className="sia-kv-logical" style={style(14,105+i*109,238,86)}><span>L{i}</span><small>{i*16}–{i*16+15}</small></div>)}
-      <div className="sia-kv-map-table" style={style(432,104,303,304)}><header>Block table</header>{[7,2,10].map((p,i)=><div key={p}><span>L{i}</span><i>→</i><strong data-build={`paging-entry-${i}`} data-visible={step>=i+2} data-delay="420">P{p}</strong></div>)}</div>
+      {[0,1,2].map(i=><div key={i} className="sia-kv-logical" data-active={step===i+2} data-mapped={step>=i+2} style={style(14,105+i*109,238,86)}><span>L{i}</span><small>{i*16}–{i*16+15}</small></div>)}
+      <div className="sia-kv-map-table" style={style(432,104,303,304)}><header>Block table</header>{[7,2,10].map((p,i)=><div key={p} data-active={step===i+2}><span>L{i}</span><i>→</i><strong data-build={`paging-entry-${i}`} data-visible={step>=i+2} data-delay="420">P{p}</strong></div>)}</div>
       <Arrow x={278} y={251} w={125}/>
       <Label x={922} y={24} large>Physical blocks · HBM</Label>
-      {Array.from({length:12},(_,i)=><div className="sia-kv-physical-slot" key={i} style={style(922+(i%3)*162,72+Math.floor(i/3)*94,144,76)}><span>P{i}</span></div>)}
-      {[7,2,10].map((p,i)=><svg key={p} className="sia-kv-map-wire" viewBox="0 0 1408 510" data-build={`paging-wire-${i}`} data-visible={step>=i+2} data-delay="250" aria-hidden="true"><path d={`M748 ${154+i*71}H${810+i*24}V${110+Math.floor(p/3)*94}H${910+(p%3)*162}`}/></svg>)}
+      {Array.from({length:12},(_,i)=><div className="sia-kv-physical-slot" data-active={i===[7,2,10][step-2]} key={i} style={style(922+(i%3)*162,72+Math.floor(i/3)*94,144,76)}><span>P{i}</span></div>)}
+      {[7,2,10].map((p,i)=><svg key={p} className="sia-kv-map-wire" viewBox="0 0 1408 510" data-build={`paging-wire-${i}`} data-visible={step>=i+2} data-active={step===i+2} data-delay="300" aria-hidden="true"><path d={`M748 ${206+i*71}H${810+i*24}V${110+Math.floor(p/3)*94}H${922+(p%3)*162}m-8-5 8 5-8 5`}/><circle cx={748} cy={206+i*71} r="4"/></svg>)}
     </div>
     <Label x={22} y={474} muted>{['每個 block 16 tokens · 內部的 4 格代表資料片段','Logical 位置連續；實體位置交給 block table 決定','L0 → P7：先追蹤第一個 block','L1 → P2：下一塊不必接在 P7 後面','L2 → P10：attention 依映射找到 KV，實體不必連續'][step]}</Label>
   </>;
 }
 
+
+/** Equal-size physical blocks; token indices read left-to-right, row by row. */
+function TokenBlock({id,x,y,filled}:{id:string;x:number;y:number;filled:number}){
+  return <div className="sia-kv-token-block" data-morph={`kv-block-${id}`} style={style(x,y,271,166)}>
+    {Array.from({length:16},(_,i)=><i key={i} data-filled={i<filled} data-build={i<filled?`token-${id}-${i}`:undefined} data-state={i<filled?'written':'empty'} data-delay={i>=14?'120':'0'}><span>{String((id==='P7'?0:16)+i).padStart(2,'0')}</span></i>)}
+  </div>;
+}
 function GrowthScene({step}:{step:number}){
   const count=[14,16,16,17][step];
   return <>
     <Label x={0} y={10} large>同一個 request A · {count} tokens</Label><Label x={1115} y={10} muted>16 tokens / block</Label>
     <div className="sia-kv-request" style={style(0,139,299,85)}><b>A</b><span>L0 → P7</span></div>
-    <Label x={565} y={85}>目前 block / P7</Label><div className="sia-kv-sharing-boundary" style={style(553,146,271,182)}/>
+    <Label x={565} y={85}>目前 block / P7</Label><TokenBlock id="P7" x={553} y={146} filled={step===0?14:16}/>
     <svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M320 180H433V218H540m-6-4 6 4-6 4"/></svg>
-    <Label x={565} y={349} muted>{step===0?'14 / 16 · 還有兩格': '16 / 16 · 目前 block 已滿'}</Label>
-    <div data-build="growth-allocation" data-visible={step>=2} data-delay="90"><Label x={1115} y={42}>下一個 block / P2</Label><div className="sia-kv-sharing-boundary" style={style(1103,82,271,126)}/><svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M831 218H959V144H1090m-6-4 6 4-6 4"/></svg><Label x={1115} y={225} muted>{step>=3?'1 / 16 · token index 16':'0 / 16 · 已配置，尚未寫入'}</Label></div>
-    <Label x={0} y={280} muted>Block table</Label><div className="sia-growth-table" style={style(0,325,365,92)}><span>L0 → P7</span><span data-build="growth-entry" data-visible={step>=2} data-delay="380">L1 → P2</span></div>
-    <div className="sia-growth-pool" style={style(915,328,460,90)}><span>Free pool · {step>=2?3:4} blocks</span><div>{['P2','P5','P8','P11'].map((name,i)=><i key={name} data-build={`free-${i}`} data-visible={i!==0||step<2}>{name}</i>)}</div></div>
-    <Label x={0} y={474} muted>{['14 tokens：先使用當前 block，還不需要新空間','追加兩個 tokens：填滿 P7，仍未配置 P2','下一個 token 到來前：取出 P2，新增 L1 → P2','第 17 個 token 的 KV 寫入 P2；P7 完全保留'][step]}</Label>
+    <Label x={565} y={339} muted>{step===0?'14 / 16 · 還有兩格':'16 / 16 · 目前 block 已滿'}</Label>
+    <div data-build="growth-allocation" data-visible={step>=2} data-delay="720"><Label x={1115} y={42}>下一個 block</Label><TokenBlock id="P2" x={1103} y={82} filled={step>=3?1:0}/><svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M831 218H959V165H1090m-6-4 6 4-6 4"/></svg><Label x={1115} y={263} muted>{step>=3?'1 / 16 · 第 17 個 token':'0 / 16 · 已配置，尚未寫入'}</Label></div>
+    <Label x={0} y={280} muted>Block table</Label><div className="sia-growth-table" style={style(0,325,365,92)}><span>L0 → P7</span><span data-build="growth-entry" data-visible={step>=2} data-delay="920">L1 → P2</span></div>
+    <div className="sia-growth-pool" style={style(915,328,460,90)}><span>Free pool · {step>=2?3:4} blocks</span><div><i style={{visibility:'hidden'}}>P2</i>{['P5','P8','P11'].map(name=><i key={name}>{name}</i>)}</div></div>
+    <div data-morph="kv-allocation-p2" className="sia-allocation-chip" style={{...style(step>=2?1280:915,step>=2?43:368,68,44),color:step>=2?blue:undefined}}>P2</div>
+    <Label x={0} y={474} muted>{['14 tokens：先使用當前 block，還不需要新空間','追加兩個 tokens：填滿 P7，仍未配置 P2','取出 P2 → 配置實體 block → 更新 L1 → P2','第 17 個 token 的 KV 寫入 P2；P7 完全保留'][step]}</Label>
   </>;
 }
-
 function SharingScene({step}:{step:number}){
   return <>
-    <Label x={0} y={10} large>Requests</Label><Label x={565} y={85}>同一份完整前綴 / P7</Label><Label x={1115} y={42} muted>Private blocks</Label>
-    <div className="sia-kv-sharing-boundary" style={style(553,146,271,182)}/>
-    <div className="sia-kv-sharing-boundary" style={style(1103,82,271,126)}/>
-    <div className="sia-kv-sharing-boundary" style={{...style(1103,266,271,126),opacity:step>=2?1:.1}}/>
-    <div className="sia-kv-request" style={style(0,139,299,85)}><b>A</b><span>L0 → P7</span></div><div className="sia-kv-request" data-build="sharing-request-b" data-visible={step>=1} data-delay="90" style={style(0,304,299,85)}><b>B</b><span>L0 → P7</span></div>
-    <svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M320 180H433V218H540m-6-4 6 4-6 4"/><path d="M320 345H433V255H540m-6-4 6 4-6 4" style={{opacity:step>=1?1:.12}}/><path d="M831 218H959V144H1090m-6-4 6 4-6 4"/><path d="M831 255H959V329H1090m-6-4 6 4-6 4" style={{opacity:step>=2?1:0}}/></svg>
-    <Label x={1115} y={222} muted>A / P2 · 延續上一頁</Label><Label x={1115} y={404} muted>B / P10</Label>
-    <Label x={565} y={349} muted>1 physical copy / refcount {step>=1?2:1}</Label>
-    <Label x={0} y={469} muted>{step>=2?'共用完整前綴，各自追加；共用的未滿 block 寫入時須 copy-on-write':'相同前綴共用 KV；只有引用歸零的 blocks 才能回收'}</Label>
+    <Label x={0} y={10} large>Requests</Label><Label x={565} y={85}>同一份完整前綴 / P7</Label><Label x={1115} y={10} muted>Private blocks · 16 tokens / block</Label>
+    <TokenBlock id="P7" x={553} y={146} filled={16}/><Label x={1115} y={42}>A / P2</Label><TokenBlock id="P2" x={1103} y={82} filled={1}/>
+    <div className="sia-kv-request" style={style(0,139,299,85)}><b>A</b><span>L0 → P7</span></div>
+    <svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M320 180H433V218H540m-6-4 6 4-6 4M831 218H959V165H1090m-6-4 6 4-6 4"/></svg>
+    <div data-build="sharing-branch-b" data-visible={step>=1} data-delay="140">
+      <div className="sia-kv-request" style={style(0,304,299,85)}><b>B</b><span>L0 → P7</span></div><Label x={1115} y={250}>B / P10</Label><TokenBlock id="P10" x={1103} y={282} filled={step>=2?1:0}/>
+      <svg className="sia-kv-sharing-wires" viewBox="0 0 1408 510" aria-hidden="true"><path d="M320 345H433V255H540m-6-4 6 4-6 4M831 255H959V365H1090m-6-4 6 4-6 4"/></svg>
+    </div>
+    <div data-build="sharing-refcount" data-state={step>=1?2:1} data-delay="380"><Label x={565} y={339} muted>1 physical copy / refcount {step>=1?2:1}</Label></div>
+    <Label x={0} y={474} muted>{step>=2?'共用完整前綴，各自追加；寫入共用的未滿 block 時須 copy-on-write':'相同前綴共用 P7；只有引用歸零的 blocks 才能回收'}</Label>
   </>;
 }
 
@@ -140,6 +147,6 @@ export function KvMorph({phase,step}:Props){
   const labels={cache:'KV Cache 保存過去 token 的 K 與 V，並重複讀取。',scale:'假設模型每個 request 使用 2 GiB KV Cache；16 requests 為 32 GiB。',fragmentation:'連續 KV 配置的內部碎片、外部碎片與重複前綴。',paging:'固定大小的 logical blocks 透過 block table 映射至分散 physical blocks。',growth:'14 個 tokens 先填 P7；16 個填滿；配置 P2 並更新 table；第17個 token 的 KV 寫入 P2。',sharing:'相同前綴共享一個 physical block，生成分支使用各自的 blocks。'};
   return <div className={`sia-kv-morph sia-kv-${phase}`} role="img" aria-label={labels[phase]} data-kv-phase={phase} data-kv-step={step}>
     {phase==='cache'?<CacheScene step={step}/>:phase==='scale'?<ScaleScene step={step}/>:phase==='fragmentation'?<FragmentScene step={step}/>:phase==='paging'?<PagingScene step={step}/>:phase==='growth'?<GrowthScene step={step}/>:<SharingScene step={step}/>}
-    {phase!=='fragmentation'&&<MemoryCells phase={phase} step={step}/>}
+    {!['fragmentation','growth','sharing'].includes(phase)&&<MemoryCells phase={phase} step={step}/>}
   </div>;
 }

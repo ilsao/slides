@@ -1,34 +1,37 @@
-# Keynote revision · November 2026
+# One clear focus, enough context
 
-ML systems technical keynote for computer science students. The slides accompany a spoken talk.
+Technical keynote for computer-science students. 42 slides, 101 manual states. The speaker carries the explanation; each technical slide keeps a primary visual and useful context where a relationship needs it. Gray descriptions under slide headings are removed.
 
 ## Visual system
 
-- Carbon #080b10, Paper #f6f6f4, Graphite #17191c, Fog #777d87, Rule #d9dce1, Signal #376bba.
-- Helvetica Neue for Latin; PingFang TC for Traditional Chinese, with system and bundled CJK fallback. Display 108–140 / 400–500; technical headings 66 / 450; labels 22–28 / 400.
-- Cover: full-bleed NASA Webb Cosmic Cliffs, downsampled from a 14575 px original to 4096 px. Preserve nebula detail under a restrained contrast overlay. Large two-line name and one short subtitle.
-- Section cards: six distinct full-bleed NASA Webb cosmic images, dark left-side scrim, one two-line heading and one restrained subtitle. Technical diagrams retain the light canvas.
-- Technical pages: a large, meticulous engineering diagram, short noun heading, low-chroma emphasis only for the moving/active object. Show scope, inputs, outputs and allocation units where they change interpretation. Technical qualifications stay in notes and source document.
-- Closing: Oskar Kadaksoo’s coastal aurora from Unsplash, downsampled from a 7872 px original to 4096 px. Left-aligned type occupies the naturally dark sky; the aurora and reflection remain visible on the right.
+- Paper #f6f6f4, Ink #17191c, Signal #376bba, Muted #68717e, Rule #ccd2db, Carbon #080b10.
+- Helvetica Neue / PingFang TC with the bundled CJK fallback. Technical headings 70 px, orientation copy 27 px; essential labels generally 26–42 px. Small type is reserved for source credits and magnified local coordinates.
+- A primary visual in the 1408×510 scene: a map, chart, chip, cache, matrix, memory bank, block or formula. Selective context insets clarify relationships: selected-query weights, GPU location, HBM source, tile scores, and previous/private KV blocks. Do not force every page to contain exactly one diagram.
+- Split independent explanations across pages. Use manual states and cameras for related details. GPU-to-SM zoom removes peripheral geometry from paint; tiny world-coordinate labels keep zero letter spacing and enter after magnification.
+- Six full-bleed NASA Webb chapter photographs; Cosmic Cliffs cover and Unsplash coastal-aurora closing. Chapters retain only the title and source credit.
 
 ## Motion
 
-Object identity carries explanations across pages. Transform-only movement wherever possible; animated dimensions and shadows are avoided. Every ordinary page change paints the destination background immediately. The title moves at 0ms, the diagram follows at 110ms, and local labels enter from 250ms with bounded stagger. Only the diagram and individual details reveal locally; the slide root is never faded. Never clone or retain outgoing page paint, and never clip the incoming page. Shared objects retain explanatory FLIP movement. No perpetual ambient motion.
+The old page is excluded from paint at CSS level and again in the transition callback. No clone, screenshot, source fade or incoming full-page clip. The slide root and primary scene stay opaque. Only destination objects participate.
 
-## Critique constraints
+Ordinary page entry uses a damped physical response rather than the same ease curve for every layer. Title: 48 px / 620 ms, light mass .95, no delay. Lead: 24 px / 600 ms from 65 ms. Primary diagram: 96 px horizontally, 8 px vertically, 1.2% depth / 880 ms from 70 ms, mass 1.8. Semantic details begin at 190 ms, capped at three 45 ms intervals. Chapter photographs push from 1.055× to 1× over 1150 ms. Do not stagger SVG text nodes by DOM order.
 
-Avoid a uniform card kit, oversized rounded rectangles, all-caps metadata, punctuation-as-branding, motivational sentence headings, glowing AI imagery, rainbow token palettes, and every-page fade/slide choreography. More refinement must not become more decoration.
+Related diagrams keep their parent anchored. Capture the actual visible SVG surface before mutation and cancellation; sample transform timelines 8 ms earlier in the same task to retain velocity. Matrix-to-tile and P7/P2 main-to-context handoffs begin at the captured rectangle and velocity. Camera motion lasts 840 ms; SVG object handoffs 820 ms. The response uses stiffness 320 / damping 40, with less than 1% default overshoot and no repeated bounce. Visible numeric replacements stay painted. Batch progress and playhead retain a common 520 ms rhythm.
 
+The sampled output glyph starts at the right-hand sampling socket and follows a curved path above existing words before landing. Prior glyphs settle from their captured pose if the speaker advances early. Roofline motion follows its two segments. Decode words travel around the cache. Fixed-capacity blocks retain a 4×4 grid and row-major indices. All finished effects are released; still/reduced-motion shows the settled endpoint.
 
-## Content-first refinement
+## Restraint
 
-The original outline remains 38 slides and 96 manual states. Opening architecture now names each layer’s job and previews the technical route. Chapter transitions connect hardware parallelism to batching, I/O cost to FlashAttention, and growing KV state to paging. The recap uses three engineering questions, the corresponding mechanism, and the course that supplies its foundations.
+Keep cosmic photography, quiet typography, blue active states, and enough text to orient the audience. Avoid narration paragraphs and repeated subtitles. References and credits remain an appendix. Preserve the centered cover in the gallery mosaic.
 
-Use real explanatory detail instead of repeated decorative grids: causal-mask axes, next-token feedback, roofline units and native subscripts, simultaneous online-softmax state, a one-to-one request capacity diagram, logical/physical block mappings, explicit KV ownership and recycling.
+## Grounding diagrams
 
-Motion preserves authored perspective transforms and opacity through interruption. Incoming headings, surfaces and scenes remain fully painted from the first frame. The outgoing layer is excluded with static opacity, so cancellation cannot resurrect it. No heading or whole-scene re-entry fade follows a page change. Diagram arrows finish within the same beat as their corresponding objects. Review pages expose every settled state and an enlarged step view for inspection.
+Inspect the original teaching figures before redrawing. Follow their input/output, containment and memory-placement relationships, then adapt the amount of detail to the talk. Use actual tokens, position labels, named operators and routed connections. Do not use unlabeled rectangles as substitutes for a mechanism. The source-to-slide mapping is in TEACHING_REFERENCES.md. The teaching diagrams are original SVG redraws; stock cosmic photographs remain the chapter artwork.
 
+## Apple reference revision (version 10)
 
-## Gallery cover
+See APPLE_MOTION_REFERENCES.md for the specific WWDC demonstrations and timestamps inspected before this revision. Ordinary page entry now uses 32px/500ms headings and 56px/700ms diagrams with critical damping and no depth scale. Shared object continuity remains. Chapter photograph motion is unchanged. Chapter words enter in 420ms with 65ms spacing; the full phrase completes within roughly 0.65 seconds.
 
-The first slide occupies the exact center of a 3 × 3 mosaic, with eight real technical slides surrounding it and filling the card to its edges. The center slide remains complete at desktop and mobile widths. The gallery keeps previews still; decoded photographic assets are prepared separately by the player.
+Slides 02–05 are a deliberate opening sequence: large ChatGPT title and phrase reveal, aligned Agents title with three-beat action sequence, two-line dark question, then a hand-triggered expansion from Model to System. Do not apply the generic scene translation to a wrapper already containing masked text reveals.
+
+Version 11 correction: all page boundaries enter through pageLayers, including shared-object pages. General technical/reference/takeaway headings now use masked word-group reveals (420ms, 55ms stagger); covers use line reveals. Parent entrance starts before FLIP measurement to preserve the actual captured source surface. Every technical page boundary explicitly tests both title and diagram animation coverage.

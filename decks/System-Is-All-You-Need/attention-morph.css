@@ -50,3 +50,32 @@
 
 /* Shared geometry and direct labels are animated by the presentation FLIP engine. */
 .sia-slide .sia-attn-scene [data-morph],.sia-slide .sia-attn-piece>span,.sia-slide .sia-attn-piece>b,.sia-slide .sia-attn-piece>small{transition:none}
+/* Reading order and loading paths are separate from operator geometry. */
+.sia-slide .sia-attn-wires path{stroke-width:1.7}
+.sia-slide .sia-attn-wires .sia-attn-active-wire{stroke:var(--sia-blue);stroke-width:2}
+.sia-slide .sia-attn-standard-step{font-size:21px;width:390px}
+.sia-slide .sia-attn-flow-label{position:absolute;font-size:20px;color:var(--sia-blue);z-index:4;background:var(--sia-paper);padding:2px 4px}
+.sia-slide .sia-attn-matrix-label{position:absolute;font-size:25px;color:var(--sia-blue);width:141px;text-align:center}
+.sia-slide .sia-attn-stored-matrix,.sia-slide .sia-attn-matrix-outline{position:absolute;width:141px;height:141px;z-index:2}
+.sia-slide .sia-attn-matrix-outline{border:1px dashed var(--sia-line)}
+.sia-slide .sia-attn-stored-matrix{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.sia-slide .sia-attn-stored-matrix i{background:var(--sia-blue)}
+.sia-slide .sia-attn-flash .sia-attn-sram{left:390px;width:650px}
+.sia-slide .sia-attn-flash .sia-attn-kernel{left:620px;width:190px}
+.sia-slide .sia-attn-flash .sia-attn-kernel-note{left:390px;top:432px;width:650px;font-size:21px}
+.sia-slide .sia-attn-fixed-query{position:absolute;left:620px;top:70px;font-size:21px;color:var(--sia-muted)}
+.sia-slide .sia-attn-loading-tile{position:absolute;left:0;top:0;width:134px;height:134px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;z-index:4;transform-origin:0 0}
+.sia-slide .sia-attn-loading-tile i{background:var(--sia-blue)}
+.sia-slide .sia-attn-loading-tile span{position:absolute;left:0;top:44px;width:134px;text-align:center;background:var(--sia-paper);color:var(--sia-blue);font-size:24px;padding:8px 0}
+.sia-slide .sia-attn-flash .sia-attn-tile-index{left:430px;top:115px;font-size:22px}
+.sia-slide .sia-attn-flash .sia-attn-tile-label{left:430px;top:309px;font-size:20px}
+.sia-slide .sia-attn-flash .sia-attn-load-label{left:298px;top:138px;font-size:20px}
+.sia-slide .sia-attn-flash .sia-attn-pending-label{left:1080px;top:54px;font-size:23px}
+.sia-slide .sia-attn-pending-pair{position:absolute;left:1080px;width:290px;height:42px;border:1px solid var(--sia-line);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;font-size:22px;color:var(--sia-muted)}
+.sia-slide .sia-attn-pending-pair small{font-size:18px}
+.sia-slide .sia-attn-pending-pair[data-active="true"]{color:var(--sia-blue);border-color:var(--sia-blue)}
+.sia-slide .sia-attn-pending-pair[data-complete="true"]{opacity:.45}
+.sia-slide .sia-attn-accumulator{position:absolute;left:875px;top:169px;width:135px;height:108px;background:color-mix(in srgb,var(--sia-blue) 13%,var(--sia-paper));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.sia-slide .sia-attn-accumulator strong{font-size:43px;font-weight:400}.sia-slide .sia-attn-accumulator span{font-size:18px;color:var(--sia-muted)}
+.sia-slide .sia-attn-final-output{position:absolute;left:1150px;top:340px;width:220px;height:95px;background:var(--sia-ink);color:var(--sia-paper);padding:18px 12px;text-align:center}
+.sia-slide .sia-attn-final-output b{display:block;font-size:28px;font-weight:400}.sia-slide .sia-attn-final-output span{display:block;font-size:18px;margin-top:10px}

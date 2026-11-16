@@ -1,358 +1,91 @@
-import { test, expect, type Page } from '@playwright/test';
+import {test,expect,type Page} from '@playwright/test';
+const viewer='/system-is-all-you-need?start=1',live='.page-incoming';
+async function ready(page:Page){await page.goto(viewer);await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true')}
+async function settle(page:Page){await expect.poll(()=>page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).length)).toBe(0)}
+async function jump(page:Page,id:string){await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();await settle(page)}
+async function hold(page:Page){await page.evaluate(()=>{const original=Element.prototype.animate;Element.prototype.animate=function(frames,options){const a=original.call(this,frames,options);a.pause();a.currentTime=0;return a}})}
+async function frame(page:Page,time:number){return page.locator(live).evaluate((root,time)=>{root.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=time});const slide=root.querySelector('.sia-slide')!,s=getComputedStyle(slide),old=document.querySelector('.page-outgoing');return{opacity:s.opacity,transform:s.transform,clip:s.clipPath,oldOpacity:old?getComputedStyle(old).opacity:'0',oldVisibility:old?getComputedStyle(old).visibility:'hidden',slides:root.querySelectorAll('.sia-slide').length,clones:document.querySelectorAll('.sia-transition-snapshot').length,sceneOpacity:root.querySelector('.sia-scene')?getComputedStyle(root.querySelector('.sia-scene')!).opacity:'1'}},time)}
+async function finish(page:Page){for(let i=0;i<3;i++){await page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).forEach(a=>a.finish()));await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.locator('.page-outgoing,[data-morph-surface]').count())break}await expect(page.locator('.page-outgoing,[data-morph-surface]')).toHaveCount(0)}
 
-const viewer = '/system-is-all-you-need?start=1';
-const live = '.page-incoming';
-
-async function staticBatch(page: Page) {
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('o');
-  await page.locator('[data-target="static"]').click();
-  await expect(page.locator(`${live} [data-slide-id="static"]`)).toBeVisible();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-}
-
-/** Freeze the actual animation, not an authored style, so keyboard navigation
- * must capture an intermediate visual pose. This avoids timing-sensitive sleeps. */
-async function freezeAt(page: Page, key: string, time: number) {
-  const selector = `${live} [data-morph="${key}"]`;
-  await expect.poll(() => page.locator(selector).evaluate(element => element.getAnimations().length)).toBeGreaterThan(0);
-  return page.locator(selector).evaluate((element, currentTime) => {
-    // Text boxes have separate compositor planes for paint and labels. Freeze
-    // the whole object at one time and measure its visible surface, not the
-    // already-settled layout dimensions of the unscaled text wrapper.
-    for (const animation of element.getAnimations({ subtree: true })) {
-      animation.pause();
-      animation.currentTime = currentTime;
-    }
-    const visible = element.querySelector('[data-morph-surface]') ?? element;
-    const { left, top, width, height } = visible.getBoundingClientRect();
-    return { left, top, width, height };
-  }, time);
-}
-
-function expectSamePose(actual: { left:number; top:number; width:number; height:number }, expected: typeof actual) {
-  for (const field of ['left','top','width','height'] as const)
-    expect(Math.abs(actual[field] - expected[field])).toBeLessThan(1);
-}
-
-test('cross-page morph starts at a running step transition, not its frozen endpoint', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await staticBatch(page);
-  await page.keyboard.press('ArrowRight');
-  const source = await freezeAt(page, 'batch-playhead', 375);
-  await page.keyboard.press('PageDown');
-  await expect(page.locator(`${live} [data-slide-id="continuous"]`)).toBeVisible();
-  const destination = await freezeAt(page, 'batch-playhead', 0);
-  expectSamePose(destination, source);
+test('every page boundary paints only the destination in both directions',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);
+ await page.keyboard.press('o');const count=await page.locator('.slide-list [data-target]').count();await page.keyboard.press('Escape');
+ for(const direction of ['PageDown','PageUp'])for(let i=1;i<count;i++){
+  await page.keyboard.press(direction);
+  expect(await page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).some(a=>a.effect instanceof KeyframeEffect&&a.effect.getKeyframes().some(f=>f.transform)))).toBe(true);
+  const scene=page.locator(`${live} .sia-scene`);if(await scene.count())expect(await scene.evaluate(e=>e.getAnimations().length),`${direction} ${i}: diagram entrance`).toBeGreaterThan(0);
+  const heading=page.locator(`${live} .sia-heading`);if(await heading.count())expect(await heading.locator('[data-reveal="heading"]').evaluateAll(es=>es.length>0&&es.every(e=>e.getAnimations().length>0)),`${direction} ${i}: title reveal`).toBe(true);
+  for(const time of [0,40,120,280,520,800,1400])expect(await frame(page,time),`${direction} ${i} ${time}ms`).toEqual({opacity:'1',transform:'none',clip:'none',oldOpacity:'0',oldVisibility:'hidden',slides:1,clones:0,sceneOpacity:'1'});
+  await finish(page);
+ }
 });
 
-test('interrupting a morph preserves the current request position and width on reverse navigation', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await staticBatch(page);
-  await page.keyboard.press('ArrowRight');
-  await page.keyboard.press('ArrowRight');
-  await page.keyboard.press('PageDown');
-  await expect(page.locator(`${live} [data-slide-id="continuous"]`)).toBeVisible();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  await page.keyboard.press('ArrowRight');
-  const source = await freezeAt(page, 'batch-request-D', 500);
-  await page.keyboard.press('PageUp');
-  await expect(page.locator(`${live} [data-slide-id="static"]`)).toBeVisible();
-  const destination = await freezeAt(page, 'batch-request-D', 0);
-  expectSamePose(destination, source);
+test('page title leads the primary diagram without fading the slide root',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);await page.keyboard.press('o');await page.locator('[data-target="roofline"]').click();
+ const timing=await page.locator(live).evaluate(root=>{const title=root.querySelector('.sia-heading')!,scene=root.querySelector('.sia-scene')!,delay=(e:Element)=>Number(e.getAnimations({subtree:true})[0].effect!.getTiming().delay);return{title:delay(title),scene:delay(scene),root:root.querySelector('.sia-slide')!.getAnimations().length}});
+ expect(timing.title).toBe(0);expect(timing.scene).toBeGreaterThan(timing.title);expect(timing.root).toBe(0);
 });
 
-test('reduced motion bypasses capture and morph animation and leaves a single usable layer', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await staticBatch(page);
-  await page.keyboard.press('PageDown');
-  await expect(page.locator(`${live} [data-slide-id="continuous"]`)).toBeVisible();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  await expect(page.locator('.page-transition')).toHaveAttribute('data-transition', 'none');
-  expect(await page.locator(live).getAttribute('data-morph-count')).toBeNull();
-  expect(await page.locator(live).evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+test('technical states retain clear diagrams without gray title descriptions',async({page})=>{
+ await ready(page);await page.keyboard.press('o');const slides=await page.locator('.slide-list [data-target]').evaluateAll(es=>es.map(e=>({id:(e as HTMLElement).dataset.target!})));await page.keyboard.press('Escape');
+ for(const slide of slides){await jump(page,slide.id);const steps=await page.locator('.step-dots span').count();for(let step=0;step<steps;step++){if(step)await page.keyboard.press('ArrowRight');const scene=page.locator(`${live} .sia-scene`);if(!await scene.count())continue;const info=await scene.evaluate(root=>({heroes:root.querySelectorAll('[data-hero],.sia-bm').length,paragraphs:root.querySelectorAll('p').length,copy:root.textContent!.replace(/\s/g,'').length}));await expect(page.locator(`${live} .sia-lead`)).toHaveCount(0);expect(info.heroes,`${slide.id}-${step}`).toBe(1);expect(info.paragraphs).toBe(0);expect(info.copy).toBeLessThan(220);}}
 });
 
-async function holdNewAnimations(page: Page) {
-  await page.evaluate(() => {
-    const animate = Element.prototype.animate;
-    Element.prototype.animate = function(keyframes, options) {
-      const animation = animate.call(this, keyframes, options);
-      animation.pause();
-      animation.currentTime = 0;
-      return animation;
-    };
-  });
-}
-
-async function assertPaintedFrame(page: Page, time: number) {
-  const frame = await page.evaluate(time => {
-    for (const animation of document.querySelector('.page-transition')!.getAnimations({ subtree: true })) {
-      animation.pause();
-      animation.currentTime = time;
-    }
-    const opacity = (element: Element | null) => {
-      if (!element) return null;
-      let value = 1;
-      for (let parent: Element | null = element; parent; parent = parent.parentElement)
-        value *= Number(getComputedStyle(parent).opacity);
-      return value;
-    };
-    const incoming = document.querySelector('.page-incoming')!;
-    return {
-      layer: opacity(incoming),
-      title: opacity(incoming.querySelector('.sia-heading,.sia-chapter-layout h1,.sia-cover-layout h1,.sia-closing-layout h1')),
-      scene: opacity(incoming.querySelector('.sia-scene,.sia-stage-reveal,.sia-chapter-object,.sia-chapter-photo')),
-      source: opacity(document.querySelector('.page-outgoing')),
-    };
-  }, time);
-  expect(frame.layer).toBe(1);
-  expect(frame.title).toBe(1);
-  expect(frame.scene).not.toBeNull();
-  expect(frame.scene!).toBeGreaterThanOrEqual(0);
-  expect(frame.scene!).toBeLessThanOrEqual(1);
-  expect(frame.source === null || frame.source === 0).toBe(true);
-}
-
-for (const [from, step, to] of [['request', 2, 'tokens'], ['stage', 1, 'request-title'], ['continuous', 3, 'flash-title']] as const) {
-  test(`${from} to ${to} paints a complete destination on the first frame without a blank entrance`, async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await page.goto(viewer);
-    await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready', 'true');
-    await page.keyboard.press('o');
-    await page.locator(`[data-target="${from}"]`).click();
-    for (let i = 0; i < step; i++) await page.keyboard.press('ArrowRight');
-    await expect(page.locator('.page-outgoing')).toHaveCount(0);
-    await holdNewAnimations(page);
-    await page.keyboard.press('PageDown');
-    await expect(page.locator(`${live} [data-slide-id="${to}"]`)).toBeVisible();
-    for (const time of [0, 40, 100, 200, 340, 500, 800]) await assertPaintedFrame(page, time);
-    // Reverse/forward before another paint must not replay a title entrance.
-    await page.keyboard.press('PageUp');
-    await page.keyboard.press('PageDown');
-    await assertPaintedFrame(page, 0);
-  });
-}
-
-test('shared attention morph keeps its title and SRAM context painted in every intermediate frame', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('o');
-  await page.locator('[data-target="standard"]').click();
-  await page.keyboard.press('ArrowRight');
-  await page.keyboard.press('ArrowRight');
-  await expect.poll(() => page.locator(live).evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
-  await holdNewAnimations(page);
-  await page.keyboard.press('PageDown');
-  await expect(page.locator(`${live} [data-slide-id="tiling"]`)).toBeVisible();
-  const object = page.locator(`${live} [data-morph="attn-q"]`);
-  const first = await object.boundingBox();
-  for (const time of [0, 40, 100, 200, 340, 500, 800]) {
-    await assertPaintedFrame(page, time);
-    await expect(page.locator(`${live} .sia-attn-sram`)).toHaveCSS('opacity', '1');
-  }
-  const last = await object.boundingBox();
-  expect(Math.abs(last!.x - first!.x)).toBeGreaterThan(5);
+test('roofline dot follows the ceiling throughout forward and reverse steps',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'roofline');
+ for(const key of ['ArrowRight','ArrowRight','ArrowLeft','ArrowLeft']){await page.keyboard.press(key);for(const time of [0,40,100,180,300,500,700]){const point=await page.locator(`${live} [data-motion="roofline"]`).evaluate((e,time)=>{e.getAnimations().forEach(a=>{a.pause();a.currentTime=time});const m=new DOMMatrix(getComputedStyle(e).transform);return{x:m.e,y:m.f}},time);expect(Math.abs(point.y-(point.x<=520?362-(point.x-65)*279/455:83))).toBeLessThan(.05)}await finish(page)}
 });
 
-test('rapid direction changes release temporary surfaces and restore authored attention paint', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('o');
-  await page.locator('[data-target="standard"]').click();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  for (const key of ['ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'PageUp', 'PageDown', 'ArrowRight', 'ArrowLeft', 'ArrowRight']) {
-    await page.keyboard.press(key);
-  }
-  await expect(page.locator(`${live} [data-slide-id="tiling"]`)).toBeVisible();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  await expect(page.locator('[data-morph-surface]')).toHaveCount(0);
-  await expect.poll(() => page.locator(live).evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
-  const transparentInputs = await page.locator(`${live} .sia-attn-input`).evaluateAll(elements => elements.filter(element => getComputedStyle(element).backgroundColor === 'rgba(0, 0, 0, 0)').length);
-  expect(transparentInputs).toBe(0);
+test('one sampled glyph lands precisely and each round changes the distribution',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'generation');const distributions=[];
+ for(let step=0;step<5;step++){if(step)await page.keyboard.press('ArrowRight');distributions.push(await page.locator(`${live} .sia-probability`).evaluateAll(es=>es.map(e=>e.getAttribute('style')).join('|')));await frame(page,500);await expect(page.locator(`${live} [data-motion="token"] text`)).toHaveCount(1);await expect(page.locator('.sia-sampled-token')).toHaveCount(0);await frame(page,1100);const position=await page.locator(`${live} [data-motion="token"]`).evaluate(e=>{const m=new DOMMatrix(getComputedStyle(e).transform);return{x:m.e,y:m.f,target:Number((e as HTMLElement).dataset.x)}});expect(position.x).toBeCloseTo(position.target,1);expect(position.y).toBeCloseTo(447,1);await finish(page)}expect(new Set(distributions).size).toBe(5);
 });
 
-test('the destination stays mounted and painted through every real frame of morph cleanup', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready', 'true');
-  await page.keyboard.press('o');
-  await page.locator('[data-target="standard"]').click();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  await page.evaluate(() => {
-    type Frame = { title: number; scene: number; source: number | null; sameNode: boolean; animations: number };
-    const tracking = { frames: [] as Frame[], active: true };
-    (window as unknown as { paintTracking: typeof tracking }).paintTracking = tracking;
-    let target: Element | null = null;
-    const opacity = (element: Element | null) => {
-      if (!element) return 0;
-      let value = 1;
-      for (let parent: Element | null = element; parent; parent = parent.parentElement)
-        value *= Number(getComputedStyle(parent).opacity);
-      return value;
-    };
-    const tick = () => {
-      if (!tracking.active) return;
-      const incoming = document.querySelector('.page-incoming');
-      if (incoming?.querySelector('[data-slide-id="tiling"]')) {
-        target ??= incoming;
-        const outgoing = document.querySelector('.page-outgoing');
-        tracking.frames.push({
-          title: opacity(incoming.querySelector('.sia-heading')),
-          scene: opacity(incoming.querySelector('.sia-scene')),
-          source: outgoing ? opacity(outgoing) : null,
-          sameNode: incoming === target,
-          animations: incoming.getAnimations({ subtree: true }).length,
-        });
-      }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-  await page.keyboard.press('PageDown');
-  await page.waitForFunction(() => (window as unknown as { paintTracking: { frames: unknown[] } }).paintTracking.frames.length >= 60);
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  const frames = await page.evaluate(() => {
-    const tracking = (window as unknown as { paintTracking: { active: boolean; frames: { title:number; scene:number; source:number|null; sameNode:boolean; animations:number }[] } }).paintTracking;
-    tracking.active = false;
-    return tracking.frames;
-  });
-  expect(frames.some(frame => frame.animations > 0)).toBe(true);
-  expect(frames.some(frame => frame.animations === 0)).toBe(true);
-  expect(frames.every(frame => frame.title === 1 && frame.scene === 1 && frame.sameNode && (frame.source === null || frame.source === 0))).toBe(true);
+test('GPU camera expands the selected SM without shrinking its settled labels',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'gpu');await page.keyboard.press('ArrowRight');const lens=page.locator(`${live} [data-motion-id="gpu-camera"]`);expect(await lens.evaluate(e=>e.getAnimations().length)).toBeGreaterThan(0);await frame(page,1000);await finish(page);await page.keyboard.press('ArrowRight');await settle(page);const info=await lens.evaluate(e=>{const m=new DOMMatrix(getComputedStyle(e).transform);return{scale:m.a,tracking:getComputedStyle(e.querySelector('text')!).letterSpacing}});expect(info.scale).toBeCloseTo(8.8);expect(info.tracking).toBe('normal');
 });
 
-
-test('all page boundaries paint only the destination throughout forward and reverse motion', async ({page}) => {
-  await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  const count=await page.evaluate(async()=>{const {systemIsAllYouNeed}=await import('/decks/System-Is-All-You-Need/deck.tsx');return systemIsAllYouNeed.slides.length;});
-  await holdNewAnimations(page);
-  for(const direction of ['PageDown','PageUp']) {
-    for(let index=1;index<count;index++) {
-      await page.keyboard.press(direction);
-      const observation=await page.locator(live).evaluate(element=>{
-        const animations=element.getAnimations({subtree:true});
-        return {count:animations.length,
-          geometry:animations.some(animation=>animation.effect instanceof KeyframeEffect&&animation.effect.getKeyframes().some(frame=>frame.transform))};
-      });
-      expect(observation.count,`${direction} boundary ${index}`).toBeGreaterThan(0);
-      expect(observation.geometry,`${direction} boundary ${index} has spatial motion`).toBe(true);
-      for(const time of [0,40,120,280,520,800,1200]) {
-        const frame=await page.locator(live).evaluate((element,time)=>{
-          element.getAnimations({subtree:true}).forEach(animation=>animation.currentTime=time);
-          const slide=element.querySelector('.sia-slide')!;
-          const paint=getComputedStyle(slide);
-          const outgoing=document.querySelector('.page-outgoing');
-          return {copies:document.querySelectorAll('.sia-transition-snapshot').length,
-            slides:element.querySelectorAll('.sia-slide').length,
-            clip:paint.clipPath,opacity:paint.opacity,transform:paint.transform,
-            source:outgoing?getComputedStyle(outgoing).opacity:'0'};
-        },time);
-        expect(frame,`${direction} boundary ${index} at ${time}ms`).toEqual({copies:0,slides:1,clip:'none',opacity:'1',transform:'none',source:'0'});
-      }
-      await page.locator(live).evaluate(element=>element.getAnimations({subtree:true}).forEach(animation=>animation.finish()));
-      await expect(page.locator('.page-outgoing,.sia-transition-snapshot,[data-morph-surface]')).toHaveCount(0);
-    }
-  }
+test('static batching final beat isolates the blocked slot; continuous keeps the same time',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'static');for(let i=0;i<2;i++){await page.keyboard.press('ArrowRight');await settle(page)}await page.keyboard.press('ArrowRight');expect(await page.locator(`${live} [data-morph="batch-idle-A"]`).evaluate(e=>e.getAnimations().length)).toBeGreaterThan(0);await expect(page.locator(`${live} [data-build="batch-wait"]`)).toHaveAttribute('data-visible','true');await settle(page);await page.keyboard.press('PageDown');await expect(page.locator(`${live} .sia-bm`)).toHaveAttribute('data-time','10');
 });
 
-test('generation recomputes probabilities and animates the sampled token',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  await page.keyboard.press('o'); await page.locator('[data-target="generation"]').click();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  const distributions=[];
-  for(let step=0;step<5;step++) {
-    if(step) await page.keyboard.press('ArrowRight');
-    distributions.push(await page.locator(`${live} .sia-probability`).evaluateAll(elements=>elements.map(e=>e.getAttribute('style')).join('|')));
-    if(step) expect(await page.locator(`${live} .sia-sampled-token`).evaluate(e=>e.getAnimations().length)).toBeGreaterThan(0);
-    await expect(page.locator(`${live} [data-build="generation-eos"]`)).toHaveAttribute('data-visible',String(step===4));
-  }
-  expect(new Set(distributions).size).toBe(5);
+test('rapid reversal preserves an interrupted batching playhead and releases temporary planes',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'static');await page.keyboard.press('ArrowRight');
+ const selector=`${live} [data-morph="batch-playhead"]`;
+ const source=await page.locator(selector).evaluate(e=>{e.getAnimations().forEach(a=>{a.pause();a.currentTime=300});return e.getBoundingClientRect().left});
+ await hold(page);await page.keyboard.press('PageDown');const target=await page.locator(selector).evaluate(e=>e.getBoundingClientRect().left);expect(Math.abs(source-target)).toBeLessThan(1);await finish(page);
+ for(const key of ['ArrowRight','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowLeft'])await page.keyboard.press(key);await finish(page);await expect(page.locator('[data-morph-surface],.sia-transition-snapshot')).toHaveCount(0);
 });
 
-test('growth retains P7 and P2 in place across prefix sharing',async({page})=>{
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  await page.keyboard.press('o'); await page.locator('[data-target="growth"]').click();
-  for(let i=0;i<3;i++)await page.keyboard.press('ArrowRight');
-  const source=await page.locator(`${live} [data-morph="kv-page-0"]`).boundingBox();
-  const sourcePrivate=await page.locator(`${live} [data-morph="kv-page-4"]`).boundingBox();
-  await page.keyboard.press('PageDown');
-  expectSamePose((({x,y,width,height})=>({left:x,top:y,width,height}))((await page.locator(`${live} [data-morph="kv-page-0"]`).boundingBox())!),(({x,y,width,height})=>({left:x,top:y,width,height}))(source!));
-  expect(await page.locator(`${live} [data-morph="kv-page-4"]`).boundingBox()).toEqual(sourcePrivate);
-  await expect(page.locator(`${live} [data-build="sharing-request-b"]`)).toHaveAttribute('data-visible','false');
+test('KV growth retains fixed capacity and sharing reveals B only on its own beat',async({page})=>{
+ await ready(page);await jump(page,'growth');for(let i=0;i<4;i++){if(i)await page.keyboard.press('ArrowRight');await expect(page.locator(`${live} [data-capacity="16"]:not(.sia-block-inset)`)).toHaveCount(1);await expect(page.locator(`${live} [data-capacity]:not(.sia-block-inset)`)).toHaveAttribute('data-block-id',i<2?'P7':'P2')}
+ await jump(page,'sharing');await expect(page.locator(`${live} [data-build="sharing-branch-b"]`)).toHaveCSS('opacity','0');await page.keyboard.press('ArrowRight');await expect(page.locator(`${live} [data-build="sharing-branch-b"]`)).toHaveAttribute('data-visible','true');await expect(page.locator(`${live} .sia-focus-block`)).toHaveCount(1);
 });
 
-test('system overview reveals one stage per manual step',async({page})=>{
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  await page.keyboard.press('o'); await page.locator('[data-target="systems"]').click();
-  for(let step=0;step<5;step++) {
-    if(step)await page.keyboard.press('ArrowRight');
-    for(let stage=0;stage<5;stage++)await expect(page.locator(`${live} [data-build="system-stage-${stage}"]`)).toHaveAttribute('data-visible',String(stage<=step));
-  }
+test('prefill and decode occupy separate pages and decode has one evolving cache',async({page})=>{
+ await ready(page);await jump(page,'phases');await expect(page.locator(`${live} h1`)).toHaveText('Prefill');await page.keyboard.press('PageDown');await expect(page.locator(`${live} h1`)).toHaveText('Decode');for(let i=0;i<3;i++){if(i)await page.keyboard.press('ArrowRight');await expect(page.locator(`${live} [data-hero="decode-cache"]`)).toHaveCount(1);await expect(page.locator(`${live} [data-build="decode-output-${i}"]`)).toHaveCount(1)}
 });
 
-test('a partially revealed stage keeps its visible pose when the next build interrupts it',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  await page.keyboard.press('o'); await page.locator('[data-target="systems"]').click();
-  await expect(page.locator('.page-outgoing')).toHaveCount(0);
-  await page.keyboard.press('ArrowRight');
-  const stage=page.locator(`${live} [data-build="system-stage-1"]`);
-  const source=await stage.evaluate(element=>{
-    for(const animation of element.getAnimations()){animation.pause();animation.currentTime=340;}
-    const {left,top,width,height}=element.getBoundingClientRect();
-    return {left,top,width,height};
-  });
-  await holdNewAnimations(page);
-  await page.keyboard.press('ArrowRight');
-  const destination=await stage.evaluate(element=>{
-    const {left,top,width,height}=element.getBoundingClientRect();
-    return {left,top,width,height};
-  });
-  expectSamePose(destination,source);
+test('six chapter photographs remain distinct and decoded at high resolution',async({page})=>{
+ await ready(page);const sources=[];for(const id of ['request-title','gpu-title','batch-title','flash-title','paged-title','systems-title']){await jump(page,id);const info=await page.locator(`${live} .sia-chapter-photo`).evaluate(async e=>{const i=e as HTMLImageElement;await i.decode();return{src:i.src,width:i.naturalWidth,height:i.naturalHeight}});expect(info.width).toBeGreaterThanOrEqual(3500);expect(info.width/info.height).toBeCloseTo(16/9,2);sources.push(info.src);await expect(page.locator(`${live} .sia-chapter-subtitle,.sia-chapter-topic`)).toHaveCount(0)}expect(new Set(sources).size).toBe(6);
 });
 
-
-test('new-page title, diagram and fine labels enter in separate beats without fading the page',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  await holdNewAnimations(page);
-  await page.keyboard.press('o'); await page.locator('[data-target="roofline"]').click();
-  const timing=await page.locator(live).evaluate(element=>{
-    const delay=(node:Element)=>Number(node.getAnimations()[0].effect!.getTiming().delay);
-    const title=element.querySelector('.sia-heading')!,diagram=element.querySelector('.sia-scene')!;
-    const labels=[...diagram.querySelectorAll('text')].filter(node=>node.getAnimations().length);
-    const slide=element.querySelector('.sia-slide')!;
-    return {title:delay(title),diagram:delay(diagram),details:labels.map(delay),rootOpacity:getComputedStyle(slide).opacity,rootAnimations:slide.getAnimations().length,copies:element.querySelectorAll('.sia-transition-snapshot').length};
-  });
-  expect(timing.title).toBe(0);expect(timing.diagram).toBeGreaterThan(timing.title);
-  expect(Math.min(...timing.details)).toBeGreaterThan(timing.diagram);
-  expect(new Set(timing.details).size).toBeGreaterThan(1);
-  expect(timing.rootOpacity).toBe('1');expect(timing.rootAnimations).toBe(0);expect(timing.copies).toBe(0);
+test('reduced motion leaves exactly one usable layer and no active animations',async({page})=>{
+ await ready(page);await jump(page,'static');await page.keyboard.press('PageDown');await expect(page.locator('.page-outgoing')).toHaveCount(0);expect(await page.locator(live).evaluate(e=>e.getAnimations({subtree:true}).length)).toBe(0);await expect(page.locator(`${live} .sia-slide`)).toHaveAttribute('data-still','true');
 });
 
-test('six chapter covers use distinct decoded high-resolution cosmic photographs',async({page})=>{
-  await page.goto(viewer);
-  await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true');
-  const covers=['request-title','gpu-title','batch-title','flash-title','paged-title','systems-title'];
-  const sources=[];
-  for(const id of covers){
-    await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();
-    const photo=page.locator(`${live} .sia-chapter-photo`);
-    const info=await photo.evaluate(async image=>{const img=image as HTMLImageElement;await img.decode();return{src:img.src,width:img.naturalWidth,height:img.naturalHeight};});
-    expect(info.width).toBeGreaterThanOrEqual(3500);expect(info.width/info.height).toBeCloseTo(16/9,2);sources.push(info.src);
-    await expect(page.locator(`${live} .sia-chapter-photo-credit a`)).toHaveAttribute('href',/^https:\/\/science.nasa.gov\/asset\/webb\//);
-  }
-  expect(new Set(sources).size).toBe(6);
+async function surfacePose(page:Page,id:string){return page.locator(`${live} [data-motion-id="${id}"]`).evaluate(root=>{const r=(root.querySelector('[data-motion-surface]')??root).getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}})}
+function samePose(a:{x:number;y:number;width:number;height:number},b:typeof a){for(const k of ['x','y','width','height'] as const)expect(Math.abs(a[k]-b[k]),k).toBeLessThan(1)}
+
+test('matrix-to-tile handoff starts at the actual visible surface and reverses without a jump',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'standard');for(let i=0;i<2;i++){await page.keyboard.press('ArrowRight');await settle(page)}const source=await surfacePose(page,'attention-work');await hold(page);await page.keyboard.press('PageDown');samePose(await surfacePose(page,'attention-work'),source);
+ await page.locator(`${live} [data-motion-id="attention-work"]`).evaluate(e=>e.getAnimations().forEach(a=>a.currentTime=280));const middle=await surfacePose(page,'attention-work');await page.keyboard.press('PageUp');samePose(await surfacePose(page,'attention-work'),middle);await finish(page);
+});
+
+test('shared and private blocks move between main and context views without snapping',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'growth');for(let i=0;i<3;i++){await page.keyboard.press('ArrowRight');await settle(page)}const shared=await surfacePose(page,'block-P7'),privateBlock=await surfacePose(page,'block-P2');await hold(page);await page.keyboard.press('PageDown');samePose(await surfacePose(page,'block-P7'),shared);samePose(await surfacePose(page,'block-P2'),privateBlock);await finish(page);
+});
+
+test('advancing during a token flight preserves its pose while it settles into the sentence',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'generation');await page.keyboard.press('ArrowRight');const glyph=page.locator(`${live} [data-motion-id="output-1"]`);const source=await glyph.evaluate(e=>{e.getAnimations().forEach(a=>{a.pause();a.currentTime=420});return getComputedStyle(e).transform});await hold(page);await page.keyboard.press('ArrowRight');expect(await glyph.evaluate(e=>getComputedStyle(e).transform)).toBe(source);await finish(page);
 });

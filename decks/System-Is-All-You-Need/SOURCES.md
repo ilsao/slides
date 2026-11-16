@@ -162,3 +162,15 @@ b     = 2 bytes/element (BF16)
 每次更新共同基準 m，保存 `ℓ = Σ exp(score − m)` 與 `o = Σ exp(score − m) × v`，最後 `O = o / ℓ`。三步顯示的 `(m, ℓ, o)` 分別約為 `(2, 1.368, 4.736)`、`(3, 1.553, 2.892)`、`(4, 1.707, 3.740)`，最終 O 約為 2.192。畫面顯示四捨五入值，計算採完整精度。
 
 實際 attention 的 V 與輸出是向量，教學算例只保留一個維度以看清「重新縮放舊摘要，再累加新 tile」；它不將完整 N × N scores 常駐 HBM。此處說明數學等價，並不宣稱浮點結果逐位元一致。
+
+
+## 2026-11-16 · 教學圖重畫參考
+
+本輪先檢視下列作者的教學圖／動圖，再重畫可編輯SVG。頁面、借鑑的教學方式與實際改圖對照記於 [TEACHING_REFERENCES.md](./TEACHING_REFERENCES.md)。
+
+- [3Blue1Brown：Attention in transformers, step-by-step](https://www.3blue1brown.com/lessons/attention/)：以具體tokens、Q/K比對、attention pattern與V的加權整合建立連結。
+- [Hugging Face：Continuous batching from first principles](https://huggingface.co/blog/continuous_batching) 與 [How caching works](https://huggingface.co/docs/transformers/main/en/cache_explanation)：當前Q、歷史／新增K/V、下一token的關係。
+- [NVIDIA CUDA Programming Model](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html)、[Hardware multithreading](https://docs.nvidia.com/cuda/cuda-programming-guide/03-advanced/advanced-kernel-programming.html)、[GPU Performance Background](https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html)、[Ampere Architecture](https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/)：包含關係、SM內的元件及運算／資料供給瓶頸。圖中元件數量不按實際硬體比例。
+- [Tri Dao / Stanford CRFM：FlashAttention-2](https://crfm.stanford.edu/2023/07/17/flash2.html)：HBM／SRAM的資料位置、Q/K/V分塊與摘要重縮放。頁面重畫的是FlashAttention共通機制，不宣稱實作了FA2的所有work partitioning優化。
+- [vLLM：PagedAttention introduction](https://vllm-project.github.io/2023/06/20/vllm.html)：logical blocks、block table、physical blocks及sharing的逐步示例。
+- [Apple WWDC23：Animate with springs](https://developer.apple.com/videos/play/wwdc2023/10158/)：阻尼響應與中斷時的位置／速度接續，僅作動效設計參考。

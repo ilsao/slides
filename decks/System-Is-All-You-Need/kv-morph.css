@@ -51,3 +51,26 @@
 .sia-slide .sia-growth-pool i{font-style:normal;border:1px solid var(--sia-line);padding:10px 22px;font-size:19px}
 .sia-slide .sia-kv-sharing .sia-kv-microtokens{gap:4px}
 .sia-slide .sia-kv-microtokens i[data-build]{transition:background-color 620ms ease!important}
+
+/* Logical identities stay readable while data fragments move. */
+.sia-slide .sia-kv-paging .sia-kv-logical{border-color:var(--sia-line);padding-left:17px}
+.sia-slide .sia-kv-paging[data-kv-step="1"] .sia-kv-logical span{opacity:1}
+.sia-slide .sia-kv-paging .sia-kv-logical small{opacity:0}
+.sia-slide .sia-kv-paging .sia-kv-logical[data-mapped="true"] small{opacity:1}
+.sia-slide .sia-kv-logical[data-active="true"],.sia-slide .sia-kv-physical-slot[data-active="true"]{border:2px solid var(--sia-blue);background:color-mix(in srgb,var(--sia-blue) 5%,transparent)}
+.sia-slide .sia-kv-map-table>div[data-active="true"]{color:var(--sia-blue);background:color-mix(in srgb,var(--sia-blue) 7%,transparent)}
+.sia-slide .sia-kv-physical-slot>span{font-size:20px;top:4px;color:var(--sia-muted)}
+.sia-slide .sia-kv-physical-slot[data-active="true"]>span{color:var(--sia-blue)}
+.sia-slide .sia-kv-map-wire path{stroke-width:1.4;opacity:.2}
+.sia-slide .sia-kv-map-wire circle{fill:var(--sia-blue);opacity:.2}
+.sia-slide .sia-kv-map-wire[data-active="true"] path{stroke-width:2.5;opacity:1}
+.sia-slide .sia-kv-map-wire[data-active="true"] circle{opacity:1}
+.sia-slide .sia-kv-sharing-wires path{stroke-width:1.8}
+.sia-slide .sia-kv-token-block{position:absolute;width:271px;height:166px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:5px;padding:12px;border:1px solid var(--sia-line);border-top:2px solid var(--sia-ink);background:var(--sia-paper);z-index:3}
+.sia-slide .sia-kv-token-block>i{display:grid;place-items:center;border:1px solid #bdc7d4;color:var(--sia-muted);font-size:18px;font-style:normal;font-variant-numeric:tabular-nums}
+.sia-slide .sia-kv-token-block>i[data-filled="true"]{background:var(--sia-blue);color:var(--sia-paper);border-color:var(--sia-blue)}
+.sia-slide .sia-allocation-chip{position:absolute;display:grid;place-items:center;border:1px solid var(--sia-line);background:var(--sia-paper);font-size:22px;z-index:5}
+.sia-slide .sia-growth-pool i{width:68px;padding:10px 0;text-align:center}
+.sia-slide .sia-kv-current-query,.sia-slide .sia-kv-query-wire{transition:opacity 460ms ease}
+
+.sia-slide .sia-kv-map-table header{height:66px;display:flex;align-items:center;padding:0}

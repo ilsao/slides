@@ -1,8 +1,8 @@
 .sia-slide .sia-bm{position:relative;width:1408px;height:510px;color:var(--sia-ink,#17191c);font-family:inherit}
 .sia-slide .sia-bm :is(div,span,p){box-sizing:border-box}
 .sia-slide .sia-bm-heading{position:absolute;left:94px;top:12px;font-size:24px;line-height:1.3;font-weight:500}
-.sia-slide .sia-bm-explanation{position:absolute;left:94px;top:57px;width:1000px;font-size:18px;line-height:1.3;color:var(--sia-muted);margin:0}
-.sia-slide .sia-bm-status{position:absolute;left:1200px;top:327px;width:172px;font-size:17px;line-height:1.4;color:var(--sia-muted)}
+.sia-slide .sia-bm-explanation{position:absolute;left:94px;top:57px;width:1000px;font-size:21px;line-height:1.3;color:var(--sia-muted);margin:0}
+.sia-slide .sia-bm-status{position:absolute;left:1200px;top:327px;width:172px;font-size:20px;line-height:1.4;color:var(--sia-muted)}
 .sia-slide .sia-bm-status>div{display:flex;justify-content:space-between;gap:8px;margin-bottom:14px}
 .sia-slide .sia-bm-status strong{font-weight:400;color:var(--sia-ink);white-space:nowrap}
 .sia-slide .sia-bm-queue-title{position:absolute;left:1200px;top:15px;white-space:nowrap;font-size:20px;line-height:1.3;color:var(--sia-muted,#777d87)}
@@ -15,8 +15,14 @@
 .sia-slide .sia-bm-lane-label{position:absolute;left:20px;width:46px;text-align:center;font-size:18px;line-height:30px;color:#9299a3;font-variant-numeric:tabular-nums;letter-spacing:.3px}
 .sia-slide .sia-bm-idle{position:absolute;overflow:hidden;background:repeating-linear-gradient(132deg,transparent 0 9px,#d7dce3 9px 10px)}
 .sia-slide .sia-bm-idle span{position:absolute;right:19px;top:19px;font-size:19px;line-height:26px;color:#7b838f;background:#f0f1f2;padding:0 8px}
-.sia-slide .sia-bm-request{position:absolute;overflow:hidden;border-width:1px;border-style:solid}
-.sia-slide .sia-bm-request-progress{position:absolute;inset:0;background:#b9cce5;transform-origin:left center;transition:transform .76s cubic-bezier(.22,.72,.18,1)}
+.sia-slide .sia-bm-request{position:absolute;overflow:hidden;border-width:1.5px;border-style:solid;z-index:2}
+.sia-slide .sia-bm-span{position:absolute;overflow:hidden;border:1px solid #c2cfdf;transform-origin:left center}
+.sia-slide .sia-bm-span[data-admitting="true"]{animation:sia-batch-extend 300ms cubic-bezier(.25,.1,.25,1) 520ms backwards}
+@keyframes sia-batch-extend{from{clip-path:inset(0 calc(100% - 76px) 0 0)}to{clip-path:inset(0)}}
+.sia-slide .sia-bm-wait-wire{position:absolute;inset:0;width:1408px;height:510px;pointer-events:none;z-index:4}
+.sia-slide .sia-bm-wait-wire path{fill:none;stroke:var(--sia-blue);stroke-width:2;stroke-dasharray:1200;animation:sia-batch-wait 480ms cubic-bezier(.25,.1,.25,1) backwards}
+@keyframes sia-batch-wait{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}
+.sia-slide .sia-bm-request-progress{position:absolute;inset:0;background:#b9cce5;transform-origin:left center;transition:transform 520ms cubic-bezier(.25,.1,.25,1)}
 .sia-slide .sia-bm-request-progress::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--request-color)}
 .sia-slide .sia-bm-request-id{position:absolute;left:18px;top:17px;color:var(--sia-ink,#17191c);font-size:24px;line-height:28px;font-weight:500}
 .sia-slide .sia-bm-request-duration{position:absolute;right:18px;top:19px;color:#465467;font-size:21px;line-height:25px;font-variant-numeric:tabular-nums;font-weight:400}
@@ -28,7 +34,7 @@
 .sia-slide .sia-bm-playhead i{display:block;position:absolute;top:-3px;left:-4px;width:9px;height:7px;background:var(--sia-blue,#376bba);clip-path:polygon(0 0,100% 0,50% 100%)}
 .sia-slide .sia-bm-unit{position:absolute;left:1121px;top:416px;font-size:17px;line-height:1.3;color:var(--sia-muted,#777d87)}
 .sia-slide .sia-bm-rule{position:absolute;left:94px;top:459px;width:1278px;height:1px;background:var(--sia-line,#d9dce1)}
-.sia-slide .sia-bm-footnote{position:absolute;left:94px;top:481px;margin:0;font-size:16px;line-height:1.3;letter-spacing:.1px;color:var(--sia-muted,#777d87)}
+.sia-slide .sia-bm-footnote{position:absolute;left:94px;top:481px;margin:0;font-size:18px;line-height:1.3;letter-spacing:.1px;color:var(--sia-muted,#777d87)}
 .sia-slide .sia-bm-caption{position:absolute;right:36px;top:477px;margin:0;max-width:500px;text-align:right;font-size:23px;line-height:1.3;letter-spacing:.2px;font-weight:400}
 .sia-slide .sia-bm[data-policy="continuous"] .sia-bm-caption{color:var(--sia-blue,#376bba)}
 .sia-slide[data-still="true"] .sia-bm *{animation:none!important;transition:none!important}

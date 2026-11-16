@@ -42,17 +42,16 @@ export function GpuArchitecture({ step }: SceneProps) {
       <rect x="217" y="369" width="85" height="25" fill="#e6e9ed" />
       <text x="259" y="387" textAnchor="middle" className="sia-gb-micro" fill={muted}>L2 CACHE</text>
     </g>
-    <g className="sia-gb-sm-shell" style={{ opacity: step >= 1 ? 1 : 0, transform: step>=1?'translate(0px,0px) scale(1)':'translate(-309px,-27px) scale(.08)' }}>
-      <path d="M 224 188 L 636 48 M 224 234 L 636 428" fill="none" stroke="#bcc8d7" />
-      <rect x="636" y="48" width="744" height="380" fill={paper} stroke="#aab6c5" />
-      <path d="M 636 112 H 1380" stroke={line} />
-      <text x="664" y="95" className="sia-gb-label" fill={ink}>Streaming Multiprocessor</text>
-      <text x="1352" y="94" textAnchor="end" className="sia-gb-micro" fill={blue}>ONE SM</text>
-      <g data-build="sm-interior" data-visible={step>=2} data-delay="100">
+    <g className="sia-gb-sm-shell" style={{opacity:step>=1?1:0}}>
+      <g data-motion="sm-panel" data-motion-key="open" data-motion-active={step===1} style={{transform:'translate(636px,48px)'}}><rect width="744" height="380" fill={paper} stroke="#aab6c5" /></g>
+      <g data-build="sm-connection" data-visible={step>=1} data-delay="820"><path d="M254 188L636 48M254 234L636 428" fill="none" stroke="#8d9fb7" strokeWidth="1.6"/></g>
+      <g data-build="sm-title" data-visible={step>=1} data-delay="760"><path d="M636 112H1380" stroke={line}/><text x="664" y="95" className="sia-gb-label" fill={ink}>Streaming Multiprocessor</text><text x="1352" y="94" textAnchor="end" className="sia-gb-micro" fill={blue}>ONE SM</text></g>
+      <g data-build="sm-schedulers" data-visible={step>=2}>
         <rect x="664" y="132" width="688" height="34" fill={soft} stroke={line} />
         {[836, 1008, 1180].map(x => <path key={x} d={`M ${x} 132 V 166`} stroke={line} />)}
         <rect x="908" y="135" width="200" height="28" fill={soft} />
         <text x="1008" y="156" textAnchor="middle" className="sia-gb-small" fill={ink}>Warp schedulers</text>
+      </g><g data-build="sm-cores" data-visible={step>=2} data-delay="150">
         {Array.from({ length: 48 }, (_, i) => <rect key={i} x={664 + i % 12 * 31} y={189 + Math.floor(i / 12) * 24} width="23" height="16" fill={i % 3 === 0 ? '#6685ad' : '#91a6c1'} />)}
         <path d="M 1056 184 V 310" stroke={line} />
         {Array.from({ length: 8 }, (_, i) => <g key={i} transform={`translate(${1090 + i % 4 * 67} ${189 + Math.floor(i / 4) * 45})`}>
@@ -64,6 +63,7 @@ export function GpuArchitecture({ step }: SceneProps) {
         <text x="844" y="316" textAnchor="middle" className="sia-gb-micro" fill={muted}>一般整數與浮點運算</text>
         <text x="1214" y="294" textAnchor="middle" className="sia-gb-small" fill={ink}>Tensor cores</text>
         <text x="1214" y="316" textAnchor="middle" className="sia-gb-micro" fill={muted}>矩陣乘加</text>
+      </g><g data-build="sm-memory" data-visible={step>=2} data-delay="300">
         <rect x="664" y="334" width="688" height="31" fill="#eceef0" stroke={line} />
         <text x="1008" y="356" textAnchor="middle" className="sia-gb-small" fill={muted}>Register file</text>
         <rect x="664" y="380" width="688" height="31" fill="#e3e8ef" stroke="#ccd4de" />
@@ -124,13 +124,15 @@ export function MemoryHierarchy({ step }: SceneProps) {
     <text x="72" y="49" className="sia-gb-small" fill={muted}>低延遲</text><text x="72" y="83" className="sia-gb-micro" fill={muted}>小容量</text>
     <path d="M 118 368 V 123 m -6 9 6-9 6 9" stroke={muted} fill="none"/>
     <text x="72" y="415" className="sia-gb-small" fill={muted}>大容量</text><text x="72" y="449" className="sia-gb-micro" fill={muted}>較高延遲</text>
+    <path d="M674 8L1139 412H209Z" fill="none" stroke={line} strokeWidth="1.5"/>
+    {[109,210,311].map(y=><path key={y} d={`M${cx-half(y)} ${y}H${cx+half(y)}`} stroke={line} strokeWidth="1.2"/>)}
     {levels.map(([name,scope,detail],i)=>{
       const y1=top+i*band,y2=y1+band-5,visible=i===0||step>=1&&i<3||step>=2;
       const left=cx-half(y1),right=cx+half(y1),bottomLeft=cx-half(y2),bottomRight=cx+half(y2);
       return <g key={name} data-build={`memory-level-${i}`} data-visible={visible} data-delay={i*85}>
         <path d={`M${left} ${y1}H${right}L${bottomRight} ${y2}H${bottomLeft}Z`} fill={i===3?'#dfe7f1':i===0?'#d5e0ee':'#e9edf2'} stroke={i===0?blue:'#bdc9d8'}/>
         <text x={cx} y={y1+(i===0?70:55)} textAnchor="middle" className="sia-gb-label" fill={ink}>{name}</text>
-        {i>0&&<text x={cx} y={y1+82} textAnchor="middle" className="sia-gb-micro" fill={muted}>{scope}</text>}
+        {i===3&&<text x={cx} y={y1+82} textAnchor="middle" className="sia-gb-micro" fill={muted}>{scope}</text>}
         <path d={`M${cx+half(y1+61)+13} ${y1+61}H1188`} stroke={line}/><text x="1210" y={y1+56} className="sia-gb-small" fill={ink}>{i===0?scope:scope==='HBM / GDDR'?'Off-chip':scope}</text>
         <text x="1210" y={y1+83} className="sia-gb-micro" fill={muted}>{i===3?'模型與 KV 的主要存放處':i===1?'Shared：block / L1：SM':detail}</text>
       </g>;
@@ -147,20 +149,20 @@ export function WhyBatch({ step }: SceneProps) {
       <path d={`M ${48 + i * 18} 102 V 390 M 48 ${102 + i * 18} H 336`} />
     </g>)}
     <text x="192" y="266" textAnchor="middle" className="sia-gb-matrix-symbol" fill="#47678f">W</text>
-    <path d="M 336 246 H 566" stroke={blue} strokeWidth="1.5" />
+    <path d="M336 246H566" stroke={blue} strokeWidth="2"/>
+    <g key={`weight-read-${step}`} className="sia-gb-weight-read"><rect x="330" y="238" width="16" height="16" fill={blue}/></g>
     <path d="M 559 241 l 7 5 l -7 5" stroke={blue} strokeWidth="1.5" fill="none" />
     <text x="451" y="222" textAnchor="middle" className="sia-gb-small" fill={muted}>權重重用</text>
     <text x="623" y="49" className="sia-gb-label" fill={ink}>Requests</text>
     <text x="1360" y="49" textAnchor="end" className="sia-gb-small" fill={muted}>Next token</text>
     <path d="M 623 76 H 1360 M 623 422 H 1360" stroke={line} />
-    {Array.from({ length: 4 }, (_, i) => <g key={i} className="sia-gb-reveal" style={{ opacity: step >= 1 || i === 0 ? 1 : .12 }}>
-      <path d={`M 566 246 V ${126 + i * 80} H 604`} fill="none" stroke="#99aec9" />
+    {Array.from({ length: 4 }, (_, i) => <g key={i} data-build={`batch-row-${i}`} data-visible={step>=1||i===0} data-delay="230">
+      <path key={`fan-${step}-${i}`} className="sia-gb-fanout" d={`M566 246V${126+i*80}H604`} fill="none" stroke="#7f99bc" strokeWidth="2"/>
       <text x="623" y={135 + i * 80} className="sia-gb-small" fill={ink}>{String.fromCharCode(65 + i)}</text>
       <path d={`M 680 ${126 + i * 80} H 1213`} stroke={line} />
       {Array.from({ length: 8 }, (_, j) => <rect key={j} x={680 + j * 60} y={108 + i * 80} width="44" height="36" fill={j < 7 ? '#e3e8ee' : '#bbcade'} stroke="#c6cfdb" />)}
       <path d={`M 1170 ${126 + i * 80} H 1231 m -6 -4 l 6 4 l -6 4`} fill="none" stroke="#9babc0" />
-      <rect x="1253" y={108 + i * 80} width="66" height="36" fill={blue} />
-      <text x="1286" y={133 + i * 80} textAnchor="middle" className="sia-gb-small" fill="#fff">+1</text>
+      <g data-build={`batch-result-${i}`} data-visible={step>=1||i===0} data-state={step} data-delay="650"><rect x="1253" y={108+i*80} width="66" height="36" fill={blue}/><text x="1286" y={133+i*80} textAnchor="middle" className="sia-gb-small" fill="#fff">+1</text></g>
     </g>)}
     <text x="48" y="490" className="sia-gb-micro" fill={muted}>標準自回歸 decode · 請求彼此獨立</text>
     <text x="1360" y="490" textAnchor="end" className="sia-gb-small" fill={ink}>{step === 0 ? '一份權重，處理一個 request' : '同一輪，讓更多 requests 共用權重讀取'}</text>

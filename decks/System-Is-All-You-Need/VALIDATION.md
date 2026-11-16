@@ -1,3 +1,102 @@
+# 全頁換頁覆蓋修復 · 2026-11-16 · version 11
+
+修正上一輪漏套用的路徑：shared-objects分支原先跳過通用pageLayers；一般技術標題也未採用文字揭示。現在所有頁面共用同一換頁入口，技術頁／References／takeaway的標題詞組都執行420ms揭示，間隔55ms；封面／結語逐行揭示。開場專屬分鏡與Section圖片動畫保留。
+
+- 82個正反換頁新增直接覆蓋檢查：每個技術頁的scene本身都有動畫，每個技術標題存在非空詞組且所有詞組都有動畫。沒有只用「頁面上某處有animation」代替覆蓋檢查。
+- 同一入口先啟動父層，再量測FLIP。矩陣→tile及P7/P2主圖／縮圖的首幀位置、中途反向與快速切換回歸通過。
+- 15項Chrome回歸在開發版與建置版通過；66項單測、TypeScript、正式／測試建置及git diff --check通過。
+- 42頁全部101靜態狀態與505動畫中間幀重新擷取，無SVG文字碰撞／執行錯誤；82個邊界共574幀，根節點與scene保持不透明，來源隱藏，無前頁clone。
+- 完整正反巡覽、8章節、64次快速操作與1024／390px檢查共441個檢查點通過，無console錯誤／警告、HTTP失敗、殘留outgoing／surface或過慢收尾。
+
+原始紀錄位於已忽略的output/playwright/sia-universal/。下方保留先前版本驗證歷史。
+
+---
+
+# Apple參考、文字揭示與開場 · 2026-11-16
+
+目前為42頁、101狀態、version 10。先查閱Apple WWDC23的18:15 snappy示範、20:34／21:07阻尼對照、WWDC18 Music Now Playing示範及Keynote Build In文件，再實作。具體來源與分鏡見 APPLE_MOTION_REFERENCES.md。
+
+- 移除標題下灰色敘述的DOM與takeaway灰色thesis；保留圖解內必要標籤。普通換頁改為32px／500ms標題、56px／700ms主圖，主圖critical damping、無尺度起伏。
+- Section照片的原始動畫程式保持1.055×→1×、1150ms、mass 2.1。只改文字：每詞組420ms，間隔65ms，完整章節標題約0.65秒內完成。
+- 02–05重做為大字ChatGPT／快速提問、Agents三拍接力、深色兩行問題、Model展開System四拍開場。已目視靜態與500ms中途畫面，並另錄六段實時播放。
+- TypeScript、66項單測、15項建置版Chrome回歸、Vite正式與測試建置通過。82個正反換頁／574個中間幀的目的根節點與主圖保持不透明；來源opacity=0、visibility=hidden，無前頁clone。
+- 42頁全部101個靜態狀態、505個動畫取樣：執行錯誤與SVG文字碰撞均為0。完整正反巡覽、快速切換與大小螢幕共441個檢查點通過，console錯誤／警告、HTTP失敗、殘留surface／outgoing、過慢收尾均為0。
+- 六段開場／Section實時錄影各91–92個RAF取樣，中位16.7ms、p95最高16.8ms，沒有超過25ms的間隔。這是本機Chrome的觀測。
+
+原始紀錄與錄影：已忽略的 output/playwright/sia-apple/，包含audit.json、motion-all.json、runtime.json、ux-playback.json、ux-playback.mp4。下方為先前版本歷史。
+
+---
+
+# 教學參考重畫與重量動效 · 2026-11-16
+
+目前為42頁、101個手動狀態，deck version 9。先檢視3Blue1Brown、Hugging Face、NVIDIA、Tri Dao與vLLM的教學圖／動圖，再重畫SVG。來源與逐頁改圖對照見 `TEACHING_REFERENCES.md`；References頁也提供已打包的下載連結。
+
+## 圖解與動效
+
+- 07–09 補完整請求路徑、文字／ID／向量對應，以及有token標籤的Q/K/V heatmap；12–16 補SM功能分區、Grid/Block/Warp包含關係、低延遲／大容量方向及各request的下一token。
+- 20–25 用HBM→SM供給路徑、Q/K→scores→softmax×V→O、片上tile計算與scores/V數值，交代資料從哪裡來、在哪裡運算、結果去哪裡。
+- 28–39 補token與KV欄位對應、當前Q與輸出、logical blocks的token範圍、table到physical blocks的連線、logical引用與refcount，以及持續可見的系統流程。
+- 普通進場採不同質量的阻尼響應：標題48px／620ms；主圖96px水平、8px垂直、1.2%尺度變化／880ms，延遲70ms起動；細節從190ms開始。章節照片從1.055×緩慢推回1×。主圖的位置超越小於1%，沒有反覆彈跳。
+- SVG共享物件與camera接續切換前的位置及速度。前頁立即排除繪製，slide根節點與主圖保持不透明；沒有前頁clone、全頁fade或全頁clip。
+
+## 實際驗證
+
+- TypeScript、66項單元測試、15項Chrome動態回歸、Vite正式及測試建置、`git diff --check`通過。新增的3項物理響應單測檢查起點、速度接續與受控收束。
+- 全部42頁／101個靜態狀態，以及101個狀態各0/220/500/900/1400ms的505個動畫中間幀均重新擷取。SVG文字碰撞、瀏覽器執行錯誤、主圖不透明檢查失敗均為0。已目視全套頁面、全部改圖狀態與重點大圖，修正KV箭頭穿字、固定Q選取位置、Warp起點及標籤對比。
+- 全部82個正反換頁，各取0/40/120/280/520/800/1400ms，共574個邊界中間幀。目的頁根節點與主圖opacity=1，根節點transform=none、clip-path=none；前頁opacity=0、visibility=hidden，clone數0。開發版與建置版回歸均通過。
+- 101狀態正向與101狀態反向、8個章節跳轉、64次快速交錯操作、重新載入恢復；1024×768與390×844各101個reduced-motion狀態，加上觸控及縮小舞台核心變形，共441個檢查點通過。執行錯誤、console警告、HTTP失敗、殘留outgoing／surface、過慢收尾均為0。
+- 最後的KV連線、K/V載入起點與Prefill逐欄建立微調後，重跑全套靜態／動畫取樣、66項單測、15項建置版回歸與建置。另以1600、1024、390px在正常／reduced motion下對KV、Tiling、Systems、Prefill正反巡覽120個檢查點；固定Q位置檢查25次，教學參考下載HTTP 200，均通過。
+- 八段1600×900本機Chrome實時錄影：GPU放大、matrix→tile、growth→sharing、token生成、static→continuous、補入請求、decode迴圈、普通換頁。每段91個requestAnimationFrame取樣，中位幀間隔16.7ms、p95最高16.8ms，沒有超過25ms的間隔。這是此測試環境的觀測，不代表其他瀏覽器或裝置的效能保證。
+
+原始紀錄與預覽位於已忽略的 `output/playwright/sia-grounded/`：`audit.json`、`motion-all.json`、`runtime.json`、`followup.json`、`ux-playback.json`、`ux-playback.mp4`，以及研究用原圖截圖、全套PNG與接觸表。最後的局部微調未變更全域重量動效；其後使用針對性巡覽與完整回歸驗證。
+
+以下保留先前版本的驗證歷史；目前規格、頁碼與時序以上方為準。
+
+---
+
+# 聚焦與脈絡平衡版 · 2026-11-16
+
+目前為42頁、101個手動狀態，deck version 8。技術頁恢復一句短提示，按需要保留局部參照；Online softmax 補上最大值、指數和、加權累積的短標籤。完整講解仍保存在講者備註。
+
+## 動效與畫面
+
+- 普通進場改為短距離水平位移：標題0ms起／320ms、主圖40ms起／420ms、語意細節110ms起／260ms。slide根節點及主圖全程opacity=1，不作整頁淡入淡出。前頁在CSS及callback中立即隱藏。
+- 共享SVG物件使用切換前實際可見的矩形接續。矩陣→tile、P7/P2主圖↔縮圖皆檢查首幀幾何；反向與動畫中途切換不會跳回預設起點。
+- Token從右側取樣口沿曲線落位，避開既有文字；快速推進時前一字由當前姿勢落位。Batch時間指標、進度與請求進場同步。GPU放大時移除鏡頭外幾何，減少巨大SVG繪製範圍。
+
+## 實際驗證
+
+- TypeScript、63項單元測試、15項Chrome動態回歸、Vite正式與測試建置、`git diff --check`通過。瀏覽器回歸同時在開發與建置版本執行；測試透過公開導航取得頁數與步驟，不依賴開發伺服器的原始碼import。
+- 全部42頁／101個靜態狀態與505個動畫中間幀重新擷取。目視檢查全套接觸表與重點大圖；SVG文字碰撞、執行錯誤及不透明主圖檢查失敗皆為0。
+- 全部82個正反換頁，各取0/40/120/280/520/800/1400ms，共574個邊界中間幀。目的slide根節點與主圖opacity=1，根節點transform=none、clip-path=none；來源opacity=0、visibility=hidden，前頁clone數0。
+- 101狀態正向與101狀態反向巡覽、8個章節跳轉、64次快速交錯操作、重新載入恢復；1024×768與390×844各101個reduced-motion狀態，加上觸控及縮小舞台的核心正反變形，共441個檢查點通過。執行錯誤、console警告、HTTP失敗、殘留outgoing／surface、超時收尾均為0。
+- 八段實時播放在1600×900本機Chrome以requestAnimationFrame取樣並錄影：GPU放大、matrix→tile、growth→sharing、token生成、static→continuous、補入請求、decode迴圈、普通換頁。各段約90–92個畫面；幀間隔中位數16.7ms、p95最高16.8ms，沒有超過25ms的取樣間隔。這是目前測試環境的觀測，沒有代表其他瀏覽器或裝置的FPS保證。
+
+原始紀錄與預覽位於已忽略的 `output/playwright/sia-balanced/`：`audit.json`、`motion-all.json`、`runtime.json`、`ux-playback.json`、`ux-playback.mp4`，以及全套PNG與接觸表。最後的softmax短標籤與機率條曲線微調後，已重跑靜態、動畫取樣、型別／單元測試及建置。
+
+以下為先前版本的驗證歷史；頁碼、時序與目前規格以上方為準。
+
+---
+
+# 單一物件精簡版 · 2026-11-16
+
+目前為42頁、101個手動狀態，deck version 7。說明文字移到講者備註；新增 Memory-bound、KV blocks、Block table、Decode 四頁，其他流程透過單一物件與鏡頭／手動狀態接續。
+
+## 實際完成的檢查
+
+- TypeScript、63項單元測試、12項Chrome瀏覽器回歸、Vite正式建置、`git diff --check` 通過。
+- 逐頁擷取42頁的全部101個靜態狀態；執行錯誤與文字碰撞皆為0。目視檢查全套頁面與動畫接觸表，修正SM世界座標字距、縮放後的局部揭示位移，以及句點穿過已生成文字的路徑。
+- 全部82個正反換頁，在0/40/120/280/520/800/1400ms檢查，共574個邊界中間幀。目的slide根節點始終opacity=1、transform=none、clip-path=none；前頁opacity=0且visibility=hidden，沒有前頁clone。
+- 全部101個狀態在0/220/500/900/1400ms檢查，共505個動畫中間幀。前頁暫留、整頁淡入淡出、SVG文字碰撞、瀏覽器執行錯誤皆為0。
+- 完整巡覽101狀態正向與101狀態反向；8個章節跳轉、64次快速交錯操作、重新載入狀態恢復；1024×768與390×844各101個reduced-motion狀態及觸控／縮小舞台的核心變形，共441個檢查點通過。執行錯誤、console警告、HTTP失敗、殘留outgoing與臨時surface均為0。
+- 專屬回歸涵蓋：單一主要圖解、技術區沒有解說段落、roofline沿折線正反移動、每輪分布不同且只有一個抽樣字、GPU鏡頭與字距、static最後一步及continuous的t=10延續、快速反向姿勢、16格block與B分支時序、Prefill/Decode拆頁，以及六張高解析章節照片。
+
+檢查使用本機Chrome；沒有跨瀏覽器FPS基準。可重現的原始檢查紀錄與預覽位於已忽略的 `output/playwright/sia-focus/`：`audit.json`、`motion-all.json`、`runtime.json` 與全套PNG／接觸表。
+
+下方保留先前版本驗證歷史，頁數與時序以本節為準。
+
+---
+
 # 宇宙章節與分層進場 · 2026-11-16
 
 最新版本為38頁、96個手動狀態。四個新章節頁加在request、GPU、batching、systems之前；FlashAttention與PagedAttention既有章節頁更新為滿版宇宙影像。

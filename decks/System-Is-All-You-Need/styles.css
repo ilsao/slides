@@ -1,6 +1,8 @@
 @font-face{font-family:'SIA CJK Fallback';src:url('/fonts/SourceHanSansTW-VF.otf.woff2') format('woff2');font-weight:250 900;font-display:swap}
-[data-deck="system-is-all-you-need"]{--sia-ink:#17191c;--sia-blue:#376bba;--sia-cyan:#90a9bc;--sia-muted:#777d87;--sia-line:#d9dce1;--sia-paper:#f6f6f4;--sia-surface:#eceef0;--sia-dark:#080b10}
+[data-deck="system-is-all-you-need"]{--sia-ink:#17191c;--sia-blue:#376bba;--sia-cyan:#90a9bc;--sia-muted:#68717e;--sia-line:#ccd2db;--sia-paper:#f6f6f4;--sia-surface:#e7ebef;--sia-dark:#080b10}
 [data-deck="system-is-all-you-need"] .presentation-player{background:#080b10}
+/* The previous layer is never paintable, even before layout effects or cancellation. */
+[data-deck="system-is-all-you-need"] .page-outgoing{visibility:hidden!important;opacity:0!important;pointer-events:none}
 .sia-slide{position:relative;isolation:isolate;width:1600px;height:900px;overflow:hidden;background:var(--sia-paper);color:var(--sia-ink);font-family:'Helvetica Neue','Helvetica','Arial','PingFang TC','SIA CJK Fallback',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .sia-slide *{box-sizing:border-box}
 .sia-slide :is(h1,h2,h3,p){margin:0}
@@ -30,14 +32,18 @@
 .sia-slide .sia-year{font-size:238px;line-height:1;letter-spacing:-14px;font-weight:300;font-variant-numeric:tabular-nums}
 .sia-slide .sia-epoch-copy{position:absolute;left:0;top:305px}
 .sia-slide .sia-epoch-copy h1{font-size:80px;font-weight:400;letter-spacing:-3px}
-.sia-slide .sia-epoch-detail{position:absolute;left:730px;right:0;top:355px}
-.sia-slide .sia-chat-form{display:flex;align-items:center;justify-content:space-between;font-size:27px;padding-bottom:25px;border-bottom:1px solid var(--sia-line);color:#666b73}
+.sia-slide .sia-epoch-detail{position:absolute;left:690px;right:0;top:323px}
+.sia-slide .sia-chat-form{display:flex;align-items:center;justify-content:space-between;font-size:34px;padding:12px 0 28px;border-bottom:2px solid #9ca8b8;color:var(--sia-ink)}
 .sia-slide .sia-chat-form i{font-style:normal;color:var(--sia-ink)}
-.sia-slide .sia-agent-sequence{display:flex;justify-content:space-between}
-.sia-slide .sia-agent-sequence>div{position:relative;display:flex;flex-direction:column;gap:24px;width:135px}
-.sia-slide .sia-agent-sequence i{font-size:16px;color:#78808c;font-style:normal}
-.sia-slide .sia-agent-sequence span{font-size:33px}
+.sia-slide .sia-agent-sequence{position:relative;display:flex;justify-content:space-between;padding-bottom:55px}
+.sia-slide .sia-agent-sequence>div{position:relative;display:flex;flex-direction:column;gap:22px;width:145px}
+.sia-slide .sia-agent-sequence i{font-size:20px;color:#9aa7ba;font-style:normal}
+.sia-slide .sia-agent-sequence span{font-size:42px}
 .sia-slide .sia-agent-sequence b{position:absolute;right:-40px;top:54px;font-size:25px;color:#6e7886;font-weight:400}
+.sia-slide .sia-agent-sequence svg{position:absolute;left:0;bottom:0;width:100%;height:18px;overflow:visible}
+.sia-slide .sia-agent-sequence path{stroke:#53657e;fill:none;stroke-width:1.5}
+.sia-slide .sia-agent-task{fill:#b9d0f0;transform:translate(650px,9px);animation:sia-agent-handoff 1200ms cubic-bezier(.22,.72,.18,1) 200ms backwards}
+@keyframes sia-agent-handoff{0%,15%{transform:translate(10px,9px)}48%,60%{transform:translate(330px,9px)}100%{transform:translate(650px,9px)}}
 .sia-slide .sia-question-layout{position:absolute;inset:215px 100px 150px;text-align:center}
 .sia-slide .sia-question-layout h1{font-size:100px;line-height:1.35;font-weight:400;letter-spacing:-4px}
 .sia-slide .sia-question-layout h1 span{color:#979da5}
@@ -106,3 +112,57 @@
 
 .sia-slide [data-build]{transition:none!important;transform-box:view-box;transform-origin:0 0}
 .sia-slide [data-build][data-visible="false"]{opacity:0}
+.sia-slide [data-motion]{transform-box:view-box;transform-origin:0 0}
+
+/* One primary object; explanations belong to the speaker notes. */
+.sia-slide .sia-topline{display:none}
+.sia-slide .sia-focus-takeaway{position:absolute;inset:130px 100px 100px}
+.sia-slide .sia-focus-takeaway h1{font-size:94px;font-weight:400;letter-spacing:-4px}
+.sia-slide .sia-focus-foundations{position:absolute;left:360px;top:230px;width:680px}
+.sia-slide .sia-focus-foundations>div{border-top:1px solid var(--sia-line);padding:27px 0;font-size:42px;line-height:1.3;letter-spacing:-1px}
+.sia-slide .sia-chapter-heading{top:288px}
+/* Concise orientation stays visible while the visual changes underneath it. */
+.sia-slide .sia-lead{position:absolute;left:100px;top:213px;right:100px;font-size:27px;line-height:1.3;color:var(--sia-muted);letter-spacing:-.3px}
+.sia-slide .sia-focus-thesis{font-size:29px;color:var(--sia-muted);margin-top:22px}
+.sia-slide .sia-focus-foundations{left:150px;top:250px;width:1100px}
+.sia-slide .sia-focus-foundations>div{display:flex;align-items:center;justify-content:space-between;gap:50px;padding:25px 0;font-size:39px}
+.sia-slide .sia-focus-foundations small{font-size:29px;color:var(--sia-muted);font-weight:400;min-width:280px}
+
+.sia-slide .sia-teaching-reference{margin-left:32px}
+
+/* Apple-reference opening: one typographic idea per beat, quick masked reveals. */
+.sia-slide .sia-reveal-clip{display:block;overflow:hidden;padding-bottom:.12em;margin-bottom:-.12em}
+.sia-slide .sia-reveal-clip>[data-reveal]{display:block;will-change:auto}
+.sia-slide [data-reveal="chapter-word"]{display:inline-block}
+.sia-slide .sia-epoch-layout{inset:110px 100px 100px}
+.sia-slide .sia-year{font-size:76px;letter-spacing:-4px;line-height:1;color:var(--sia-muted)}
+.sia-slide .sia-epoch-copy{left:0;top:138px}
+.sia-slide .sia-epoch-copy h1{font-size:180px;letter-spacing:-9px;line-height:1.1}
+.sia-slide .sia-epoch-detail{left:0;right:30px;top:448px}
+.sia-slide .sia-chat-form{font-size:54px;padding:0 0 28px;border-bottom:2px solid #a5adb8}
+.sia-slide .sia-chat-form>span{display:flex}
+.sia-slide .sia-chat-form .sia-reveal-clip{display:inline-block}
+.sia-slide .sia-agent-sequence{padding-bottom:68px}
+.sia-slide .sia-agent-sequence>div{width:285px;gap:18px}
+.sia-slide .sia-agent-sequence span{font-size:68px;letter-spacing:-2px}
+.sia-slide .sia-agent-sequence b{right:-65px;top:42px;font-size:42px;color:#8091a8}
+.sia-slide .sia-agent-sequence i{font-size:22px}
+.sia-slide .sia-agent-task{animation:none;transform:translate(1190px,9px)}
+.sia-slide .sia-question-layout{inset:240px 100px 120px;text-align:left}
+.sia-slide .sia-question-layout h1{font-size:136px;line-height:1.23;letter-spacing:-6px}
+.sia-slide .sia-question-layout h1 span{color:inherit}
+.sia-slide .sia-stage-reveal h1{left:100px;top:310px;font-size:132px;letter-spacing:-6px;line-height:1.08}
+.sia-slide .sia-stage-reveal h1 .sia-model-word{display:block;color:#f5f6f8;opacity:1;transform:none;margin:0}
+.sia-slide .sia-stage-reveal h1 .sia-system-word{color:#f5f6f8;margin-top:12px;transform:translateY(32px);transition:transform 500ms cubic-bezier(.16,1,.3,1),opacity 280ms}
+.sia-slide [data-expanded="true"] h1 .sia-system-word{transform:none}
+.sia-slide .sia-system-stack{left:875px;top:200px;width:590px;perspective:1800px}
+.sia-slide .sia-stack-layer{width:560px;height:108px;padding:25px 32px;border-color:#3e4c60;transform:translateY(155px) rotateY(-8deg);transform-origin:left center;transition:transform 620ms cubic-bezier(.16,1,.3,1),opacity 260ms}
+.sia-slide .sia-stack-layer>span{font-size:34px}
+.sia-slide [data-expanded="true"] .sia-stack-0{transform:translateY(0) rotateY(-8deg)}
+.sia-slide [data-expanded="true"] .sia-stack-1{transform:translateY(125px) rotateY(-8deg)}
+.sia-slide [data-expanded="true"] .sia-stack-2{transform:translateY(250px) rotateY(-8deg)}
+.sia-slide [data-expanded="true"] .sia-stack-3{transform:translateY(375px) rotateY(-8deg)}
+.sia-slide .sia-scene{top:235px}
+.sia-slide .sia-lead{display:none}
+
+.sia-slide .sia-title-word{display:inline-block;vertical-align:bottom}

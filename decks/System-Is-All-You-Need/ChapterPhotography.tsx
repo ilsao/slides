@@ -24,9 +24,7 @@ export function PhotoChapter({id,active}:{id:PhotoChapterId;active:boolean}) {
   return <div className="sia-chapter-layout sia-photo-chapter">
     <img className="sia-chapter-photo" src={photo.src} alt="" decoding="sync"/>
     <div className="sia-chapter-photo-shade"/>
-    <div className="sia-chapter-topic" data-entry="detail">{photo.topic}</div>
-    <header className="sia-chapter-heading" data-entry="title"><h1>{photo.lines[0]}<br/>{photo.lines[1]}</h1></header>
-    <p className="sia-chapter-subtitle" data-entry="detail">{photo.subtitle}</p>
+    <header className="sia-chapter-heading" data-entry="title"><h1>{photo.lines.map((text,i)=><span className="sia-reveal-clip" key={text}><span data-reveal="chapter" data-reveal-order={i}>{text.split(/(\s+)/).map((word,j)=>word.trim()?<span data-reveal="chapter-word" data-reveal-order={i*2+j} key={j}>{word}</span>:word)}</span></span>)}</h1></header>
     <div className="sia-chapter-photo-credit" data-entry="detail">{active?<a href={`https://science.nasa.gov/asset/webb/${photo.slug}/`} target="_blank" rel="noreferrer">{photo.title} · {photo.credit}</a>:<span>{photo.title} · {photo.credit}</span>}</div>
   </div>;
 }

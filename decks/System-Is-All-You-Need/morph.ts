@@ -4,15 +4,48 @@ type Box = Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>;
 type Label = { key: string; element: HTMLElement; box: Box };
 type MorphSource = { box: Box; opacity: string; labels: { key: string; box: Box }[] };
 type BuildPose = { opacity: string; transform: string; state: string };
-type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose> };
-const easing = 'cubic-bezier(.22,.72,.18,1)';
-const entranceEasing = 'cubic-bezier(.16,1,.3,1)';
-const pageTiming = { title: 0, diagram: 110, detail: 250, detailStagger: 22 };
+type MotionVelocity = { box:Box; matrix:number[] };
+type MotionPose = { key:string; transform:string; index:number; box?:Box; opacity?:number; velocity?:MotionVelocity };
+type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose>; motions?:Map<string,MotionPose>; slide?:string; step?:number; title?:string };
+const easing = 'cubic-bezier(.22,0,.2,1)';
+const entranceEasing = easing;
+const pageTiming = { title: 0, diagram: 70, detail: 190, detailStagger: 45 };
 const surfaces = new WeakMap<HTMLElement, HTMLElement>();
 const cleanups = new WeakMap<HTMLElement, () => void>();
 const copyBox = (box: Box): Box => ({ left: box.left, top: box.top, width: box.width, height: box.height });
 const safeScale = (scale: number) => Number.isFinite(scale) && scale > 0 ? scale : 1;
 const center = (box: Box) => ({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
+
+/** Damped physical response in seconds. A larger mass gives the main visual a
+ * deliberate launch and long braking tail, with less than 1% overshoot. */
+export function springValue(from:number,to:number,velocity:number,time:number,mass=1.8):number {
+  const stiffness=320,damping=40,a=damping/(2*mass),d=stiffness/mass-a*a,delta=from-to;
+  if(Math.abs(d)<.001)return to+Math.exp(-a*time)*(delta+(velocity+a*delta)*time);
+  const w=Math.sqrt(Math.abs(d));
+  return to+Math.exp(-a*time)*(d>0?delta*Math.cos(w*time)+(velocity+a*delta)/w*Math.sin(w*time):delta*Math.cosh(w*time)+(velocity+a*delta)/w*Math.sinh(w*time));
+}
+const matrixValues=(value:string)=>{const m=new DOMMatrix(value==='none'?undefined:value);return [m.a,m.b,m.c,m.d,m.e,m.f]};
+function springMatrix(from:string,to:string,velocity:number[]|undefined,duration:number,mass=1.8):Keyframe[]{
+  const start=matrixValues(from),end=matrixValues(to);
+  return Array.from({length:61},(_,i)=>({offset:i/60,transform:`matrix(${start.map((v,j)=>i===60?end[j]:springValue(v,end[j],velocity?.[j]??0,i/60*duration/1000,mass)).join(',')})`}));
+}
+function entryFrames(x:number,y:number,duration:number,direction:number,base='',mass=1.8,depth=false):Keyframe[]{
+  return Array.from({length:61},(_,i)=>{const remaining=i===60?0:springValue(1,0,0,i/60*duration/1000,mass);return{offset:i/60,transform:`translate(${direction*x*remaining}px,${y*remaining}px)${depth?` scale(${1-.012*remaining})`:''} ${base}`.trim()}});
+}
+
+/** Measure velocity only at navigation, before cancellation. Temporarily sample
+ * transform timelines 8ms earlier in the same JS task; no intermediate paint. */
+function motionVelocities(current:HTMLElement,nodes:HTMLElement[]):Map<HTMLElement,MotionVelocity>{
+  const result=new Map<HTMLElement,MotionVelocity>();
+  if(!nodes.length||typeof current.getAnimations!=='function')return result;
+  const moving=current.getAnimations({subtree:true}).filter(a=>typeof a.currentTime==='number'&&a.currentTime>8&&a.effect instanceof KeyframeEffect&&a.effect.getKeyframes().some(f=>f.transform));
+  if(!moving.length)return result;
+  const pose=(e:HTMLElement)=>({box:copyBox((e.querySelector('[data-motion-surface]')??e).getBoundingClientRect()),matrix:matrixValues(getComputedStyle(e).transform)});
+  const now=nodes.map(pose),times=moving.map(a=>a.currentTime as number);
+  moving.forEach((a,i)=>{a.currentTime=times[i]-8});const before=nodes.map(pose);moving.forEach((a,i)=>{a.currentTime=times[i]});
+  nodes.forEach((e,i)=>result.set(e,{box:{left:(now[i].box.left-before[i].box.left)/.008,top:(now[i].box.top-before[i].box.top)/.008,width:(now[i].box.width-before[i].box.width)/.008,height:(now[i].box.height-before[i].box.height)/.008},matrix:now[i].matrix.map((v,j)=>(v-before[i].matrix[j])/.008)}));
+  return result;
+}
 
 /** Empty tiles use compositor FLIP; layout is measured once, never tweened. */
 export function morphGeometry(from: Box, to: Box, scale: number): Keyframe[] {
@@ -53,6 +86,16 @@ function captureMorph(current: HTMLElement): MorphSnapshot {
   snapshot.builds = new Map(Array.from(current.querySelectorAll<HTMLElement>('[data-build]')).map(element => {
     const paint = getComputedStyle(element);
     return [element.dataset.build!, { opacity: paint.opacity, transform: paint.transform, state: element.dataset.state ?? element.dataset.visible ?? '' }];
+  }));
+  snapshot.slide = current.querySelector<HTMLElement>('.sia-slide')?.dataset.slideId;
+  snapshot.step = Number(current.querySelector<HTMLElement>('.sia-slide')?.dataset.step ?? 0);
+  snapshot.title=current.querySelector('.sia-heading h1')?.textContent??'';
+  const motionNodes=Array.from(current.querySelectorAll<HTMLElement>('[data-motion]')),velocities=motionVelocities(current,motionNodes);
+  snapshot.motions = new Map(motionNodes.map(element => {
+    let opacity=1;
+    for(let node:Element|null=element;node&&node!==current;node=node.parentElement)opacity*=Number(getComputedStyle(node).opacity);
+    const surface=element.querySelector<HTMLElement>('[data-motion-surface]')??element;
+    return [element.dataset.motionId ?? element.dataset.motion!, {key:element.dataset.motionKey ?? '',transform:getComputedStyle(element).transform,index:Number(element.dataset.motionIndex ?? 0),box:copyBox(surface.getBoundingClientRect()),opacity,velocity:velocities.get(element)}];
   }));
   return snapshot;
 }
@@ -123,7 +166,7 @@ function animateObjects(current: HTMLElement, source: MorphSnapshot, duration: n
   const dispose: (() => void)[] = [];
   const run = (element: HTMLElement, frames: Keyframe[]) => {
     const delay = phaseDelay + Number(element.dataset.morphDelay ?? 0);
-    const animation = element.animate(frames, { duration, delay, easing, fill: 'both' });
+    const animation = element.animate(frames, { duration:Number(element.dataset.morphDuration??duration), delay, easing, fill: 'both' });
     animations.push(animation);
   };
   for (const pair of pairs) {
@@ -188,55 +231,167 @@ function animateBuilds(current: HTMLElement, source: MorphSnapshot, entranceDela
     const visible = element.dataset.visible !== 'false';
     const settledTransform = !old || old.transform === 'none' || old.transform === 'matrix(1, 0, 0, 1, 0, 0)';
     if (old?.state === state && (visible ? Number(old.opacity) >= .999 && settledTransform : Number(old.opacity) <= .001)) continue;
-    if (!visible && !old) continue;
+    // Hide inactive beats immediately; visible replacements retain their paint.
+    if (!visible) continue;
     const opacity = visible ? '1' : '0';
-    const fromOpacity = old?.opacity ?? '0';
+    const replacing=Boolean(old&&old.state!==state&&Number(old.opacity)>.99);
+    const fromOpacity = replacing?'1':old?.opacity ?? '0';
     animations.push(element.animate([
-      { opacity: fromOpacity, transform: old?.transform !== 'none' && old?.transform ? old.transform : `translateY(${visible ? 16 : 0}px)` },
+      { opacity: fromOpacity, transform: replacing?'translateX(4px)':old?.transform !== 'none' && old?.transform ? old.transform : `translateY(${visible ? Number(element.dataset.enterY??8) : 0}px)` },
       { opacity, transform: `translateY(${visible ? 0 : -10}px)` },
-    ], { duration: 620, delay: visible && old?.state !== state ? entranceDelay + Number(element.dataset.delay ?? 0) : 0, easing, fill: 'both' }));
+    ], { duration: replacing?220:Number(element.dataset.duration ?? 300), delay: !replacing&&visible && old?.state !== state ? entranceDelay + Number(element.dataset.delay ?? 0) : 0, easing, fill: 'both' }));
   }
   return animations;
 }
 
 const slideId = (layer: HTMLElement) => layer.querySelector<HTMLElement>('.sia-slide')?.dataset.slideId ?? '';
-const objectDuration = (id: string, step = false) => ['standard','tiling','fragmentation','paging'].includes(id) ? (step ? 820 : 920) : ['static','continuous'].includes(id) ? (step ? 760 : 940) : (step ? 700 : 800);
+const objectDuration = (id: string, step = false) => ['static','continuous'].includes(id) ? (step ? 520 : 620) : (step ? 520 : 580);
+
+/** Explanatory paths own their destination object: no flying text duplicates. */
+function mechanisms(current:HTMLElement,source:MorphSnapshot,delay=0):Animation[] {
+  const slide=current.querySelector<HTMLElement>('.sia-slide');
+  const reverse=source.slide===slide?.dataset.slideId&&Number(slide?.dataset.step)<Number(source.step);
+  if(slide)slide.dataset.motionDirection=reverse?'reverse':'forward';
+  const animations:Animation[]=[];
+  for(const element of current.querySelectorAll<HTMLElement>('[data-motion]')) {
+    const kind=element.dataset.motion!,old=source.motions?.get(element.dataset.motionId??kind);
+    if(kind!=='object'&&source.slide===slide?.dataset.slideId&&old?.key===element.dataset.motionKey||element.dataset.motionActive==='false')continue;
+    let frames:Keyframe[]=[];
+    let duration=760,wait=delay,velocity=old?.velocity?.matrix;
+    const objectFlight=()=>{
+      if(!old?.box||(old.opacity??1)<.01||!(element instanceof SVGGraphicsElement))return [];
+      const surface=element.querySelector<SVGGraphicsElement>('[data-motion-surface]')??element;
+      if(!changed(old.box,surface.getBoundingClientRect()))return [];
+      const base=surface.getBBox(),parent=(element.parentElement as unknown as SVGGraphicsElement).getScreenCTM();
+      if(!parent||!base.width||!base.height)return [];
+      const sx=old.box.width/base.width/parent.a,sy=old.box.height/base.height/parent.d;
+      const tx=(old.box.left-parent.e)/parent.a-base.x*sx,ty=(old.box.top-parent.f)/parent.d-base.y*sy;
+      const target=getComputedStyle(element).transform;
+      if(old.velocity){const v=old.velocity.box,sa=v.width/base.width/parent.a,sd=v.height/base.height/parent.d;velocity=[sa,0,0,sd,v.left/parent.a-base.x*sa,v.top/parent.d-base.y*sd];}
+      return [{transform:`matrix(${sx},0,0,${sy},${tx},${ty})`},{transform:target}];
+    };
+    if(kind==='settle') {
+      const target=getComputedStyle(element).transform;
+      if(!old||old.transform===target)continue;
+      frames=[{transform:old.transform},{transform:target}];duration=440;
+    } else if(kind==='object') {
+      frames=objectFlight();duration=820;
+    } else if(kind==='camera') {
+      if(reverse&&element.dataset.replayForward==='true')continue;
+      const target=getComputedStyle(element).transform;
+      const from=reverse&&element.dataset.fromReverse?element.dataset.fromReverse:old?.transform&&old.transform!==target?old.transform:element.dataset.from;
+      if(!from)continue;
+      frames=[{transform:from},{transform:target}];duration=840;
+    } else if(kind==='token') {
+      if(reverse)continue;
+      const x=Number(element.dataset.x),y=Number(element.dataset.y),size=Number(element.dataset.size);
+      const sourceX=Number(element.dataset.sourceX??977),sourceY=Number(element.dataset.sourceY??77),sourceSize=Number(element.dataset.sourceSize??23);
+      if(element.dataset.sourceX) {
+        // Route outside the candidate rows and above the existing sentence.
+        // Smooth tangent joins prevent punctuation crossing already-written words.
+        const segments=sourceX>1100?[
+          [[sourceX,sourceY],[sourceX,210],[sourceX,330],[sourceX,340]],
+          [[sourceX,340],[sourceX,400],[Math.min(sourceX,x+120),y],[x,y]],
+        ]:[
+          [[sourceX,sourceY],[100,sourceY],[20,sourceY],[20,145]],
+          [[20,145],[20,300],[20,340],[140,340]],
+          [[140,340],[140+(x-140)/3,340],[140+2*(x-140)/3,340],[x,340]],
+          [[x,340],[x+60,340],[x+60,y],[x,y]],
+        ];
+        const poses=segments.flatMap((points,segment)=>Array.from({length:17},(_,i)=>{
+          const t=i/16,u=1-t;
+          const at=(axis:number)=>u*u*u*points[0][axis]+3*u*u*t*points[1][axis]+3*u*t*t*points[2][axis]+t*t*t*points[3][axis];
+          return {x:at(0),y:at(1),scale:segment<segments.length-1?sourceSize/size:sourceSize/size+(1-sourceSize/size)*t};
+        }));
+        let length=0;const distances=poses.map((p,i)=>{if(i)length+=Math.hypot(p.x-poses[i-1].x,p.y-poses[i-1].y);return length});
+        frames=[{transform:`translate(${sourceX}px,${sourceY}px) scale(${sourceSize/size})`,offset:0},...poses.map((p,i)=>({transform:`translate(${p.x}px,${p.y}px) scale(${p.scale})`,offset:.1+.9*distances[i]/length}))];
+        duration=760;
+      } else frames=[{transform:`translate(${sourceX}px,${sourceY}px) scale(${sourceSize/size})`,offset:0},{transform:`translate(${sourceX}px,${sourceY}px) scale(${sourceSize/size})`,offset:.12},{transform:`translate(${x}px,${y}px) scale(1)`,offset:1}];
+      wait+=180;
+    } else if(kind==='roofline') {
+      const target=Number(element.dataset.x);
+      const matrix=old?.transform.match(/matrix\(([^)]+)\)/)?.[1].split(',').map(Number);
+      const start=matrix?.[4]??target;
+      const y=(x:number)=>x<=520?362-(x-65)*279/455:83;
+      const xs=(start<520&&target>520)||(target<520&&start>520)?[start,520,target]:[start,target];
+      frames=xs.map(x=>({transform:`translate(${x}px,${y(x)}px)`,offset:start===target?undefined:Math.abs((x-start)/(target-start))}));
+      duration=700;
+    } else if(kind==='route') {
+      if(reverse&&!old)continue;
+      const points=JSON.parse(element.dataset.points!) as number[][],end=Number(element.dataset.motionIndex),start=old?.index??0;
+      const route=start<=end?points.slice(start,end+1):points.slice(end,start+1).reverse();
+      if(route.length<2)continue;
+      const pose=old?.transform.match(/matrix\(([^)]+)\)/)?.[1].split(',').map(Number);
+      if(pose)route[0]=[pose[4],pose[5]];
+      frames=route.map(([x,y])=>({transform:`translate(${x}px,${y}px)`}));
+      duration=Number(element.dataset.duration??800);
+    } else if(kind==='sm-panel') {
+      if(reverse)continue;
+      frames=[{transform:'translate(194px,188px) scale(.080645,.121053)'},{transform:'translate(636px,48px) scale(1,1)'}];
+      duration=560;wait+=340;
+    } else if(kind==='tile-load') {
+      if(reverse)continue;
+      if(source.slide!==slide?.dataset.slideId&&old?.box){frames=objectFlight();duration=600;}
+      else {
+      // The HBM-to-SRAM corridor ends before the operators; no tile crosses text.
+      frames=element.dataset.focusTile==='true'
+        ?[{transform:'translate(180px,210px) scale(.25)',opacity:1},{transform:'translate(544px,102px) scale(1)',opacity:1}]
+        :[{transform:'translate(104px,188px) scale(.51,.8)',opacity:0},{transform:'translate(104px,188px) scale(.51,.8)',opacity:1,offset:.12},{transform:'translate(310px,188px) scale(.75,.9)',opacity:1,offset:.65},{transform:'translate(430px,163px) scale(1,1)',opacity:1}];
+      duration=660;wait+=40;
+      }
+    }
+    if(frames.length){const physical=['object','camera','settle'].includes(kind);if(physical)frames=springMatrix(String(frames[0].transform),String(frames[frames.length-1].transform),velocity,duration,kind==='settle'?.8:1.8);animations.push(element.animate(frames,{duration,delay:wait+Number(element.dataset.motionDelay??0),easing:physical?'linear':easing,fill:'both'}));}
+  }
+  return animations;
+}
 
 /** Only destination content participates. The stage background stays fully
  * painted and the outgoing page is never retained, cloned, or faded back in. */
 function pageDetails(incoming: HTMLElement): Animation[] {
-  const details = Array.from(incoming.querySelectorAll<HTMLElement>('[data-entry="detail"],.sia-scene svg text,.sia-scene [data-morph-enter],.sia-bm-status,.sia-attn-bottom'))
-    .filter(element => !element.matches('.sia-attn-sram') && !element.closest('[data-build],[data-morph]') && !element.parentElement?.closest('[data-entry="detail"]'));
+  const details = Array.from(incoming.querySelectorAll<HTMLElement>('[data-entry-group],[data-entry="detail"],.sia-scene [data-morph-enter],.sia-bm-status,.sia-attn-bottom'))
+    .filter(element => !element.matches('.sia-attn-sram') && !element.closest('[data-build],[data-morph],[data-motion]') && !element.parentElement?.closest('[data-entry-group],[data-entry="detail"]'));
   return details.flatMap((element,index) => {
     const paint = getComputedStyle(element);
     if (Number(paint.opacity) === 0) return [];
     const base = paint.transform && paint.transform !== 'none' ? paint.transform : '';
     const animation = element.animate([
-      { transform: `translateY(14px) ${base}`.trim(), opacity: 0 },
+      { transform: `translateX(6px) ${base}`.trim(), opacity: 0 },
       { transform: `translateY(0px) ${base}`.trim(), opacity: paint.opacity },
-    ], {duration: 620, delay: pageTiming.detail + Math.min(index,8) * pageTiming.detailStagger, easing: entranceEasing, fill:'both'});
+    ], {duration: 360, delay: pageTiming.detail + Math.min(index,3) * pageTiming.detailStagger, easing: entranceEasing, fill:'both'});
     return [animation];
   });
 }
 
-function pageLayers(incoming: HTMLElement, direction: -1 | 1): Animation[] {
-  const animations: Animation[] = [];
-  const move = (selector: string, x: number, y: number, duration: number, delay: number, reveal = false) => {
-    const element = incoming.querySelector<HTMLElement>(selector);
-    if (!element) return;
-    const authored = getComputedStyle(element).transform;
-    const base = authored && authored !== 'none' ? authored : '';
-    animations.push(element.animate([
-      { transform: `translate(${direction*x}px,${y}px) ${base}`.trim(), ...(reveal ? {opacity:0} : {}) },
-      { transform: `translate(0px,0px) ${base}`.trim(), ...(reveal ? {opacity:1} : {}) },
-    ], { duration, delay, easing: entranceEasing, fill: 'both' }));
+/** Reference: Apple WWDC23 snappy(0.4), Keynote ordered text builds. */
+function textReveals(root:HTMLElement):Animation[]{
+ const animations:Animation[]=[];
+ const run=(element:Element,delay:number,duration:number,y:string,scale=1)=>animations.push(element.animate([{transform:`translateY(${y}) scale(${scale})`,opacity:0},{transform:'translateY(0) scale(1)',opacity:1}],{duration,delay,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'}));
+ root.querySelectorAll('[data-reveal="heading"]').forEach((e,i)=>run(e,i*55,420,'105%'));
+ root.querySelectorAll('[data-reveal="bookend"]').forEach((e,i)=>run(e,40+i*100,560,'105%'));
+ root.querySelectorAll('[data-reveal="chapter-word"]').forEach((e,i)=>run(e,40+i*65,420,'105%'));
+ root.querySelectorAll('[data-reveal="hero"]').forEach(e=>run(e,40,620,'105%',.97));
+ root.querySelectorAll('[data-reveal="prompt"]').forEach((e,i)=>run(e,240+i*65,400,'105%'));
+ root.querySelectorAll('[data-reveal="agent"]').forEach((e,i)=>run(e,200+i*110,460,'26px'));
+ root.querySelectorAll('[data-reveal="question"]').forEach((e,i)=>run(e,60+i*150,600,'105%'));
+ const year=root.querySelector('.sia-year');if(year)run(year,0,400,'16px');
+ const dot=root.querySelector('.sia-agent-task');if(dot)animations.push(dot.animate([{transform:'translate(10px,9px)'},{transform:'translate(600px,9px)',offset:.5},{transform:'translate(1190px,9px)'}],{duration:700,delay:260,easing:'cubic-bezier(.22,0,.2,1)',fill:'both'}));
+ return animations;
+}
+
+function pageLayers(incoming: HTMLElement, direction: -1 | 1, build=true): Animation[] {
+  const animations:Animation[]=[];
+  const move=(selector:string,x:number,y:number,duration:number,delay:number,mass=1.8,depth=false)=>{
+    const element=incoming.querySelector<HTMLElement>(selector);if(!element||element.querySelector?.('[data-reveal]'))return;
+    const authored=getComputedStyle(element).transform,base=authored&&authored!=='none'?authored:'';
+    animations.push(element.animate(entryFrames(x,y,duration,direction,base,mass,depth),{duration,delay,easing:'linear',fill:'both'}));
   };
-  move('[data-entry="title"],.sia-heading,.sia-cover-layout,.sia-closing-layout,.sia-chapter-layout h1,.sia-epoch-copy,.sia-question-layout h1,.sia-stage-reveal h1,.sia-takeaway-layout h1,.sia-references h1', 18, 22, 740, pageTiming.title);
-  move('[data-entry="diagram"],.sia-scene,.sia-chapter-object,.sia-epoch-detail,.sia-system-stack,.sia-takeaway-grid,.sia-reference-list,.sia-credit-grid', 32, 30, 980, pageTiming.diagram, true);
-  move('.sia-topline', 8, 0, 680, pageTiming.title);
+  move('[data-entry="title"],.sia-heading,.sia-cover-layout,.sia-closing-layout,.sia-chapter-layout h1,.sia-epoch-copy,.sia-question-layout h1,.sia-stage-reveal h1,.sia-takeaway-layout h1,.sia-references h1',32,0,500,0,.95);
+
+  move('[data-entry="diagram"],.sia-scene,.sia-chapter-object,.sia-epoch-detail,.sia-system-stack,.sia-takeaway-grid,.sia-reference-list,.sia-credit-grid',56,0,700,pageTiming.diagram,1.25,false);
+  move('.sia-topline',14,0,620,0,1.1);
   const photo=incoming.querySelector<HTMLElement>('.sia-chapter-photo');
-  if(photo) animations.push(photo.animate([{transform:'scale(1.035)'},{transform:'scale(1)'}],{duration:1200,easing:entranceEasing,fill:'both'}));
-  return [...animations, ...pageDetails(incoming), ...animateBuilds(incoming, new Map(), pageTiming.diagram + 70)];
+  if(photo)animations.push(photo.animate(Array.from({length:61},(_,i)=>({offset:i/60,transform:`scale(${i===60?1:1+.055*springValue(1,0,0,i/60*1.15,2.1)})`})),{duration:1150,easing:'linear',fill:'both'}));
+  return [...animations,...textReveals(incoming),...pageDetails(incoming),...(build?animateBuilds(incoming,new Map(),pageTiming.diagram+90):[])];
 }
 
 export const systemTransition: TransitionDefinition = {
@@ -244,26 +399,24 @@ export const systemTransition: TransitionDefinition = {
   capture: captureMorph,
   animateStep({ current, snapshot }) {
     if (!(snapshot instanceof Map)) return [];
+    const source=snapshot as MorphSnapshot;
     current.dataset.morphMode = 'step-objects';
-    return [...animateObjects(current, snapshot, objectDuration(slideId(current), true)), ...animateBuilds(current,snapshot)];
+    const title=current.querySelector<HTMLElement>('.sia-heading');
+    const heading=source.title&&title&&title.textContent!==source.title?[title.animate(entryFrames(24,0,480,Number(current.querySelector<HTMLElement>('.sia-slide')?.dataset.step)<Number(source.step)?-1:1,'',.95),{duration:480,easing:'linear',fill:'both'})]:[];
+    return [...animateObjects(current, source, objectDuration(slideId(current), true)), ...animateBuilds(current,source),...mechanisms(current,source),...heading];
   },
   animate({ incoming, outgoing, snapshot }, direction) {
     const id = slideId(incoming);
     const source = snapshot instanceof Map ? snapshot as MorphSnapshot : captureMorph(outgoing);
     const objects = Array.from(incoming.querySelectorAll<HTMLElement>('[data-morph]'));
-    const shared = objects.some(element => source.has(element.dataset.morph!));
+    const shared = objects.some(element => source.has(element.dataset.morph!))||Array.from(incoming.querySelectorAll<HTMLElement>('[data-motion]')).some(element=>(source.motions?.get(element.dataset.motionId??element.dataset.motion!)?.opacity??0)>.01);
     outgoing.style.opacity = '0';
-    if (shared) {
-      incoming.dataset.morphMode = ['chatgpt','agents'].includes(id) ? 'epoch' : 'shared-objects';
-      const animations = [...animateObjects(incoming,source,objectDuration(id),pageTiming.diagram), ...animateBuilds(incoming,source,pageTiming.diagram + 70), ...pageDetails(incoming)];
-      // Shared diagrams remain anchored while their heading hands over independently.
-      const title = incoming.querySelector<HTMLElement>('.sia-heading');
-      if (title) animations.push(title.animate([{transform:`translate(${direction*18}px,22px)`},{transform:'translate(0px,0px)'}],{duration:740,easing:entranceEasing,fill:'both'}));
-      // A shared epoch may have identical geometry; its new content still needs motion.
-      if (!animations.length) return pageLayers(incoming,direction);
-      return animations;
-    }
-    incoming.dataset.morphMode = ['flash-title','paged-title'].includes(id) ? 'chapter' : ['cover','closing'].includes(id) ? 'bookend' : ['chatgpt','agents'].includes(id) ? 'epoch' : 'scene';
-    return pageLayers(incoming,direction);
+    incoming.dataset.morphMode=shared?(['chatgpt','agents'].includes(id)?'epoch':'shared-objects'):['flash-title','paged-title'].includes(id)?'chapter':['cover','closing'].includes(id)?'bookend':['chatgpt','agents'].includes(id)?'epoch':'scene';
+    // Every page uses the same entrance, including pages with shared objects.
+    // Start the parent entrance before measuring destination geometry, so FLIP
+    // compensates its initial offset and still starts at the captured surface.
+    const entrance=pageLayers(incoming,direction,!shared);
+    if(shared)return [...entrance,...animateObjects(incoming,source,objectDuration(id),0),...animateBuilds(incoming,source,pageTiming.diagram+70),...mechanisms(incoming,source,0)];
+    return [...entrance,...mechanisms(incoming,source,pageTiming.diagram)];
   },
 };

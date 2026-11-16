@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { morphGeometry, systemTransition } from '../decks/System-Is-All-You-Need/morph';
+import { morphGeometry, springValue, systemTransition } from '../decks/System-Is-All-You-Need/morph';
 
 type Box = { left: number; top: number; width: number; height: number };
 const rect = (left = 0, top = 0, width = 100, height = 60): Box => ({ left, top, width, height });
@@ -203,7 +203,7 @@ describe('destination-only page motion', () => {
     for (const element of [incoming.fake, outgoing.fake, incoming.slide])
       expect(element.animate).not.toHaveBeenCalled();
     expect(title.animate.mock.calls[0][0].every(frame=>!('opacity' in frame)&&!('clipPath' in frame))).toBe(true);
-    expect(scene.animate.mock.calls[0][0].at(-1)).toMatchObject({opacity:1});
+    expect(scene.animate.mock.calls[0][0].every(frame=>!('opacity' in frame))).toBe(true);
     expect(scene.animate.mock.calls[0][1].delay).toBeGreaterThan(title.animate.mock.calls[0][1].delay!);
   });
 
@@ -236,5 +236,23 @@ describe('destination-only page motion', () => {
     const current = layer({ id: 'tokens' });
     expect(systemTransition.animateStep!({ current: current.element, snapshot: new Map() })).toEqual([]);
     expect(current.fake.animate).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('weighted physical motion', () => {
+  it('starts at the captured position for light and heavy objects', () => {
+    for(const mass of [.8,.95,1.8,2.1])expect(springValue(82,17,-400,0,mass)).toBeCloseTo(82,8);
+  });
+  it('preserves incoming velocity when a moving object is retargeted', () => {
+    for(const velocity of [-1800,0,1400]){
+      const derivative=(springValue(320,90,velocity,.000001)-320)/.000001;
+      expect(Math.abs(derivative-velocity)).toBeLessThan(.1);
+    }
+  });
+  it('brakes with restrained overshoot and converges to the target', () => {
+    const positions=Array.from({length:121},(_,i)=>springValue(1,0,0,i/100));
+    expect(Math.min(...positions)).toBeGreaterThan(-.012);
+    expect(Math.abs(positions.at(-1)!)).toBeLessThan(.00001);
   });
 });

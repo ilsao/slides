@@ -8,14 +8,18 @@
 .sia-slide .sia-gb-label { font-size: 25px; font-weight: 500; }
 .sia-slide .sia-gb-caption { font-size: 22px; font-weight: 400; }
 .sia-slide .sia-gb-small { font-size: 21px; font-weight: 400; }
-.sia-slide .sia-gb-micro { font-size: 15px; font-weight: 400; letter-spacing: .5px; }
-.sia-slide .sia-gb-thread-index { font-size: 15px; font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: .2px; }
+.sia-slide .sia-gb-micro { font-size: 18px; font-weight: 400; letter-spacing: .5px; }
+.sia-slide .sia-gb-thread-index { font-size: 18px; font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: .2px; }
 .sia-slide .sia-gb-matrix-symbol { font-size: 76px; font-weight: 300; }
 .sia-slide .sia-gb-reveal { transition: opacity 360ms ease, transform 580ms cubic-bezier(.22,.72,.18,1); }
-.sia-slide .sia-gb-chip { transition: transform 680ms cubic-bezier(.22,.72,.18,1); }
+.sia-slide .sia-gb-chip { transition: transform 440ms cubic-bezier(.22,.72,.18,1); }
 .sia-slide[data-still="true"] .sia-gb-scene * { transition: none !important; animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .sia-slide .sia-gb-scene * { transition: none !important; animation: none !important; }
 }
 
-.sia-slide .sia-gb-sm-shell{transform-box:view-box;transform-origin:1008px 238px;transition:transform 960ms cubic-bezier(.22,.72,.18,1),opacity 500ms ease 90ms}
+.sia-slide .sia-gb-sm-shell{transform-box:view-box;transform-origin:0 0}
+.sia-slide .sia-gb-weight-read{opacity:0;animation:sia-weight-read 420ms cubic-bezier(.22,.72,.18,1) backwards}
+@keyframes sia-weight-read{0%{transform:translateX(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(220px);opacity:0}}
+.sia-slide .sia-gb-fanout{stroke-dasharray:210;stroke-dashoffset:0;animation:sia-fanout 440ms ease 330ms backwards}
+@keyframes sia-fanout{from{stroke-dashoffset:210}to{stroke-dashoffset:0}}

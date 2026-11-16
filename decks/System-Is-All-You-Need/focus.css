@@ -1,0 +1,20 @@
+.sia-slide .sia-focus-figure{display:block;width:1408px;height:510px;overflow:hidden;font-family:inherit}
+.sia-slide .sia-focus-figure text{font-family:inherit;letter-spacing:-.5px}
+.sia-slide .sia-focus-figure [data-motion]{transform-box:view-box;transform-origin:0 0}
+.sia-slide .sia-focus-loading-tile{transform-origin:0 0}
+.sia-slide .sia-focus-packet{opacity:0;animation:sia-focus-packet 700ms linear var(--packet-delay) backwards}
+@keyframes sia-focus-packet{0%{transform:translateX(0);opacity:0}10%,80%{opacity:1}100%{transform:translateX(184px);opacity:0}}
+.sia-slide .sia-cache-read{animation:sia-cache-read 420ms ease var(--read-delay) backwards}
+@keyframes sia-cache-read{0%,100%{opacity:1}50%{opacity:.25}}
+/* Deliberate, finite state changes; diagrams never run ambient loops. */
+.sia-slide .sia-probability{transform-origin:0 0;transition:transform 440ms cubic-bezier(.25,.1,.25,1)}
+.sia-slide .sia-compute-wait{animation:sia-compute-wait 1200ms ease backwards}
+@keyframes sia-compute-wait{0%,48%,100%{fill:#e7ebef}58%,80%{fill:#376bba}}
+.sia-slide[data-still="true"] .sia-focus-figure *{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.sia-slide .sia-focus-figure *{animation:none!important;transition:none!important}}
+.sia-slide .sia-focus-figure [data-motion-id="gpu-camera"] text{letter-spacing:0}
+.sia-slide .sia-focus-figure text{transition:fill 260ms ease}
+.sia-slide .sia-block-inset text{display:none}
+/* Shared optical rules keep borders and timing stable during camera moves. */
+.sia-slide .sia-focus-figure rect{transition:fill 420ms cubic-bezier(.25,.1,.25,1),opacity 320ms cubic-bezier(.25,.1,.25,1),stroke 260ms ease;vector-effect:non-scaling-stroke}
+.sia-slide .sia-focus-figure path{vector-effect:non-scaling-stroke}
