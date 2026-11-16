@@ -1,11 +1,11 @@
 import {test,expect,type Page} from '@playwright/test';
 const viewer='/system-is-all-you-need?start=1',live='.page-incoming';
 async function ready(page:Page){await page.goto(viewer);await expect(page.locator('.presentation-player')).toHaveAttribute('data-ready','true')}
-async function settle(page:Page){await expect.poll(()=>page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).length)).toBe(0)}
+async function settle(page:Page){await expect.poll(()=>page.locator(live).evaluate(root=>root.getAnimations({subtree:true}).filter(a=>a.effect?.getTiming().iterations!==Infinity).length),{timeout:10000}).toBe(0)}
 async function jump(page:Page,id:string){await page.keyboard.press('o');await page.locator(`[data-target="${id}"]`).click();await settle(page)}
 async function hold(page:Page){await page.evaluate(()=>{const original=Element.prototype.animate;Element.prototype.animate=function(frames,options){const a=original.call(this,frames,options);a.pause();a.currentTime=0;return a}})}
 async function frame(page:Page,time:number){return page.locator(live).evaluate((root,time)=>{root.parentElement!.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=time});const slide=root.querySelector('.sia-slide')!,s=getComputedStyle(slide),old=document.querySelector('.page-outgoing');return{opacity:s.opacity,transform:s.transform,clip:s.clipPath,oldOpacity:old?getComputedStyle(old).opacity:'0',oldVisibility:old?getComputedStyle(old).visibility:'hidden',slides:root.querySelectorAll('.sia-slide').length,clones:document.querySelectorAll('.sia-transition-snapshot').length,sceneOpacity:root.querySelector('.sia-scene')?getComputedStyle(root.querySelector('.sia-scene')!).opacity:'1'}},time)}
-async function finish(page:Page){for(let i=0;i<3;i++){await page.locator(live).evaluate(root=>root.parentElement!.getAnimations({subtree:true}).forEach(a=>a.finish()));await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.locator('.page-outgoing,[data-morph-surface]').count())break}await expect(page.locator('.page-outgoing,[data-morph-surface]')).toHaveCount(0)}
+async function finish(page:Page){for(let i=0;i<3;i++){await page.locator(live).evaluate(root=>root.parentElement!.getAnimations({subtree:true}).forEach(a=>a.effect?.getTiming().iterations===Infinity?a.cancel():a.finish()));await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.locator('.page-outgoing,[data-morph-surface]').count())break}await expect(page.locator('.page-outgoing,[data-morph-surface]')).toHaveCount(0)}
 
 test('every boundary hides the source except the six strictly timed section endings',async({page})=>{
  await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);
@@ -31,11 +31,11 @@ test('every boundary hides the source except the six strictly timed section endi
   }
   await finish(page);
  }
- expect(sectionExits).toBe(6);
+ expect(sectionExits).toBe(7);
 });
 
 test('Draw On constructs anchored contours before the fill and labels',async({page})=>{
- await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);await page.keyboard.press('o');await page.locator('[data-target="hierarchy"]').click();
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await hold(page);await page.keyboard.press('o');await page.locator('[data-target="batch"]').click();
  const scene=page.locator(`${live} .sia-scene`);await expect(scene).toHaveAttribute('data-artwork-motion','draw-on');
  const ink=await scene.evaluate(e=>e.getAnimations({subtree:true}).flatMap(a=>{const effect=a.effect as KeyframeEffect;return effect.getKeyframes().map(f=>({stroke:f.strokeDashoffset,fill:f.fillOpacity,opacity:f.opacity,transform:f.transform,delay:effect.getTiming().delay}))}));
  expect(ink.some(f=>Number(f.stroke)>0)).toBe(true);expect(ink.some(f=>f.fill!==undefined&&Number(f.fill)===0)).toBe(true);expect(ink.every(f=>!f.transform)).toBe(true);
@@ -105,15 +105,15 @@ test('section fade freezes an interrupted glyph and cannot survive rapid navigat
  await expect(page.locator('.page-outgoing')).toHaveAttribute('data-section-exit','true');
  expect(await page.locator('.page-outgoing [data-motion-id="output-1"]').evaluate(e=>getComputedStyle(e).transform)).toBe(source);
  await frame(page,120);const opacity=await page.locator('.page-outgoing').evaluate(e=>Number(getComputedStyle(e).opacity));expect(opacity).toBeGreaterThan(0);expect(opacity).toBeLessThan(1);
- await page.keyboard.press('PageDown');await frame(page,0);await expect(page.locator('.page-outgoing[data-section-exit]')).toHaveCount(0);await expect(page.locator('.page-outgoing')).toHaveCSS('visibility','hidden');
+ await page.keyboard.press('PageDown');await frame(page,0);await page.keyboard.press('PageDown');await frame(page,0);await expect(page.locator('.page-outgoing[data-section-exit]')).toHaveCount(0);await expect(page.locator('.page-outgoing')).toHaveCSS('visibility','hidden');
  await finish(page);
 });
 
 test('section fade preserves the current CSS batching progress instead of snapping to completion',async({page})=>{
  await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'continuous');
- for(let i=0;i<2;i++){await page.keyboard.press('ArrowRight');await settle(page)}
+ for(let i=0;i<3;i++){await page.keyboard.press('ArrowRight');await settle(page)}
  await hold(page);await page.keyboard.press('ArrowRight');await frame(page,120);
- const selector='[data-morph="batch-span-E"] .sia-bm-request-progress';
+ const selector='[data-morph="batch-request-E"] .sia-bm-request-progress';
  const source=await page.locator(`${live} ${selector}`).evaluate(e=>{const transform=getComputedStyle(e).transform;return{transform,scale:new DOMMatrix(transform).a}});
  expect(source.scale).toBeLessThan(1);
  await page.keyboard.press('PageDown');await frame(page,0);
@@ -168,4 +168,38 @@ test('shared and private blocks move between main and context views without snap
 
 test('advancing during a token flight preserves its pose while it settles into the sentence',async({page})=>{
  await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'generation');await page.keyboard.press('ArrowRight');const glyph=page.locator(`${live} [data-motion-id="output-1"]`);const source=await glyph.evaluate(e=>{e.getAnimations().forEach(a=>{a.pause();a.currentTime=420});return getComputedStyle(e).transform});await hold(page);await page.keyboard.press('ArrowRight');expect(await glyph.evaluate(e=>getComputedStyle(e).transform)).toBe(source);await finish(page);
+});
+
+test('opening endpoint stays open and the requested agent marks orbit in one direction',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'chatgpt');
+ const end=await page.locator(live).evaluate(root=>{const slide=root.querySelector('.sia-slide')!.getBoundingClientRect(),left=root.querySelector('.sia-door-left')!.getBoundingClientRect(),right=root.querySelector('.sia-door-right')!.getBoundingClientRect();return{seam:root.querySelector('.sia-door-seam')?'present':'absent',left:left.right<=slide.left+1,right:right.left>=slide.right-1}});
+ expect(end).toEqual({seam:'absent',left:true,right:true});await expect(page.locator(`${live} h1`)).toHaveText('ChatGPT');
+ await jump(page,'agents');const marks=await page.locator(`${live} .sia-orbit`).evaluateAll(es=>es.map(e=>({name:e.textContent!.trim(),period:(e as HTMLElement).style.getPropertyValue('--period'),direction:(e as HTMLElement).style.getPropertyValue('--drift'),loaded:(e.querySelector('img') as HTMLImageElement).complete})));expect(marks.map(m=>m.name).sort()).toEqual(['Claude Code','Codex','Cursor','OpenAI','Qwen','Gemini','GLM','Copilot'].sort());expect(marks.every(m=>m.direction==='1'&&m.period==='12s'&&m.loaded)).toBe(true);
+});
+
+test('attention weights have clear keys and sampling distributions interpolate before full-size EOS',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'attention');await expect(page.locator(`${live} [data-build="selected-weights"]`)).toContainText('human 的注意力權重');await expect(page.locator(`${live} [data-build="selected-weights"]`)).toContainText('softmax');
+ await jump(page,'generation');await hold(page);await page.keyboard.press('ArrowRight');const values=[];for(const time of [0,200,600]){await frame(page,time);values.push(await page.locator(`${live} [data-motion-id="probability-0"]`).evaluate(e=>new DOMMatrix(getComputedStyle(e).transform).a))}expect(Math.abs(values[0]-values[2])).toBeGreaterThan(.01);expect(values[1]).toBeLessThan(values[0]);expect(values[1]).toBeGreaterThan(values[2]);await finish(page);
+ for(let i=0;i<3;i++){await page.keyboard.press('ArrowRight');await finish(page)}await expect(page.locator(`${live} .sia-generation-eos text`)).toHaveAttribute('font-size','64');
+});
+
+test('GPU overview keeps its pose and timeline bars match the playhead during rewind and E admission',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'gpu');const gpu=page.locator(`${live} [data-motion-id="gpu-overview"]`);expect(await gpu.evaluate(e=>new DOMMatrix(getComputedStyle(e).transform).a)).toBe(1);const source=await gpu.boundingBox();await hold(page);await page.keyboard.press('ArrowRight');expect(await gpu.boundingBox()).toEqual(source);await finish(page);expect(await gpu.evaluate(e=>new DOMMatrix(getComputedStyle(e).transform).a)).toBeCloseTo(.32);
+ await page.keyboard.press('o');await page.locator('[data-target="static"]').click();await finish(page);for(let i=0;i<6;i++){await page.keyboard.press('ArrowRight');await finish(page)}await page.keyboard.press('PageDown');
+ for(const time of [0,150,300,620]){await frame(page,time);const samples=await page.locator(`${live} .sia-bm`).evaluate(root=>{const r=root.getBoundingClientRect(),scale=r.width/1408,head=root.querySelector('.sia-bm-playhead')!.getBoundingClientRect(),t=((head.left-r.left)/scale-94)/20;return ['A','B','C'].map((id,i)=>({actual:new DOMMatrix(getComputedStyle(root.querySelector(`[data-motion-id="batch-progress-${id}"]`)!).transform).a,expected:Math.min(1,Math.max(0,t/[10,30,50][i]))}))});for(const s of samples)expect(s.actual).toBeCloseTo(s.expected,2)}await finish(page);
+ await page.keyboard.press('ArrowRight');await finish(page);await page.keyboard.press('ArrowRight');await finish(page);await expect(page.locator(`${live} .sia-bm`)).toHaveAttribute('data-time','30');await expect(page.locator(`${live} [data-morph="batch-request-E"]`)).toHaveClass(/is-waiting/);await page.keyboard.press('ArrowRight');await finish(page);await expect(page.locator(`${live} .sia-bm`)).toHaveAttribute('data-time','30');await expect(page.locator(`${live} [data-morph="batch-request-E"]`)).toHaveClass(/is-admitted/);
+});
+
+test('fast and slow memory streams remain live and reach inside the SM',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);
+ for(const[id,duration]of [['bottlenecks',600],['memory-bound',2400]] as const){await jump(page,id);const data=await page.locator(`${live} .sia-bound-data`).first().evaluate((e,duration)=>{const a=e.getAnimations().find(a=>a.effect!.getTiming().iterations===Infinity)!;a.pause();a.currentTime=duration*2.95;const rect=e.getBoundingClientRect(),sm=e.closest('svg')!.querySelector('.sia-bound-work,.sia-bound-idle')!.getBoundingClientRect();return{duration:a.effect!.getTiming().duration,iterations:a.effect!.getTiming().iterations,inside:rect.left>sm.left&&rect.right<sm.right,visible:Number(getComputedStyle(e).opacity)>0}},duration);expect(data.duration).toBe(duration);expect(data.iterations).toBe(Infinity);expect(data.inside&&data.visible).toBe(true)}
+});
+
+
+test('admitted D has one stable background and its blue fill tracks time without a second reveal',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});await ready(page);await jump(page,'continuous');await page.keyboard.press('ArrowRight');await settle(page);
+ const card=page.locator(`${live} [data-morph="batch-request-D"]`);await expect(card.locator('.sia-bm-request-progress')).toHaveCount(1);await expect(page.locator(`${live} [data-morph="batch-span-D"]`)).toHaveCount(0);
+ expect(await card.locator('.sia-bm-request-progress').evaluate(e=>new DOMMatrix(getComputedStyle(e).transform).a)).toBe(0);
+ const box=await card.boundingBox();await hold(page);await page.keyboard.press('ArrowRight');
+ for(const time of [0,100,260,520,900]){await frame(page,time);expect(await card.boundingBox()).toEqual(box);const sample=await card.evaluate(e=>{const bm=e.closest('.sia-bm')!,r=bm.getBoundingClientRect(),s=r.width/1408,head=bm.querySelector('.sia-bm-playhead')!.getBoundingClientRect(),t=((head.left-r.left)/s-94)/20,p=e.querySelector('.sia-bm-request-progress')!;return{animations:p.getAnimations().map(a=>({time:a.currentTime,delay:a.effect!.getTiming().delay,frames:(a.effect as KeyframeEffect).getKeyframes()})),actual:new DOMMatrix(getComputedStyle(p).transform).a,expected:Math.max(0,Math.min(1,(t-10)/40)),background:getComputedStyle(e).backgroundColor,clip:getComputedStyle(e).clipPath,border:parseFloat(getComputedStyle(e).borderLeftWidth)*s,progressLeft:p.getBoundingClientRect().left,cardLeft:e.getBoundingClientRect().left}});expect(sample.actual,JSON.stringify(sample)).toBeCloseTo(sample.expected,3);expect(sample.background).toBe('rgb(233, 238, 245)');expect(sample.clip).toBe('none');expect(sample.progressLeft-sample.cardLeft).toBeCloseTo(sample.border,2)}await finish(page);
 });

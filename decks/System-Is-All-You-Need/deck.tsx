@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import { defineDeck, type SlideRenderProps } from '../../src/presentation';
 import { GpuArchitecture, WarpHierarchy, MemoryHierarchy, WhyBatch } from './FocusedHardware';
 import { StaticBatchMorph, ContinuousBatchMorph } from './BatchMorph';
@@ -30,24 +30,25 @@ const PagingScene=({step}:{step:number})=><KvMorph phase="paging" step={step}/>;
 const GrowthScene=({step}:{step:number})=><KvMorph phase="growth" step={step}/>;
 const SharingScene=({step}:{step:number})=><KvMorph phase="sharing" step={step}/>;
 export const systemPages: Page[] = [
-  {id:'cover',title:'System Is All You Need',steps:1,chapter:'ML Systems',kind:'cover'},
+  {id:'cover',title:'Beyond the Model: Unveiling the Systems Behind AI',steps:1,chapter:'ML Systems',kind:'cover'},
   {id:'chatgpt',title:'2022 · ChatGPT',steps:1,chapter:'引言',kind:'epoch'},
   {id:'agents',title:'2025 · AI Agents',steps:1,chapter:'引言',kind:'epoch'},
   {id:'question',title:'模型之外',steps:1,chapter:'引言',kind:'question'},
   {id:'stage',title:'Model + System',steps:2,chapter:'引言',kind:'stage'},
   {id:'request-title',title:'一次 LLM 請求',steps:1,chapter:'一次 LLM 請求',kind:'chapter'},
-  {id:'request',lead:'追蹤同一個 request A',title:'一次請求',headings:['Request','Queue','Scheduler','Transformer'],steps:4,chapter:'一次 LLM 請求',scene:RequestJourney},
+  {id:'request',lead:'追蹤同一個 request A',title:'一次請求',headings:['Prompt','Client','Queue','Scheduler','Transformer'],steps:5,chapter:'一次 LLM 請求',scene:RequestJourney},
   {id:'tokens',lead:'文字 → token IDs → 向量',title:'Tokenization',headings:['文字','Tokens','Embeddings'],steps:3,chapter:'一次 LLM 請求',scene:Tokenization},
   {id:'attention',lead:'用 Q 比對 K，再按權重加總 V',title:'Attention',steps:3,chapter:'一次 LLM 請求',scene:ContextAttention,source:'attention'},
   {id:'generation',lead:'取樣一個 token，再加入上下文',title:'逐 Token 生成',steps:5,chapter:'一次 LLM 請求',scene:Generation},
+  {id:'system-title',title:'System Is All You Need',steps:1,chapter:'System Is All You Need',kind:'chapter'},
   {id:'gpu-title',title:'GPU Architecture',steps:1,chapter:'GPU Architecture',kind:'chapter'},
   {id:'gpu',lead:'從整顆 GPU，放大到一顆 SM',title:'GPU',headings:['GPU','SM','SM'],steps:3,chapter:'GPU Architecture',scene:GpuArchitecture,source:'cuda'},
   {id:'warp',lead:'Grid → Block → Warp · 32 threads',title:'Thread / Warp / Block',headings:['Grid','Thread block','Warp'],steps:3,chapter:'GPU Architecture',scene:WarpHierarchy,source:'cuda'},
-  {id:'hierarchy',lead:'越靠近運算單元，容量越小、延遲越低',title:'Memory hierarchy',steps:3,chapter:'GPU Architecture',scene:MemoryHierarchy,source:'cuda'},
+  {id:'hierarchy',lead:'越靠近運算單元，容量越小、延遲越低',title:'Memory hierarchy',steps:4,chapter:'GPU Architecture',scene:MemoryHierarchy,source:'cuda'},
   {id:'batch-title',title:'Continuous Batching',steps:1,chapter:'Continuous Batching',kind:'chapter'},
   {id:'batch',lead:'同一份權重，服務多個請求',title:'Batching',steps:2,chapter:'Continuous Batching',scene:WhyBatch},
-  {id:'static',lead:'空位必須等待整批完成',title:'Static batching',steps:4,chapter:'Continuous Batching',scene:StaticBatchMorph,source:'orca'},
-  {id:'continuous',lead:'每一輪結束，就能補入新請求',title:'Continuous batching',steps:4,chapter:'Continuous Batching',scene:ContinuousBatchMorph,source:'orca'},
+  {id:'static',lead:'空位必須等待整批完成',title:'Static batching',steps:7,chapter:'Continuous Batching',scene:StaticBatchMorph,source:'orca'},
+  {id:'continuous',lead:'每一輪結束，就能補入新請求',title:'Continuous batching',steps:5,chapter:'Continuous Batching',scene:ContinuousBatchMorph,source:'orca'},
   {id:'flash-title',title:'FlashAttention',steps:1,chapter:'FlashAttention',kind:'chapter'},
   {id:'bottlenecks',lead:'資料持續到齊，算力成為限制',title:'Compute-bound',steps:1,chapter:'FlashAttention',scene:Bottlenecks,source:'roof'},
   {id:'memory-bound',lead:'運算單元在等待資料',title:'Memory-bound',steps:1,chapter:'FlashAttention',scene:MemoryBound,source:'roof'},
@@ -76,17 +77,17 @@ export const systemPages: Page[] = [
 
 function HeadingText({text}:{text:string}){return <>{text.split(/(\s+)/).map((part,i)=>part.trim()?<span className="sia-reveal-clip sia-title-word" key={i}><span data-reveal="heading">{part}</span></span>:part)}</>}
 
+const agentIcons=Object.entries(import.meta.glob('./assets/agents/*.svg',{eager:true,query:'?url',import:'default'})) as [string,string][];
 function Epoch({agents}:{agents:boolean}) {
- return <div className="sia-epoch-layout" data-epoch={agents?'agents':'chat'}>
-  <div className="sia-year" data-morph="epoch-year">{agents?'2025':'2022'}</div>
-  <div className="sia-epoch-copy"><h1><span className="sia-reveal-clip"><span data-reveal="hero">{agents?'Agents':'ChatGPT'}</span></span></h1></div>
-  <div className="sia-epoch-detail">{agents?<div className="sia-agent-sequence">{['Plan','Build','Run'].map((label,i)=><div key={label} data-reveal="agent" data-reveal-order={i}><i>{String(i+1).padStart(2,'0')}</i><span>{label}</span>{i<2&&<b>→</b>}</div>)}<svg viewBox="0 0 1200 18" aria-hidden="true"><path d="M10 9H1190"/><circle r="6" className="sia-agent-task"/></svg></div>:<div className="sia-chat-form"><span>{['What','makes','us','human?'].map((word,i)=><span className="sia-reveal-clip" key={word}><span data-reveal="prompt" data-reveal-order={i}>{word}&nbsp;</span></span>)}</span><i data-reveal="prompt" data-reveal-order="4">↵</i></div>}</div>
+ return <div className={`sia-epoch-layout ${agents?'sia-agent-world':''}`}>
+  <div className="sia-year">{agents?'2025':'2022'}</div>
+  {agents?<><h1 className="sia-agent-center">Agents</h1><div className="sia-agent-orbits">{agentIcons.filter(([name])=>['claudecode','codex','cursor','openai','qwen','googlegemini','glm','githubcopilot'].includes(name.split('/').pop()!.replace('.svg',''))).map(([name,src],i)=><div className="sia-agent-flight" key={name}><div className="sia-orbit" style={{'--angle':`${18-i*45}deg`,'--radius':`${310+i%3*22}px`,'--period':'12s','--drift':'1'} as CSSProperties}><div><img src={src} alt={{claudecode:'Claude Code',codex:'Codex',cursor:'Cursor',openai:'OpenAI',qwen:'Qwen',googlegemini:'Gemini',glm:'GLM',githubcopilot:'Copilot'}[name.split('/').pop()!.replace('.svg','') as 'codex']}/><span>{{claudecode:'Claude Code',codex:'Codex',cursor:'Cursor',openai:'OpenAI',qwen:'Qwen',googlegemini:'Gemini',glm:'GLM',githubcopilot:'Copilot'}[name.split('/').pop()!.replace('.svg','') as 'codex']}</span></div></div></div>)}</div></>:<><div className="sia-epoch-copy"><h1><img className="sia-openai-logo" src={agentIcons.find(([name])=>name.endsWith('/openai.svg'))?.[1]} alt="OpenAI"/>ChatGPT</h1></div><div className="sia-chat-question">What makes us human?</div><a className="sia-openai-source" href="https://openai.com/index/chatgpt/" target="_blank" rel="noreferrer">OpenAI · Introducing ChatGPT · 2022</a><div className="sia-door sia-door-left"/><div className="sia-door sia-door-right"/></>}
  </div>;
 }
 function StageReveal({step}:{step:number}) {
  return <div className="sia-stage-reveal" data-expanded={step>=1}>
   <h1><span className="sia-model-word">Model</span><span className="sia-system-word">+ System</span></h1>
-  <div className="sia-system-stack">{['Application','Model','Runtime','Hardware'].map((name,i)=><div key={name} className={`sia-stack-layer sia-stack-${i}`} style={{transitionDelay:step>=1?`${[50,0,120,210][i]}ms`:'0ms'}}><span>{name}</span></div>)}</div>
+  <div className="sia-system-stack">{['Serving System','Model','GPU Clusters'].map((name,i)=><div key={name} className={`sia-stack-layer sia-stack-${i}`} style={{transitionDelay:step>=1?`${[50,0,120,210][i]}ms`:'0ms'}}><span>{name}</span></div>)}</div>
  </div>;
 }
 
@@ -119,7 +120,7 @@ function Slide(r:SlideRenderProps) {
   return <section className={`sia-slide sia-${page.id} ${dark?'sia-dark':''}`} data-still={r.still||r.reducedMotion} data-step={r.step} data-slide-id={page.id} data-kind={page.kind} aria-label={page.title}>
     <div className="sia-topline"><span>{page.chapter}</span></div>
     {Scene&&<><header className="sia-heading" data-entry="title"><h1><HeadingText text={page.headings?.[r.step]??page.title}/></h1></header><main className="sia-scene" data-entry="diagram"><Scene step={r.step}/></main></>}
-    {page.kind==='cover'&&<><img className="sia-photo-art sia-cover-photo" src={cosmicArt} alt="" fetchPriority="high" decoding="sync"/><div className="sia-cover-shade"/><div className="sia-cover-layout"><h1><span className="sia-reveal-clip"><span data-reveal="bookend">System is</span></span><span className="sia-reveal-clip"><span data-reveal="bookend">all you need.</span></span></h1><p>LLM inference, from a systems perspective</p></div></>}
+    {page.kind==='cover'&&<><img className="sia-photo-art sia-cover-photo" src={cosmicArt} alt="" fetchPriority="high" decoding="sync"/><div className="sia-cover-shade"/><div className="sia-cover-layout"><h1><span className="sia-reveal-clip"><span data-reveal="bookend">Beyond the Model:</span></span><span className="sia-reveal-clip"><span data-reveal="bookend">Unveiling the Systems</span></span><span className="sia-reveal-clip"><span data-reveal="bookend">Behind AI</span></span></h1></div></>}
     {page.kind==='epoch'&&<Epoch agents={page.id==='agents'}/>}
     {page.kind==='question'&&<div className="sia-question-layout"><h1><span className="sia-reveal-clip"><span data-reveal="question" data-reveal-order="0">我們學的系統</span></span><span className="sia-reveal-clip"><span data-reveal="question" data-reveal-order="1">還有價值嗎？</span></span></h1></div>}
     {page.kind==='stage'&&<StageReveal step={r.step}/>}
@@ -132,11 +133,11 @@ function Slide(r:SlideRenderProps) {
 }
 
 export const systemIsAllYouNeed=defineDeck({
-  id:'system-is-all-you-need',title:'System Is All You Need',version:13,
+  id:'system-is-all-you-need',title:'System Is All You Need',version:20,
   description:'一次 LLM 請求背後的系統工程。GPU、Continuous Batching、FlashAttention 與 PagedAttention。',
   size:{width:1600,height:900},slides:systemPages.map(({id,title,steps})=>({id,title,steps})),RenderSlide:Slide,
   transition:systemTransition,freezeEntranceOnNavigation:false,Provider:PhotographyReady,
   handout:{title:'講者備註（Markdown）',href:notesUrl},
   previews:[{slideId:'cover'},{slideId:'continuous'},{slideId:'flash-title'},{slideId:'paging'},{slideId:'roofline'},{slideId:'takeaway'}],
-  chapters:[{id:'intro',title:'引言',slideId:'cover'},{id:'request',lead:'追蹤同一個 request A',title:'一次請求',slideId:'request-title'},{id:'gpu',lead:'從整顆 GPU，放大到一顆 SM',title:'GPU',slideId:'gpu-title'},{id:'batching',title:'Continuous Batching',slideId:'batch-title'},{id:'flash',title:'FlashAttention',slideId:'flash-title'},{id:'paged',title:'PagedAttention',slideId:'paged-title'},{id:'systems',lead:'把排程、運算與記憶體，接回同一次請求',title:'一次請求，系統的視角',slideId:'systems-title'},{id:'refs',title:'References',slideId:'sources'}],
+  chapters:[{id:'intro',title:'引言',slideId:'cover'},{id:'request',lead:'追蹤同一個 request A',title:'一次請求',slideId:'request-title'},{id:'system-intro',title:'System Is All You Need',slideId:'system-title'},{id:'gpu',lead:'從整顆 GPU，放大到一顆 SM',title:'GPU',slideId:'gpu-title'},{id:'batching',title:'Continuous Batching',slideId:'batch-title'},{id:'flash',title:'FlashAttention',slideId:'flash-title'},{id:'paged',title:'PagedAttention',slideId:'paged-title'},{id:'systems',lead:'把排程、運算與記憶體，接回同一次請求',title:'一次請求，系統的視角',slideId:'systems-title'},{id:'refs',title:'References',slideId:'sources'}],
 });

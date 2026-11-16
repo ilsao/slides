@@ -167,3 +167,44 @@
 .sia-slide .sia-lead{display:none}
 
 .sia-slide .sia-title-word{display:inline-block;vertical-align:bottom}
+/* Opening and agent ecosystem, v14. */
+.sia-cover .sia-cover-layout h1{font-size:105px;line-height:1.12;letter-spacing:-4px}
+.sia-chatgpt .sia-epoch-layout{inset:0}
+.sia-chatgpt .sia-year{position:absolute;left:100px;top:110px}
+.sia-chatgpt .sia-epoch-copy{left:100px;top:248px}
+.sia-chat-question{position:absolute;left:100px;top:570px;font-size:52px}
+.sia-openai-source{position:absolute;left:100px;bottom:100px;font-size:22px;color:var(--sia-muted);text-decoration:none}
+.sia-door{position:absolute;top:0;bottom:0;width:50%;background:#080b10;z-index:10;pointer-events:none}
+.sia-door-left{left:0}.sia-door-right{right:0}
+.sia-door-seam{position:absolute;left:calc(50% - 1px);top:0;height:100%;width:2px;background:white;z-index:11;pointer-events:none}
+.sia-slide[data-still="true"] .sia-door,.sia-slide[data-still="true"] .sia-door-seam{display:none}
+.sia-agent-world .sia-year{position:absolute;left:0;top:0}
+.sia-agent-center{position:absolute;inset:0;display:grid;place-items:center;font-size:150px;font-weight:400;letter-spacing:-7px}
+.sia-agent-orbits{position:absolute;inset:0;pointer-events:none}
+.sia-agent-flight{position:absolute;inset:0}
+.sia-orbit{position:absolute;left:50%;top:50%;width:0;height:0;animation:sia-orbit var(--period) linear infinite;transform:rotate(var(--angle))}
+.sia-orbit>div{position:absolute;left:var(--radius);top:0;width:100px;transform:translate(-50%,-50%);text-align:center}
+.sia-orbit img{width:58px;height:58px;object-fit:contain;filter:invert(1);animation:sia-counter-orbit var(--period) linear infinite}
+.sia-orbit span{display:block;font-size:15px;color:#9aa6b8;margin-top:8px}
+@keyframes sia-orbit{to{transform:rotate(calc(var(--angle) + 360deg * var(--drift)))}}
+@keyframes sia-counter-orbit{from{transform:rotate(calc(-1 * var(--angle)))}to{transform:rotate(calc(-1 * var(--angle) - 360deg * var(--drift)))}}
+.sia-section-number{font-size:26px;letter-spacing:.5px;color:#d0d8e3;margin-bottom:30px}
+.sia-stack-2{opacity:0}
+.sia-policy-tag{position:absolute;left:94px;top:35px;color:#376bba;font-size:30px}
+.sia-orbit>div{animation:sia-counter-orbit var(--period) linear infinite}
+.sia-orbit img{animation:none}
+@keyframes sia-counter-orbit{from{transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle)))}to{transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle) - 360deg * var(--drift)))}}
+.sia-openai-logo{width:100px;height:100px;margin-right:35px}
+.sia-orbit>div{transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle)))}
+.sia-slide [data-memory-level]{transition:fill 420ms ease}
+.sia-openai-logo{vertical-align:middle}
+.sia-art-references .sia-credit-grid{gap:14px 50px}
+.sia-art-references .sia-credit-grid a{min-height:88px}
+.sia-art-references .sia-credit-grid img{width:138px;height:80px}
+/* Authored endpoints survive WAAPI cleanup. */
+.sia-door-left{transform:translateX(-100%)}
+.sia-door-right{transform:translateX(100%)}
+.sia-door-seam{opacity:0}
+/* The edge travels with the opening panel; there is no independent seam. */
+.sia-door-left{border-right:1px solid #606a78}
+.sia-door-right{border-left:1px solid #606a78}

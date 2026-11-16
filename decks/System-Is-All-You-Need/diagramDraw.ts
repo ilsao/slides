@@ -12,7 +12,7 @@ export function drawArtwork(root:HTMLElement,delay=70,protectedObjects={motions:
       if(d.morph&&protectedObjects.morphs.has(d.morph))return true;
       if(d.motion){
         if(protectedObjects.motions.has(d.motionId??d.motion))return true;
-        if(['token','route','settle','roofline'].includes(d.motion)||d.from)return true;
+        if(['token','route','settle','roofline','probability'].includes(d.motion)||d.from)return true;
       }
     }
     return false;

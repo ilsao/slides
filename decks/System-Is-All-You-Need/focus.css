@@ -18,3 +18,10 @@
 /* Shared optical rules keep borders and timing stable during camera moves. */
 .sia-slide .sia-focus-figure rect{transition:fill 420ms cubic-bezier(.25,.1,.25,1),opacity 320ms cubic-bezier(.25,.1,.25,1),stroke 260ms ease;vector-effect:non-scaling-stroke}
 .sia-slide .sia-focus-figure path{vector-effect:non-scaling-stroke}
+.sia-bound-data{animation:sia-bound-transfer var(--transfer-time) cubic-bezier(.2,0,.2,1) var(--transfer-delay) both}
+@keyframes sia-bound-transfer{0%{transform:translateX(0);opacity:0}10%,85%{opacity:1}100%{transform:translateX(275px);opacity:0}}
+.sia-bound-work{animation:sia-bound-work 1300ms ease both}
+@keyframes sia-bound-work{0%,10%{fill:#e7ebef}20%,90%{fill:#c5d8ee}100%{fill:#e7ebef}}
+.sia-bound-data{animation:sia-bound-stream var(--transfer-time) linear var(--transfer-delay) infinite}
+@keyframes sia-bound-stream{0%{transform:translateX(0);opacity:0}5%,90%{opacity:1}100%{transform:translateX(400px);opacity:0}}
+.sia-bound-work{animation:sia-bound-work 1300ms ease infinite}

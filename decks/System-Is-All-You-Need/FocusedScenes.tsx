@@ -2,59 +2,55 @@ import type {CSSProperties} from 'react';
 import {Figure,T,Arrow,Matrix,Packet,Queue,Cache,ink,blue,muted,line,paper,soft,type Props} from './FocusPrimitives';
 
 export function RequestJourney({step}:Props){
+ const station=Math.max(0,step-1);
  const names=['Client','Queue','Scheduler','GPU'],xs=[44,384,724,1064],ports=[164,504,844,1184];
  return <Figure hero="request" label="同一個請求 A 從使用者，經佇列與排程器，送入 GPU。">
-  <T x={704} y={65} size={41} anchor="middle">What makes us human?</T>
-  {names.map((name,i)=><g key={name} opacity={i===step?1:.72}>
-   <rect x={xs[i]} y="130" width="240" height="270" rx="8" fill={i===step?soft:paper} stroke={i===step?blue:line} strokeWidth={i===step?2.5:1.5}/>
-   <T x={ports[i]} y={173} size={30} anchor="middle" fill={i===step?ink:muted}>{name}</T>
+  <g data-motion="camera" data-motion-id="prompt-card" data-motion-key={step===0?'compose':'sent'} style={{transform:step===0?'translate(320px,0px) scale(1)':'translate(73px,220px) scale(.24)'}}><rect width="760" height="110" rx="18" fill={paper} stroke={line} strokeWidth="2"/><T x={28} y={65} size={36}>What makes us human?</T><T x={708} y={66} size={36} fill={blue}>↑</T></g>
+  {names.map((name,i)=><g key={name} opacity={i===station?1:.72}>
+   <rect x={xs[i]} y="130" width="240" height="270" rx="8" fill={i===station?soft:paper} stroke={i===station?blue:line} strokeWidth={i===station?2.5:1.5}/>
+   <T x={ports[i]} y={173} size={30} anchor="middle" fill={i===station?ink:muted}>{name}</T>
    <T x={ports[i]} y={444} size={25} anchor="middle" fill={muted}>{['送出請求','等待運算','選出下一批','執行模型'][i]}</T>
    {i===0&&<g><path d="M96 222H232V317H188L164 338V317H96Z" fill="none" stroke={line} strokeWidth="2"/></g>}
    {i===1&&['B','C'].map((id,j)=><g key={id}><rect x="422" y={288+j*47} width="164" height="35" fill="#d7dee7"/><T x={441} y={313+j*47} size={23} fill={muted}>{id}</T></g>)}
    {i===2&&<g><rect x="764" y="218" width="160" height="129" fill="none" stroke={line}/><T x={844} y={373} size={22} anchor="middle" fill={muted}>下一個 slot</T></g>}
    {i===3&&Array.from({length:12},(_,j)=><rect key={j} x={1091+j%4*47} y={219+Math.floor(j/4)*48} width="35" height="35" fill="#c7d3e4"/>)}
   </g>)}
-  {[0,1,2].map(i=><Arrow key={i} d={`M${xs[i]+255} 265H${xs[i+1]-16}m-9-6 9 6-9 6`} active={i<step}/>)}
-  <Packet x={ports[step]} y={step===1?242:276} size={step===1?54:60}/>
+  {[0,1,2].map(i=><Arrow key={i} d={`M${xs[i]+255} 265H${xs[i+1]-16}m-9-6 9 6-9 6`} active={i<station}/>)}
+  {step>0&&<g data-build="request-packet" data-delay="800"><Packet x={ports[station]} y={station===1?242:276} size={station===1?54:60}/></g>}
  </Figure>;
 }
-export function Tokenization({step}:Props){
- const words=['What','makes','us','human','?'];
- return <Figure hero="tokens" label="同一段文字依序變成 token、ID，再成為 embedding 矩陣。">
-  {step===0?<T x={704} y={276} size={71} anchor="middle">What makes us human?</T>:step===1?<g>{words.map((word,i)=><g key={word} data-build={`token-${i}`} data-delay={i*65}><rect x={184+i*212} y="181" width="192" height="148" fill={soft}/><T x={280+i*212} y={253} size={37} anchor="middle">{word}</T><T x={280+i*212} y={303} size={26} fill={blue} anchor="middle">ID {[101,207,318,426,9][i]}</T></g>)}</g>:<g>{words.map((_,i)=><g key={i} data-build={`embedding-${i}`} data-delay={i*65}><T x={280+i*212} y={36} size={27} fill={muted} anchor="middle">{words[i]}</T><T x={280+i*212} y={84} size={33} anchor="middle" fill={blue}>{[101,207,318,426,9][i]}</T>{Array.from({length:9},(_,j)=><rect key={j} x={207+i*212} y={112+j*39} width="146" height="29" fill={blue} opacity={.2+((j*3+i)%8)*.1}/>)}</g>)}</g>}
- </Figure>;
-}
+export function Tokenization({step}:Props){const words=['What','makes','us','human','?'],ids=[101,207,318,426,9];return <Figure hero="tokens" label="五個token各自對應一列embedding向量，合成5乘d的矩陣。">
+ {step===0?<T x={704} y={276} size={71} anchor="middle">What makes us human?</T>:step===1?<g>{words.map((word,i)=><g key={word} data-build={`token-${i}`} data-delay={i*65}><rect x={184+i*212} y="181" width="192" height="148" fill={soft}/><T x={280+i*212} y={253} size={37} anchor="middle">{word}</T><T x={280+i*212} y={303} size={26} fill={blue} anchor="middle">ID {ids[i]}</T></g>)}</g>:<g><T x={731} y={45} size={27} anchor="middle" fill={muted}>embedding dimensions →</T><path d="M370 82H350V446H370M1090 82H1110V446H1090" stroke={ink} strokeWidth="3" fill="none"/>{words.map((word,i)=><g key={word} data-build={`embedding-${i}`}><T x={125} y={132+i*70} size={30} fill={muted}>{word}</T><T x={304} y={132+i*70} size={25} fill={blue} anchor="end">{ids[i]}</T>{Array.from({length:9},(_,j)=><rect key={j} x={378+j*78} y={95+i*70} width="64" height="50" fill={blue} opacity={.2+((j*3+i)%8)*.1}/>)}</g>)}<T x={731} y={498} size={32} fill={blue} anchor="middle">E ∈ ℝ⁵ˣᵈ · 5 tokens × d dimensions</T></g>}
+ </Figure>}
 export function ContextAttention({step}:Props){
  const words=['What','makes','us','human','?','Our','shared','connections','.'],weights=[[.08,.12,.45,.35],[.14,.48,.11,.27],[.05,.18,.24,.53]],x=300,y=90,stride=43;
  return <Figure hero="attention-map" label={`Head ${step+1}：用 human 的 Query 比對已知 tokens 的 Keys，再用權重加總 Values。`}>
   <T x={489} y={22} size={25} anchor="middle" fill={muted}>Keys · token 位置</T><T x={100} y={66} size={26} fill={muted}>Queries</T>
   {words.map((word,r)=><g key={word}><T x={277} y={y+r*stride+27} size={r===3?27:24} anchor="end" fill={r===3?blue:muted}>{word}</T><T x={x+r*stride+19} y={65} size={22} anchor="middle" fill={muted}>{r}</T></g>)}
-  {Array.from({length:81},(_,i)=>{const r=Math.floor(i/9),c=i%9,masked=c>r,w=masked?0:r===3?weights[step][c]*8:1+((r*7+c*3+step*5)%8);return <g key={i}><rect x={x+c*stride} y={y+r*stride} width="38" height="38" fill={masked?soft:blue} opacity={masked?.35:.15+w*.1} stroke={r===3?blue:'none'} strokeWidth="2"/>{masked&&<path d={`M${x+7+c*stride} ${y+31+r*stride}l24-24`} stroke="#a5aebb"/>}</g>})}
+  {Array.from({length:81},(_,i)=>{const r=Math.floor(i/9),c=i%9,masked=c>r,w=masked?0:r===3?weights[step][c]*8:1+((r*7+c*3+step*5)%8);return <g key={i}><rect x={x+c*stride} y={y+r*stride} width="38" height="38" fill={masked?soft:blue} opacity={masked?.35:.15+w*.1} stroke={r===3&&c<=3?blue:'none'} strokeWidth="2"/>{masked&&<path d={`M${x+7+c*stride} ${y+31+r*stride}l24-24`} stroke="#a5aebb"/>}</g>})}
   <g data-build="selected-weights" data-state={step}>
-   <T x={824} y={78} size={31} fill={blue}>human 的 Q · Head {step+1}</T><T x={824} y={125} size={25} fill={muted}>比對 K → 權重 → 加總 V</T>
-   {weights[step].map((w,i)=><g key={i}><T x={824} y={190+i*59} size={27} fill={muted}>{words[i]}</T><rect x="943" y={169+i*59} width={w*340} height="25" fill={blue} opacity={.45+w}/><T x={1235} y={190+i*59} size={26} fill={blue} anchor="end">{w.toFixed(2)}</T><T x={1300} y={190+i*59} size={24} fill={muted}>V{i}</T></g>)}
-   <path d="M824 401H1340" stroke={line}/><T x={824} y={452} size={29} fill={blue}>Σ wⱼ Vⱼ → 更新 human</T>
+   <T x={824} y={76} size={29} fill={blue}>human 的注意力權重</T>
+   {weights[step].map((w,i)=><g key={i}><T x={824} y={166+i*60} size={27} fill={muted}>{words[i]}</T><rect x="943" y={144+i*60} width={w*440} height="27" fill={blue}/><T x={1328} y={166+i*60} size={26} anchor="end" fill={muted}>{w.toFixed(2)}</T></g>)}
+   <path d="M824 389H1340" stroke={line}/><T x={824} y={435} size={27} fill={blue}>Attention(Q, K, V) =</T><T x={824} y={483} size={30} fill={blue}>softmax(QKᵀ / √dₖ) V</T>
   </g>
  </Figure>;
 }
 export function Generation({step}:Props){
+ const order=[[1,0,2],[2,1,0],[0,2,1],[1,2,0],[2,0,1]][step];
  const words=['Our','shared','connections','.'],xs=[160,299,523,872],candidates=[['Our','The','It'],['shared','own','human'],['connections','stories','experiences'],['.','and',','],['EOS','We','That']][step],probs=[[.54,.28,.18],[.43,.35,.22],[.68,.19,.13],[.79,.14,.07],[.91,.06,.03]][step];
- return <Figure hero="sampling" label={`下一 token 分布依上下文改變，選中 ${candidates[0]} 後移入輸出。`}><T x={260} y={22} size={24} fill={muted}>候選</T><T x={550} y={22} size={24} fill={muted}>P(next token)</T><T x={1220} y={22} size={24} fill={muted}>取樣</T><Arrow d="M1182 75H1206m-8-5 8 5-8 5"/><T x={160} y={346} size={24} fill={muted}>Streaming output</T>
-  {candidates.map((word,i)=><g key={i}><text key={`chosen-${step}-${i}`} x="260" y={88+i*99} fontSize="34" fill={i?muted:blue} className={i===0?'sia-candidate-picked':undefined}>{word}</text><rect x="550" y={62+i*99} width="540" height="20" fill={soft}/><rect x="550" y={62+i*99} width="540" height="20" fill={i?muted:blue} className="sia-probability" style={{transform:`translateX(${550*(1-probs[i])}px) scaleX(${probs[i]})`}}/><T x={1170} y={88+i*99} size={30} anchor="end" fill={muted}>{probs[i].toFixed(2)}</T></g>)}
-  {words.slice(0,Math.min(step+1,4)).map((word,i)=><g key={word} data-motion={i===step?'token':'settle'} data-motion-id={`output-${i}`} data-motion-key={i===step?i:`settled-${i}`} data-x={xs[i]} data-y="447" data-size="64" data-source-x="1220" data-source-y="88" data-source-size="28" style={{transform:`translate(${xs[i]}px,447px)`}}><T x={0} y={0} size={64} fill={i===step?blue:ink}>{word}</T></g>)}
-  {step===4&&<g className="sia-generation-eos" data-motion="token" data-motion-id="output-eos" data-motion-key="eos" data-x="1110" data-y="447" data-size="34" data-source-x="1220" data-source-y="88" data-source-size="28" style={{transform:'translate(1110px,447px)'}}><T x={0} y={0} size={34} fill={blue}>EOS</T></g>}
+ return <Figure hero="sampling" label={`下一 token 分布依上下文改變，選中 ${candidates[0]} 後移入輸出。`}><T x={260} y={22} size={24} fill={muted}>候選</T><T x={550} y={22} size={24} fill={muted}>P(next token)</T><T x={1220} y={22} size={24} fill={muted}>取樣</T><Arrow d={`M1182 ${75+order.indexOf(0)*99}H1206m-8-5 8 5-8 5`}/>
+  {order.map((candidate,i)=>{const word=candidates[candidate],prob=probs[candidate],best=candidate===0;return <g key={i} data-build={`distribution-row-${i}`} data-state={step}><text key={`chosen-${step}-${i}`} x="260" y={88+i*99} fontSize="34" fill={best?blue:muted} className={best?'sia-candidate-picked':undefined}>{word}</text><rect x="550" y={62+i*99} width="540" height="20" fill={soft}/><rect x="550" y={62+i*99} width="540" height="20" fill={best?blue:muted} className="sia-probability" data-motion="probability" data-motion-id={`probability-${i}`} data-motion-key={step} style={{transform:`translateX(${550*(1-prob)}px) scaleX(${prob})`}}/><T x={1170} y={88+i*99} size={30} anchor="end" fill={muted}>{prob.toFixed(2)}</T></g>})}
+  {words.slice(0,Math.min(step+1,4)).map((word,i)=><g key={word} data-motion={i===step?'token':'settle'} data-motion-id={`output-${i}`} data-motion-key={i===step?i:`settled-${i}`} data-x={xs[i]} data-y="447" data-size="64" data-source-x="1220" data-source-y={88+order.indexOf(0)*99} data-source-size="28" style={{transform:`translate(${xs[i]}px,447px)`}}><T x={0} y={0} size={64} fill={i===step?blue:ink}>{word}</T></g>)}
+  {step===4&&<g className="sia-generation-eos" data-motion="token" data-motion-id="output-eos" data-motion-key="eos" data-x="916" data-y="447" data-size="64" data-source-x="1220" data-source-y={88+order.indexOf(0)*99} data-source-size="28" style={{transform:'translate(916px,447px)'}}><T x={0} y={0} size={64} fill={blue}>EOS</T></g>}
  </Figure>;
 }
 export function BottleneckHero({memory=false}:{memory?:boolean}){
- return <Figure hero="compute-chip" label={memory?'HBM 資料搬移較慢，SM 等待資料。':'HBM 持續供給資料，SM 的運算吞吐成為限制。'}>
-  <T x={202} y={75} size={32} anchor="middle">HBM</T>
-  {[0,1,2,3].map(i=><g key={i}><path d={`M78 ${139+i*52}L202 ${112+i*52}L326 ${139+i*52}L202 ${166+i*52}Z`} fill={i===0?'#d7e2f0':soft} stroke={line}/><path d={`M78 ${139+i*52}V${157+i*52}L202 ${184+i*52}L326 ${157+i*52}V${139+i*52}`} fill="none" stroke={line}/></g>)}
-  <T x={462} y={128} size={26} anchor="middle" fill={muted}>資料搬移</T>
-  {[0,1,2,3].map(i=><g key={i}><path d={`M347 ${187+i*54}H565`} stroke={memory?line:blue} strokeWidth={memory?1.5:3}/>{(!memory||i===0)&&<rect x="347" y={181+i*54} width="18" height="12" fill={blue} className="sia-focus-packet" style={{'--packet-delay':`${memory?400:i*100}ms`} as CSSProperties}/>}</g>)}
-  <rect x="586" y="90" width="640" height="360" rx="8" fill="none" stroke={line} strokeWidth="2"/>
-  <T x={616} y={131} size={29}>SM · 運算單元</T>
-  {Array.from({length:60},(_,i)=><rect key={i} x={618+i%10*58} y={159+Math.floor(i/10)*44} width="42" height="29" fill={memory?soft:blue} opacity={memory?1:.5+(i%4)*.15} className={memory?'sia-compute-wait':undefined}/>)}
-  <T x={906} y={493} size={30} anchor="middle" fill={blue}>{memory?'等待資料':'運算滿載'}</T>
+ return <Figure hero="compute-chip" label={memory?'讀取大量資料，計算短；瓶頸是記憶體頻寬。':'資料重複利用、計算時間長；瓶頸是運算吞吐。'}>
+ <rect x="100" y="90" width="280" height="240" rx="8" fill={soft} stroke={line}/><T x={240} y={143} size={32} anchor="middle">HBM</T><T x={240} y={185} size={23} anchor="middle" fill={muted}>GPU 記憶體</T>{Array.from({length:6},(_,i)=><rect key={i} x={133+i%3*72} y={216+Math.floor(i/3)*44} width="58" height="30" fill={blue} opacity=".5"/>)}
+ <Arrow d="M402 245H694m-10-6 10 6-10 6"/><T x={550} y={205} size={25} anchor="middle" fill={muted}>{memory?'大量讀取':'讀入後重複使用'}</T>
+ <rect className={memory?'sia-bound-idle':'sia-bound-work'} x="720" y="90" width="500" height="240" rx="8" fill={soft} stroke={blue}/><T x={970} y={143} size={32} anchor="middle">SM</T><T x={970} y={249} size={53} anchor="middle" fill={blue}>{memory?'等待資料 …':'× ＋ × ＋ ×'}</T>
+ {[0,1,2,3].map(i=><rect key={i} className="sia-bound-data" x="410" y={230} width="30" height="30" fill={blue} style={{'--transfer-time':memory?'2400ms':'600ms','--transfer-delay':`${-i*(memory?600:150)}ms`} as CSSProperties}/>)}
+ <T x={100} y={401} size={26} fill={muted}>搬資料</T><rect x="260" y="380" width={memory?920:210} height="30" fill={memory?blue:soft}/><T x={100} y={468} size={26} fill={muted}>計算</T><rect x="260" y="447" width={memory?160:920} height="30" fill={memory?soft:blue}/>
  </Figure>;
 }
 export const Bottlenecks=()=> <BottleneckHero/>;

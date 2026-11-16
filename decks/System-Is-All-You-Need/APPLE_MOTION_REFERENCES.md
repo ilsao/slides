@@ -1,5 +1,14 @@
 # Apple 動效參考與採用方式
 
+## Version 20：快速入軌、一圈、減速
+
+本次先查閱 [WWDC23 Wind your way through advanced animations in SwiftUI，9:48 Keyframes](https://developer.apple.com/videos/play/wwdc2023/10157/?time=588) 的 rotation／translation 分軌編排及跨 keyframe 速度連續性，再以 [Animate with springs，1:36 Why springs](https://developer.apple.com/videos/play/wwdc2023/10158/?time=96) 的位置與速度連續性示範交叉檢查。這裡採用分段敘事與接續原則；軌道構圖與時間是本投影片的設計。
+
+- 每個圖標 210ms 切線飛入，間隔 240ms；同時最多一個正在飛入。
+- 第一個入軌（330ms）就開始計一圈；快速軌道 1.92 秒一圈，2250ms 開始降速。最後一個在 2010ms 入軌，所以只再等 240ms。
+- 用 1100ms 將角速度平滑降到每圈 12 秒。速度以 smoothstep 變化，角度是速度的積分，兩端的角加速度皆為零。整圈共同時鐘保留各圖標間距；反向旋轉標籤保持正向。
+- 有限的旋轉軌道在終點直接交接給相同相位與速度的 CSS 持續動畫，取消效果不會跳位。切線飛入保留位置、速度及向心加速度的接續。
+
 ## Version 13：Draw On 與章節尾頁淡出
 
 2026-11-16。先查閱[WWDC25 What’s new in SF Symbols 7，2:19 Draw](https://developer.apple.com/videos/play/wwdc2025/337/?time=139)，再改寫圖解進場。選擇Whole Symbol的共同起終節奏：圖形固定在原位，既有輪廓以420ms描繪；填色晚110ms、持續200ms；標籤晚180ms、持續160ms。頁面主圖從70ms起動。大於30×24的無描邊矩陣格先用同色細輪廓描繪，再填實，輪廓自行消退；微小晶片紋理不套這種額外描邊。

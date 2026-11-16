@@ -17,8 +17,6 @@
 .sia-slide .sia-bm-idle span{position:absolute;right:19px;top:19px;font-size:19px;line-height:26px;color:#7b838f;background:#f0f1f2;padding:0 8px}
 .sia-slide .sia-bm-request{position:absolute;overflow:hidden;border-width:1.5px;border-style:solid;z-index:2}
 .sia-slide .sia-bm-span{position:absolute;overflow:hidden;border:1px solid #c2cfdf;transform-origin:left center}
-.sia-slide .sia-bm-span[data-admitting="true"]{animation:sia-batch-extend 300ms cubic-bezier(.25,.1,.25,1) 520ms backwards}
-@keyframes sia-batch-extend{from{clip-path:inset(0 calc(100% - 76px) 0 0)}to{clip-path:inset(0)}}
 .sia-slide .sia-bm-wait-wire{position:absolute;inset:0;width:1408px;height:510px;pointer-events:none;z-index:4}
 .sia-slide .sia-bm-wait-wire path{fill:none;stroke:var(--sia-blue);stroke-width:2;stroke-dasharray:1200;animation:sia-batch-wait 480ms cubic-bezier(.25,.1,.25,1) backwards}
 @keyframes sia-batch-wait{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}
@@ -39,3 +37,11 @@
 .sia-slide .sia-bm[data-policy="continuous"] .sia-bm-caption{color:var(--sia-blue,#376bba)}
 .sia-slide[data-still="true"] .sia-bm *{animation:none!important;transition:none!important}
 @media(prefers-reduced-motion:reduce){.sia-slide .sia-bm *{animation:none!important;transition:none!important}}
+.sia-slide .sia-bm-wait-note{position:absolute;color:#376bba;font-size:21px;line-height:26px;background:#f0f1f2;padding:0 8px;z-index:3}
+.sia-slide .sia-bm-playhead{width:2px}
+/* Progress and playhead share the same piecewise time, including rewind. */
+.sia-slide .sia-bm-request-progress{transition:none}
+
+/* One request plane owns its background, progress and readable labels. */
+.sia-slide .sia-bm-request-progress{z-index:0}
+.sia-slide .sia-bm-request-id,.sia-slide .sia-bm-request-duration{z-index:1}

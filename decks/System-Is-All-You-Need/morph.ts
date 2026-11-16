@@ -8,8 +8,8 @@ type BuildPose = { opacity: string; transform: string; state: string };
 type MotionVelocity = { box:Box; matrix:number[] };
 type MotionPose = { key:string; transform:string; index:number; box?:Box; opacity?:number; velocity?:MotionVelocity };
 type ExitPaint=Pick<CSSStyleDeclaration,'opacity'|'transform'|'stroke'|'strokeWidth'|'strokeOpacity'|'strokeDasharray'|'strokeDashoffset'|'fillOpacity'|'clipPath'>;
-type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose>; motions?:Map<string,MotionPose>; slide?:string; step?:number; title?:string; exitPaint?:ExitPaint[] };
-const sectionEnds:Record<string,string>={'request-title':'stage','gpu-title':'generation','batch-title':'hierarchy','flash-title':'continuous','paged-title':'flash-result','systems-title':'sharing'};
+type MorphSnapshot = Map<string, MorphSource> & { builds?: Map<string, BuildPose>; motions?:Map<string,MotionPose>; slide?:string; step?:number; title?:string; background?:string; color?:string; exitPaint?:ExitPaint[] };
+const sectionEnds:Record<string,string>={'request-title':'stage','system-title':'generation','gpu-title':'system-title','batch-title':'hierarchy','flash-title':'continuous','paged-title':'flash-result','systems-title':'sharing'};
 // Only authored nodes: diagnostic attributes and temporary backing surfaces
 // are absent from React's frozen source render and cannot identify its nodes.
 const exitNodes='[data-motion],[data-build],[data-morph],[data-reveal],svg path,svg line,svg polyline,svg polygon,svg rect,svg circle,svg ellipse,svg text,h1,.sia-scene,.sia-heading,.sia-stack-layer,.sia-system-word,.sia-bm-request-progress';
@@ -94,6 +94,8 @@ function captureMorph(current: HTMLElement): MorphSnapshot {
     return [element.dataset.build!, { opacity: paint.opacity, transform: paint.transform, state: element.dataset.state ?? element.dataset.visible ?? '' }];
   }));
   snapshot.slide = current.querySelector<HTMLElement>('.sia-slide')?.dataset.slideId;
+  const slidePaint=current.querySelector('.sia-slide');
+  if(slidePaint){const paint=getComputedStyle(slidePaint);snapshot.background=paint.backgroundColor;snapshot.color=paint.color;}
   snapshot.step = Number(current.querySelector<HTMLElement>('.sia-slide')?.dataset.step ?? 0);
   snapshot.title=current.querySelector('.sia-heading h1')?.textContent??'';
   if(Object.values(sectionEnds).includes(snapshot.slide??''))snapshot.exitPaint=Array.from(current.querySelectorAll<HTMLElement>(exitNodes)).map(element=>{
@@ -241,7 +243,7 @@ function animateBuilds(current: HTMLElement, source: MorphSnapshot, entranceDela
     const settledTransform = !old || old.transform === 'none' || old.transform === 'matrix(1, 0, 0, 1, 0, 0)';
     if (old?.state === state && (visible ? Number(old.opacity) >= .999 && settledTransform : Number(old.opacity) <= .001)) continue;
     // Hide inactive beats immediately; visible replacements retain their paint.
-    if (!visible) continue;
+    if (!visible) {if(element.dataset.exitFade==='true'&&old&&Number(old.opacity)>.01)animations.push(element.animate([{opacity:old.opacity},{opacity:0}],{duration:240,fill:'both'}));continue;}
     const opacity = visible ? '1' : '0';
     const replacing=Boolean(old&&old.state!==state&&Number(old.opacity)>.99);
     const fromOpacity = replacing?'1':old?.opacity ?? '0';
@@ -293,6 +295,20 @@ function mechanisms(current:HTMLElement,source:MorphSnapshot,delay=0):Animation[
       const from=reverse&&element.dataset.fromReverse?element.dataset.fromReverse:old?.transform&&old.transform!==target?old.transform:element.dataset.from;
       if(!from)continue;
       frames=[{transform:from},{transform:target}];duration=840;
+    } else if(kind==='batch-progress') {
+      if(!old)continue;
+      const bm=current.querySelector<HTMLElement>('.sia-bm'),head=source.get('batch-playhead');
+      if(!bm||!head||!slide)continue;
+      const scale=slide.getBoundingClientRect().width/1600;
+      const from=((head.box.left-bm.getBoundingClientRect().left)/scale-94)/20,to=Number(element.dataset.time),start=Number(element.dataset.start),length=Number(element.dataset.duration);
+      if(Math.abs(from-to)<.001)continue;
+      const stops=[from,...[start,start+length].filter(t=>t>Math.min(from,to)&&t<Math.max(from,to)).sort((a,b)=>from<to?a-b:b-a),to];
+      // Keep scaleX in every frame: a singular matrix(0,...) cannot be
+      // decomposed against scaleX, which otherwise makes a zero-width fill jump.
+      frames=stops.map((t,i)=>({offset:Math.abs((t-from)/(to-from)),transform:`scaleX(${i===0?matrixValues(old.transform)[0]:Math.max(0,Math.min(1,(t-start)/length))})`}));
+      duration=source.slide===slide.dataset.slideId?520:620;
+    } else if(kind==='probability') {
+      const target=getComputedStyle(element).transform;frames=springMatrix(old?.transform??'matrix(0,0,0,1,550,0)',target,undefined,520,1.25);duration=520;
     } else if(kind==='token') {
       if(reverse)continue;
       const x=Number(element.dataset.x),y=Number(element.dataset.y),size=Number(element.dataset.size);
@@ -351,7 +367,7 @@ function mechanisms(current:HTMLElement,source:MorphSnapshot,delay=0):Animation[
       duration=660;wait+=40;
       }
     }
-    if(frames.length){const physical=['object','camera','settle'].includes(kind);if(physical)frames=springMatrix(String(frames[0].transform),String(frames[frames.length-1].transform),velocity,duration,kind==='settle'?.8:1.8);animations.push(element.animate(frames,{duration,delay:wait+Number(element.dataset.motionDelay??0),easing:physical?'linear':easing,fill:'both'}));}
+    if(frames.length){const physical=['object','camera','settle'].includes(kind);if(physical)frames=springMatrix(String(frames[0].transform),String(frames[frames.length-1].transform),velocity,duration,kind==='settle'?.8:1.8);animations.push(element.animate(frames,{duration,delay:wait+Number(element.dataset.motionDelay??0),easing:physical||kind==='probability'?'linear':easing,fill:'both'}));}
   }
   return animations;
 }
@@ -388,13 +404,73 @@ function textReveals(root:HTMLElement,chapterDelay=0):Animation[]{
  root.querySelectorAll('[data-reveal="prompt"]').forEach((e,i)=>run(e,240+i*65,400,'105%'));
  root.querySelectorAll('[data-reveal="agent"]').forEach((e,i)=>run(e,200+i*110,460,'26px'));
  root.querySelectorAll('[data-reveal="question"]').forEach((e,i)=>run(e,60+i*150,600,'105%'));
- const year=root.querySelector('.sia-year');if(year)run(year,0,400,'16px');
+ const year=root.querySelector('.sia-year');if(year&& !root.querySelector('.sia-agent-world'))run(year,root.querySelector('.sia-door')?480:0,400,'16px');
+ const doors=root.querySelectorAll('.sia-door');doors.forEach((e,i)=>animations.push(e.animate([{transform:'translateX(0)'},{transform:`translateX(${i===0?-100:100}%)`}],{duration:700,delay:120,easing:'cubic-bezier(.76,0,.24,1)',fill:'both'})));
+
  const dot=root.querySelector('.sia-agent-task');if(dot)animations.push(dot.animate([{transform:'translate(10px,9px)'},{transform:'translate(600px,9px)',offset:.5},{transform:'translate(1190px,9px)'}],{duration:700,delay:260,easing:'cubic-bezier(.22,0,.2,1)',fill:'both'}));
  return animations;
 }
 
+/** Apple WWDC23 10157 keyframe tracks: arrival, one lap from the first join, coast.
+ * Tangent entry matches position/velocity/acceleration; one shared angular
+ * timeline preserves spacing and speed through the final slow-orbit handoff. */
+function agentArrival(root:HTMLElement):Animation[]{
+  const flights=Array.from(root.querySelectorAll<HTMLElement>('.sia-agent-flight'));
+  if(!flights.length)return [];
+  const clock=root.ownerDocument.timeline.currentTime;
+  const firstDelay=120,duration=210,interval=240,deceleration=1100;
+  const omega=2*Math.PI/(flights.length*interval);
+  const ambientOmega=2*Math.PI/12000;
+  const gate=35*Math.PI/180,base=18*Math.PI/180;
+  const initialPhase=gate-base-omega*(firstDelay+duration);
+  const lastJoin=firstDelay+(flights.length-1)*interval+duration;
+  const cruiseEnd=firstDelay+duration+flights.length*interval,total=cruiseEnd+deceleration;
+  const phase=(time:number)=>{
+    if(time<=cruiseEnd)return initialPhase+omega*time;
+    const x=Math.min(1,(time-cruiseEnd)/deceleration);
+    // Integrate smoothstep velocity. Acceleration is zero at both joins.
+    return initialPhase+omega*cruiseEnd+omega*deceleration*x+(ambientOmega-omega)*deceleration*(x**3-.5*x**4)+ambientOmega*Math.max(0,time-total);
+  };
+  const ambientOffset=phase(total)/ambientOmega-total;
+  root.querySelectorAll('.sia-orbit').forEach(orbit=>orbit.getAnimations({subtree:true}).forEach(a=>{a.startTime=typeof clock==='number'?clock-ambientOffset:clock;}));
+  const times=Array.from(new Set([...Array.from({length:361},(_,i)=>i/360*total),lastJoin,cruiseEnd,total])).sort((a,b)=>a-b);
+  return flights.flatMap((flight,index)=>{
+    const orbit=flight.querySelector<HTMLElement>('.sia-orbit')!,style=getComputedStyle(orbit);
+    const angle=parseFloat(style.getPropertyValue('--angle'))*Math.PI/180,radius=parseFloat(style.getPropertyValue('--radius'));
+    const ring=orbit.animate(times.map(t=>({offset:t/total,transform:`rotate(${angle+phase(t)}rad)`})),{duration:total,easing:'linear',fill:'backwards'});
+    const counter=orbit.querySelector('div')!.animate(times.map(t=>({offset:t/total,transform:`translate(-50%,-50%) rotate(${-angle-phase(t)}rad)`})),{duration:total,easing:'linear',fill:'backwards'});
+    ring.startTime=clock;counter.startTime=clock;
+    const delay=firstDelay+index*interval;
+    const end={x:radius*Math.cos(gate),y:radius*Math.sin(gate)},tangent={x:-Math.sin(gate),y:Math.cos(gate)};
+    const frames=Array.from({length:121},(_,i)=>{
+      const u=i/120,orbitAngle=angle+phase(delay+duration*u);
+      const h00=1-10*u**3+15*u**4-6*u**5,h10=u-6*u**3+8*u**4-3*u**5;
+      const h11=-4*u**3+7*u**4-3*u**5,h21=.5*u**3-u**4+.5*u**5;
+      const travel=-1000*h00+1350*h10+omega*radius*duration*h11;
+      const bend=omega**2*duration**2*h21;
+      const x=end.x*(1-bend)+tangent.x*travel,y=end.y*(1-bend)+tangent.y*travel;
+      return{offset:u,opacity:Math.min(1,u/.08),transform:`translate(${i===120?0:x-radius*Math.cos(orbitAngle)}px,${i===120?0:y-radius*Math.sin(orbitAngle)}px)`};
+    });
+    const animation=flight.animate(frames,{delay,duration,easing:'linear',fill:'both'});
+    animation.startTime=clock;
+    const label=orbit.querySelector('span')!.animate([{opacity:0},{opacity:1}],{delay:delay+duration-90,duration:90,easing,fill:'both'});
+    label.startTime=clock;
+    return [ring,counter,animation,label];
+  });
+}
+
 function pageLayers(incoming: HTMLElement, direction: -1 | 1, source:MorphSnapshot, build=true,chapterDelay=0): Animation[] {
   const animations:Animation[]=[];
+  const slide=incoming.querySelector<HTMLElement>('.sia-slide');
+  if(slide&&source.slide==='chatgpt'&&slideId(incoming)==='agents'){
+    const paint=getComputedStyle(slide);
+    animations.push(slide.animate([{backgroundColor:source.background,color:source.color},{backgroundColor:paint.backgroundColor,color:paint.color}],{duration:680,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'}));
+  }
+  if(slideId(incoming)==='agents'){
+    animations.push(...agentArrival(incoming));
+    const title=incoming.querySelector('.sia-agent-center');
+    if(title)animations.push(title.animate([{opacity:0},{opacity:1}],{duration:320,delay:170,easing,fill:'both'}));
+  }
   const move=(selector:string,x:number,y:number,duration:number,delay:number,mass=1.8,depth=false)=>{
     const element=incoming.querySelector<HTMLElement>(selector);if(!element||element.querySelector?.('[data-reveal]'))return;
     const authored=getComputedStyle(element).transform,base=authored&&authored!=='none'?authored:'';
@@ -403,7 +479,8 @@ function pageLayers(incoming: HTMLElement, direction: -1 | 1, source:MorphSnapsh
   move('[data-entry="title"],.sia-heading,.sia-cover-layout,.sia-closing-layout,.sia-chapter-layout h1,.sia-epoch-copy,.sia-question-layout h1,.sia-stage-reveal h1,.sia-takeaway-layout h1,.sia-references h1',0,14,500,0,.95);
 
   const scene=incoming.querySelector<HTMLElement>('.sia-scene');
-  if(scene)animations.push(...drawArtwork(scene,pageTiming.diagram,{morphs:new Set(source.keys()),motions:new Set(Array.from(source.motions??[]).filter(([,p])=>(p.opacity??1)>.01).map(([id])=>id))}));
+  if(scene&&slideId(incoming)!=='hierarchy')animations.push(...drawArtwork(scene,pageTiming.diagram,{morphs:new Set(source.keys()),motions:new Set(Array.from(source.motions??[]).filter(([,p])=>(p.opacity??1)>.01).map(([id])=>id))}));
+  if(scene&&slideId(incoming)==='hierarchy'){const level=scene.querySelector('[data-memory-level="0"]');if(level)animations.push(level.animate([{fill:'#e7ebef'},{fill:'#c5d8ee'}],{duration:450,fill:'both'}));}
   const supporting=incoming.querySelector<HTMLElement>('.sia-system-stack,.sia-focus-foundations,.sia-reference-list,.sia-credit-grid');
   if(supporting)animations.push(...drawArtwork(supporting,pageTiming.diagram));
   move('.sia-topline',0,6,500,0,1.1);
